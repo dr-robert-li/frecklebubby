@@ -1,0 +1,39 @@
+# Planning documents (kept on disk, not in version control)
+.planning/
+
+# Secrets and local data
+.env
+.env.*
+!.env.example
+.config/
+data/
+*.db
+*.db-*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+
+# Node and frontend build
+node_modules/
+frontend/.svelte-kit/
+frontend/build/
+src/frecklebubby/static/
+
+# Test recordings
+e2e/recordings/
+e2e/test-results/
+e2e/playwright-report/
+
+# Models
+*.gguf
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
