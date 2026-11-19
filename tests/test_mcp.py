@@ -11,6 +11,7 @@ EXPECTED = {
     "pump_timer", "log_pump", "activity_timer", "log_activity", "log_solids", "log_nappy", "log_potty", "log_growth",
     "log_temperature", "log_medicine", "log_milestone", "log_note", "list_entries", "update_entry", "delete_entry",
     "get_daily_report", "get_sleep_prediction", "get_milestones", "get_insights", "search_knowledge",
+    "log_cry", "get_cry_help",
 }
 
 

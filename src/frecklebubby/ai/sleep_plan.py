@@ -11,7 +11,7 @@ from ..knowledge.store import search
 from ..models import Entry, SleepPlan
 from ..services import Ctx
 from ..services.children import get_child, is_night
-from ..services.sleep import predict, recommendations, wake_range
+from ..services.sleep import age_summary, norms, predict, recommendations, stage, wake_range
 from . import llm
 from .assistant import SOURCE_CHARS, child_context
 
@@ -37,6 +37,7 @@ Rules:
 - Use ONLY the child's data, the age ranges and the numbered sources given. Do not use your own knowledge.
 - The schedule is one typical day from morning wake to bedtime, in time order, 24-hour HH:MM.
 - Fit the recommended total sleep and the wake-window range. Start from the child's own recent times.
+- If typical values for the age are given, use them where the child's own days are few or irregular.
 - Advice: 2 to 4 short tips. Put the numbers of the sources that support each tip in "cites".
 - No medicine. Short plain sentences."""
 
@@ -63,6 +64,11 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
     recs = "; ".join(f"{r['min_hours']:g}-{r['max_hours']:g} h per 24 h ({r['citation']['publisher'].split(' /')[0]})"
                      for r in recommendations(months)) or "none for this age"
     p = predict(s, child, ctx.tz, now, default=True)
+    n = norms()
+    st = stage(s, child, ctx.tz, now, n) if n else None
+    typical = (age_summary(n, (now.astimezone(ctx.tz).date() - child.birthdate).days) + "\n") if n else ""
+    if st:
+        typical += f"This child recently: {st['naps']} naps on most days.\n"
     hits, seen = [], set()
     for q in QUERIES:
         for h in search(s, ctx.fam, q, limit=4):
@@ -80,7 +86,7 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
     user = (f"Child data:\n{child_context(s, ctx, child, now)}\n"
             f"Usual night: from {child.night_start} to {child.morning_cutoff}.\n"
             f"Wake-window range for this age (common practice, not a medical standard): {lo}-{hi} minutes.\n"
-            f"Recommended total sleep: {recs}.\n"
+            f"Recommended total sleep: {recs}.\n" + typical
             + (f"Next predicted sleep: {p['start'].astimezone(ctx.tz):%H:%M} ({p['kind']}).\n" if p else "")
             + f"Sleep in the last 7 days:\n{_recent_days(s, ctx, child, now)}\n\nSources:\n" + "\n\n".join(blocks)
             + "\n\nMake the sleep plan for a typical day.")

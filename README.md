@@ -36,6 +36,8 @@ to a doctor or nurse. In an emergency, call your local emergency number.
 - [Connect Claude (MCP)](#connect-claude-mcp)
 - [REST API](#rest-api)
 - [The AI model](#the-ai-model)
+- [Sleep model](#sleep-model)
+- [Cry helper](#cry-helper)
 - [Knowledge library and licences](#knowledge-library-and-licences)
 - [Move from Huckleberry](#move-from-huckleberry)
 - [Backup](#backup)
@@ -219,6 +221,61 @@ example a llama.cpp or vLLM server with a GPU). Open **Settings > AI model**, en
 `/v1`), the model name and the key if the server needs one. Select **Save**, then **Test connection**. These
 settings are per family. The defaults come from `LLM_BASE_URL`, `LLM_MODEL` and `LLM_API_KEY` in `.env`. The model
 must support JSON schema output (`response_format`), as llama.cpp does.
+
+## Sleep model
+
+The Home screen shows the next nap or bedtime. Without extra files it uses a table of common wake windows by age
+(`src/frecklebubby/data/wake_windows.json`).
+
+With the optional **sleep norms file** it uses your child's last 14 days and typical patterns of babies of the same
+age, and it shows an 80 % range ("earliest" to "latest"). Insights then also show the current nap stage (for example
+"Mostly 3 naps a day"), compare total sleep with babies of the same age, and show a card when a nap change is common
+at this age. The recommended sleep ranges (AASM 2016, NSF 2015) stay the main reference.
+
+- **What it is**: a JSON file with sleep percentiles by age (0 to 24 months) and the settings of the predictor. It
+  has no data about single babies.
+- **Where it comes from**: made with `training/sleep/` from the infant-sleep data of Liu et al. (2019),
+  "Time-Series Analysis via Low-Rank Matrix Factorization Applied to Infant-Sleep Data"
+  (<https://arxiv.org/abs/1904.04780>): 700 babies whose parents logged sleep in the Baby Connect app. On babies
+  not used to make the file, the start of the next sleep was within 30 minutes 53 % of the time (old table 49 %);
+  the median error was 27 minutes (old table 32 minutes). How to make the file: `training/sleep/README.md`.
+- **Not shipped yet**: the dataset has no licence. The file is not in this repository until the dataset authors give
+  permission.
+- **Install**: copy `sleep_norms.json` to the data folder (`DATA_DIR/sleep_norms.json`; in the container `/data`, the
+  `data` volume), or set `SLEEP_NORMS_PATH` to its full path. Restart is not necessary.
+- **Fallback**: when the file is missing or not valid, or the child is older than 24 months, or no night sleep is
+  logged in the last 24 hours, the app uses the wake-window table as before.
+
+## Cry helper
+
+The **Crying?** tile on the Home screen answers "what do I check first?".
+
+- **Just tell me what to check**: uses only the logs (last feed, last sleep, last nappy, age). It ranks the likely
+  needs, gives things to try and says when to get medical help. Each fact has a source from the built-in NHS and CDC
+  library. This part needs no model and no microphone.
+- **Listen**: records up to 60 seconds and adds a guess from the sound. The audio is analysed on your server and is
+  not stored.
+- You can save the crying time and what helped to the timeline. Reports show crying per day.
+
+**The sound guess is experimental. It is a guess, not a diagnosis.** There are two models:
+
+- **Cry detector**: finds crying and snoring in the recording. On the test recordings of its dataset it found 40 of
+  43 clips with a cry and gave no false alarm on 39 clips without one.
+- **Cry reason** (hungry, tired, burping, belly pain, discomfort, scared): trained on 489 clips where the label is
+  the parent's own guess, and 382 of them say "hungry". On babies the model had not heard it was right 80 % of the
+  time; "always hungry" is right 78 % of the time. Thus the logs decide the order of the list, and the sound guess
+  is shown only as a hint. The app reads these numbers from `model_card.json` and shows them to the parent.
+
+The model files are **not in this repository** (dataset licence terms: non-commercial, see `training/cry/NOTICE.md`).
+Without them the app says "Sound analysis is not installed on this server." and the rest works.
+
+- **Make the files**: `training/cry/README.md`. You need the ICSD dataset (permission from its authors) and the
+  DeepInfant clips.
+- **Install**: copy `cry_detector.onnx`, `cry_reason.onnx`, `model_card.json` and `NOTICE.txt` to
+  `DATA_DIR/models/cry` (in the container `/data/models/cry`, the `data` volume), or set `CRY_MODEL_DIR`.
+- **Without containers**: install the extra (`uv sync --extra cry`) and the `ffmpeg` program. The container image has
+  both.
+- **Microphone**: browsers give the microphone only to HTTPS pages (or `localhost`). See [HTTPS](#https).
 
 ## Knowledge library and licences
 

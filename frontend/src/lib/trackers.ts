@@ -3,7 +3,7 @@ import { fmtDur, fmtUnit, type UnitKind, type Units } from './format.svelte';
 
 export type EntryType =
 	| 'sleep' | 'nursing' | 'bottle' | 'solids' | 'nappy' | 'potty' | 'pump'
-	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note';
+	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry';
 
 export type Entry = {
 	id: number;
@@ -125,7 +125,10 @@ export function trackers(wording: Wording): Tracker[] {
 		{ type: 'milestone', label: 'Milestone', color: '--lavender', fields: [
 			{ key: 'title', label: 'What happened', kind: 'text', required: true }
 		] },
-		{ type: 'note', label: 'Note', color: '--cloud', fields: [] }
+		{ type: 'note', label: 'Note', color: '--cloud', fields: [] },
+		{ type: 'cry', label: 'Crying', color: '--coral', end: 'optional', fields: [
+			{ key: 'soothed_by', label: 'What helped', kind: 'text' }
+		] }
 	];
 }
 
@@ -193,9 +196,29 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 		case 'milestone':
 			parts.push(d.title);
 			break;
+		case 'cry':
+			parts.push(dur, d.soothed_by && `Helped: ${d.soothed_by}`,
+				d.sound_reason && `Sound guess: ${soundLabel(d.sound_reason)} (experimental)`);
+			break;
 	}
 	if (e.type === 'note' || (e.notes && !parts.some(Boolean))) parts.push(e.notes ?? '');
 	return parts.filter(Boolean).join(' · ');
+}
+
+/** Cry helper labels. */
+export const SOUND_LABELS: Record<string, string> = {
+	hungry: 'Hungry', tired: 'Tired', burping: 'Needs burping', belly_pain: 'Belly pain', discomfort: 'Discomfort',
+	scared: 'Scared'
+};
+export const soundLabel = (v: string) => SOUND_LABELS[v] ?? v;
+
+export function needLabel(need: string, wording: Wording): string {
+	const labels: Record<string, string> = {
+		hunger: 'Hungry', tired: 'Tired', nappy: wording === 'diaper' ? 'Diaper' : 'Nappy', wind: 'Wind',
+		unwell: 'May be unwell', allergic: 'Allergic reaction', too_hot_or_cold: 'Too hot or too cold',
+		cuddle: 'Wants comfort', evening_crying: 'Evening crying', colic: 'Colic pattern'
+	};
+	return labels[need] ?? need;
 }
 
 export function activityLabel(kind: string) {

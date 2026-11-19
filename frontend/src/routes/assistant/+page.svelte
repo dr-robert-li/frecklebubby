@@ -3,10 +3,10 @@
 	import { child, refresh, toast } from '#lib/app.svelte.ts';
 	import { fmtDay, localDay } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
-	import Sheet from '#lib/Sheet.svelte';
+	import Cites from '#lib/Cites.svelte';
+	import SourceSheet, { type Citation } from '#lib/SourceSheet.svelte';
 	import { tick } from 'svelte';
 
-	type Citation = { n: number; title: string; publisher: string; author?: string; url?: string; year?: number; kind: string; licence?: string };
 	type Msg = { id?: number; role: 'user' | 'assistant'; content: string; citations: Citation[] };
 	type Insight = { kind: string; severity: 'info' | 'attention' | 'urgent'; title: string; body: string; citations: Citation[] };
 
@@ -129,13 +129,7 @@
 <svelte:head><title>Assistant · Frecklebubby</title></svelte:head>
 
 {#snippet chips(list: Citation[])}
-	{#if list.length}
-		<div class="chips cites">
-			{#each list as c (c.n)}
-				<button class="cite" onclick={() => (source = c)}>[{c.n}] {c.publisher || c.title}</button>
-			{/each}
-		</div>
-	{/if}
+	<Cites {list} />
 {/snippet}
 
 <h1>Assistant</h1>
@@ -261,19 +255,7 @@
 	</section>
 {/if}
 
-{#if source}
-	<Sheet title="Source" onclose={() => (source = null)}>
-		<div class="stack">
-			<h3>[{source.n}] {source.title}</h3>
-			<p class="muted">
-				{[source.author, source.publisher, source.year].filter(Boolean).join(' · ')}<br />
-				{{ bundled: 'From the built-in library', link: 'Trusted source (link only)', upload: 'Your family upload', web: 'Read from an approved website' }[source.kind] ?? ''}
-				{#if source.licence}· Licence: {source.licence}{/if}
-			</p>
-			{#if source.url}<a class="btn wide" href={source.url} target="_blank" rel="noopener"><Icon name="link" /> Open source</a>{/if}
-		</div>
-	</Sheet>
-{/if}
+{#if source}<SourceSheet {source} onclose={() => (source = null)} />{/if}
 
 <style>
 	.tabs {
@@ -328,17 +310,6 @@
 	}
 	.ask input {
 		border-radius: 999px;
-	}
-	.cites {
-		margin-top: 8px;
-		gap: 6px;
-	}
-	.cite {
-		min-height: 36px;
-		padding: 4px 12px;
-		font-size: 0.85rem;
-		background: var(--surface);
-		border: 1.5px solid var(--line);
 	}
 	.mark {
 		display: inline-block;

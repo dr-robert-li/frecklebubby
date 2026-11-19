@@ -22,9 +22,13 @@ class Settings(BaseSettings):
     data_dir: Path = Path("./data")
     # Bundled data files (growth tables, milestones). Tests point this at small fixtures.
     bundled_data_dir: Path = PACKAGE_DATA
+    # Optional sleep norms file (see README "Sleep model"). Empty = DATA_DIR/sleep_norms.json.
+    sleep_norms_path: Path | None = None
     llm_base_url: str = "http://llama:8080/v1"
     llm_model: str = ""
     llm_api_key: str = ""
+    # Cry sound models (optional extra "cry"). Default: <DATA_DIR>/models/cry
+    cry_model_dir: Path | None = None
     host: str = "0.0.0.0"
     port: int = 8000
 

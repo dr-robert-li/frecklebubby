@@ -62,7 +62,9 @@
 	}
 
 	function buildData(): Record<string, any> | null {
-		const data: Record<string, any> = {};
+		// Keep data the form does not show (for example the cry helper's sound fields): PATCH replaces all data.
+		const shown = new Set(t.fields.map((f) => f.key));
+		const data: Record<string, any> = Object.fromEntries(Object.entries(entry?.data ?? {}).filter(([k]) => !shown.has(k)));
 		for (const f of t.fields) {
 			if (!visible(f)) continue;
 			let x = vals[f.key];

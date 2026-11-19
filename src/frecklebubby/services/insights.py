@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from ..config import PACKAGE_DATA
 from ..db import utcnow
 from ..models import Child, Entry
-from . import Ctx
+from . import Ctx, sleep
 from .children import age_months, get_child
 from .families import wording
 from .growth import growth
@@ -206,10 +206,65 @@ def _sleep_card(s: Session, ctx: Ctx, child: Child, now: datetime) -> list[dict]
     off = avg_h < low or avg_h > high
     body = (f"Average logged sleep over {len(days)} days: {int(avg_h)} h {round(avg_h % 1 * 60)} min a day. "
             f"Recommended for this age: {ranges}. Only logged sleep counts.")
+    cites_ = [r["citation"] for r in recs]
+    cohort = _cohort_total(child, now, avg_h * 60)
+    if cohort:
+        body += " " + cohort
+        cites_.append(sleep.norms()["source"])
     if off:
         body += " If you are worried about your child's sleep, talk to your doctor or child health nurse."
-    return [card("sleep_total", "attention" if off else "info", "Total sleep this week", body,
-                 [r["citation"] for r in recs])]
+    return [card("sleep_total", "attention" if off else "info", "Total sleep this week", body, cites_)]
+
+
+# --- sleep model cards (M7): optional norms file from training/sleep ---------------------------------------------------
+
+def _months(days: float) -> str:
+    return f"{round(days / 30.4375 * 2) / 2:g}"
+
+
+def _cohort_total(child: Child, now: datetime, avg_minutes: float) -> str:
+    """Where the child's average total sleep falls among babies of the same age in the research dataset."""
+    n = sleep.norms()
+    b = sleep.band(n, (now.date() - child.birthdate).days) if n else None
+    q = n["bands"][b].get("total_24h") if b is not None else None
+    if not q:
+        return ""
+    where = ("below most" if avg_minutes < q[0] else "a little below the middle half" if avg_minutes < q[1]
+             else "within the middle half" if avg_minutes <= q[3] else "a little above the middle half"
+             if avg_minutes <= q[4] else "above most")
+    return (f"Babies this age in a research dataset of app users logged {q[1] / 60:.1f} to {q[3] / 60:.1f} hours a "
+            f"day (middle half). This average is {where} of them.")
+
+
+def sleep_model_cards(s: Session, ctx: Ctx, child: Child, now: datetime) -> list[dict]:
+    """Current nap stage and, when a nap change is common at this age, an outlook card."""
+    n = sleep.norms()
+    if n is None:
+        return []
+    age = (now.astimezone(ctx.tz).date() - child.birthdate).days
+    b = sleep.band(n, age)
+    st = sleep.stage(s, child, ctx.tz, now, n)
+    if b is None or st is None:
+        return []
+    k = st["naps"]
+    naps = lambda x: f"{x} nap" + ("" if x == 1 else "s")  # noqa: E731
+    share = (n["bands"][b].get("naps_share") or {}).get(str(min(k, 4)))
+    body = f"In the last {st['days']} logged days, your child had {naps(k)} on {round(st['share'] * 100)}% of days."
+    if share is not None:
+        body += (f" Among babies this age in a research dataset of app users, {round(share * 100)}% of days had "
+                 f"{naps(k) if k < 4 else '4 or more naps'}.")
+    out = [card("sleep_stage", "info", "Mostly {naps} a day", body, [n["source"]], naps=naps(k))]
+    t = n.get("transitions", {}).get(f"{k}to{k - 1}", {}).get("age_days")
+    if t and t[1] - 28 <= age <= t[3]:
+        dur = n["transitions"][f"{k}to{k - 1}"].get("duration_days")
+        body = (f"Many babies move from {naps(k)} to {naps(k - 1)} between about {_months(t[1])} and "
+                f"{_months(t[3])} months. This is the middle half of babies in a research dataset of app users.")
+        if dur:
+            body += f" For half of them the change took about {max(1, round(dur[2] / 7))} weeks, with mixed days."
+        body += " Every baby is different."
+        out.append(card("sleep_outlook", "info", "Nap change ahead: {a} to {b}", body, [n["source"]],
+                        a=naps(k), b=naps(k - 1)))
+    return out
 
 
 def _growth_card(s: Session, ctx: Ctx, child: Child) -> list[dict]:
@@ -256,6 +311,6 @@ def insights(s: Session, ctx: Ctx, child_id: int, now: datetime | None = None) -
     word = wording(ctx.fam)
     w = {"nappy": word, "nappies": "nappies" if word == "nappy" else "diapers"}
     cards = (red_flags(s, child, ctx.tz, now, word) + _wet_nappy_card(s, ctx, child, now, w)
-             + _sleep_card(s, ctx, child, now) + _growth_card(s, ctx, child) + _milestone_cards(s, ctx, child, now))
+             + _sleep_card(s, ctx, child, now) + sleep_model_cards(s, ctx, child, now) + _growth_card(s, ctx, child) + _milestone_cards(s, ctx, child, now))
     order = {"urgent": 0, "attention": 1, "info": 2}
     return sorted(cards, key=lambda c: order[c["severity"]])

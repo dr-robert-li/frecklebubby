@@ -47,7 +47,19 @@ from .schemas import (
     Status,
     TimerBody,
 )
-from .services import Ctx, ServiceError, children, entries, insights, milestones, plain_errors, reports, sleep, timers
+from .services import (
+    Ctx,
+    ServiceError,
+    children,
+    cry,
+    entries,
+    insights,
+    milestones,
+    plain_errors,
+    reports,
+    sleep,
+    timers,
+)
 from .services.families import context, sign_in
 
 log = logging.getLogger(__name__)
@@ -423,6 +435,29 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
     ) -> dict[str, Any]:
         """Save a free-text note."""
         return log_entry(child, "note", start_time, {}, text)
+
+    @mcp.tool
+    def log_cry(
+        start_time: Annotated[str | None, Field(description="When the crying started, ISO 8601. Omit = now.")] = None,
+        end_time: Annotated[str | None, Field(description="When it stopped, ISO 8601. Optional.")] = None,
+        soothed_by: Annotated[str | None, Field(description="What helped, for example 'feed' or 'rocking'.",
+                                                max_length=200)] = None,
+        notes: Notes = None,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Log a crying episode."""
+        return log_entry(child, "cry", start_time, {"soothed_by": soothed_by}, notes, end_time)
+
+    @mcp.tool(annotations=READ)
+    def get_cry_help(child: ChildArg = None) -> dict[str, Any]:
+        """Why might the baby cry? Ranked things to check from the logs (time since the last feed against the usual
+        gap, time awake against the sleep window, time since the last nappy, temperature, medicine), things to try,
+        and urgent warning signs. Every item cites its source. No audio and no AI model."""
+        with call() as (s, ctx):
+            c = child_of(s, ctx, child)
+            out = cry.help(s, ctx, c.id)
+            out.pop("sound")  # sound analysis needs a recording; it is in the app only
+            return out
 
     # --- history ----------------------------------------------------------------------------------
 

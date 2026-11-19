@@ -92,6 +92,13 @@
 				{ label: 'Dirty', color: 'var(--s2)', values: days.map((d: any) => d.nappies.dirty) }
 			]} />
 	</section>
+	{#if days.some((d: any) => d.crying?.count)}
+		<section class="card">
+			<BarChart title="Crying per day (minutes)" {labels} fmt={(v) => `${Math.round(v)} min`}
+				series={[{ label: 'Crying', color: 'var(--s1)', values: days.map((d: any) => Math.round(d.crying.seconds / 60)) }]} />
+			<p class="small muted">Logged crying times with an end time.</p>
+		</section>
+	{/if}
 {:else if !error}
 	<p class="empty">Loading…</p>
 {/if}

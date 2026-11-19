@@ -17,7 +17,7 @@ from ..db import SessionLocal, utcnow
 from ..knowledge import web_lookup
 from ..knowledge.store import search
 from ..models import ChatMessage, Child
-from ..services import Ctx
+from ..services import Ctx, cry
 from ..services.children import age_months, get_child
 from ..services.families import wording
 from ..services.growth import growth
@@ -29,6 +29,7 @@ from . import llm
 log = logging.getLogger(__name__)
 
 FOOTER = "General information, not medical advice."
+CRY_WORDS = re.compile(r"\b(cry|cries|cried|crying|unsettled|fussy|fussing|screaming|colic\w*)\b", re.I)
 NOT_COVERED = "The sources I have do not cover this question. Ask your doctor or child health nurse."
 HISTORY_CHARS = 2400  # about 700 tokens; the whole prompt stays under about 6,000 tokens (context 8,192)
 SOURCE_CHARS = 1100
@@ -70,7 +71,7 @@ def child_context(s: Session, ctx: Ctx, child: Child, now: datetime) -> str:
     p = predict(s, child, ctx.tz, now)
     if p:
         lines.append(f"Next sleep ({p['kind']}) predicted {p['start'].astimezone(ctx.tz):%H:%M}-"
-                     f"{p['end'].astimezone(ctx.tz):%H:%M} (common-practice wake windows).")
+                     f"{p['end'].astimezone(ctx.tz):%H:%M} ({p['note']})")
     g = [x for x in growth(s, ctx, child.id)["points"] if x.get("weight_percentile") is not None]
     if g:
         lines.append(f"Latest weight {g[-1]['weight_kg']:g} kg, WHO percentile {g[-1]['weight_percentile']:.0f}.")
@@ -173,8 +174,11 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
         blocks.append(f"[{n}] {h['title']} ({h.get('publisher') or 'own upload'}), {h['heading']}:\n"
                       f"{h['text'][:SOURCE_CHARS]}")
 
+    data = child_context(s, ctx, child, now)
+    if CRY_WORDS.search(message):
+        data += "\n" + cry.context_lines(s, ctx, child, now)
     prompt = [{"role": "system", "content": SYSTEM.format(nappy=word)}, *history(s, child.id),
-              {"role": "user", "content": f"Child data:\n{child_context(s, ctx, child, now)}\n\nSources:\n"
+              {"role": "user", "content": f"Child data:\n{data}\n\nSources:\n"
                                           + "\n\n".join(blocks) + f"\n\nQuestion: {message}"}]
     child_id = child.id
 

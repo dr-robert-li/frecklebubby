@@ -77,6 +77,7 @@ EVENTS = [
                                            "outdoorPlay", "indoorPlay", "brushTeeth")}, ["kind"]),
     _ev("milestone", {"at": TIME, "title": _STR}, ["at", "title"]),
     _ev("note", {"at": TIME, "text": {"type": "string", "maxLength": 500}}, ["at", "text"]),
+    _ev("cry", {**_SPAN, "soothed_by": _STR}, []),
     _ev("timer", {"timer": _enum("sleep", "nursing", "pump", "activity"),
                   "action": _enum("start", "pause", "resume", "switch", "cancel", "complete"),
                   "at": TIME, "side": _enum("left", "right"),
@@ -91,7 +92,7 @@ SYSTEM = """You turn a parent's note about their baby into log events. Answer wi
 Rules:
 - Make ONE event for EACH thing that happened. Three nappies are three events. Do not invent events. A note with no baby-care event gives {"events": []}.
 - Times: copy the parent's own words for the time of each event into "at", for example "half past 12", "quarter to 2", "7:30 last night", "20 minutes ago", "at 9". Write "now" when the note gives no time or says "just now". Do NOT calculate or change times.
-- Sleep, nursing and activity have "start", "end" and "duration" instead of "at". Copy the words for each one the note gives, for example {"start": "9", "end": "10:15"} or {"end": "10 minutes ago", "duration": "45 minutes"}. Leave out the ones the note does not give.
+- Sleep, nursing, activity and cry have "start", "end" and "duration" instead of "at". Copy the words for each one the note gives, for example {"start": "9", "end": "10:15"} or {"end": "10 minutes ago", "duration": "45 minutes"}. Leave out the ones the note does not give.
 - Copy amounts and units as written. Do NOT convert units.
 - Use a "timer" event only for something that goes on now: "fell asleep", "went down", "is asleep" with no end → timer sleep start. "woke up", "is awake", "she's up" with no start, while a sleep timer runs → timer sleep complete. "started feeding on the left" → timer nursing start, side left. Same for pumping and activities.
 
@@ -104,6 +105,7 @@ Words:
 - weighed, weight, length, height, head = "growth".
 - ate, tried, had food, puree = "solids". loved it = LOVED, ok or so-so = MEH, hated it or spat it out = HATED, rash, hives or swelling after food = ALLERGIC.
 - bath, tummy time, story, reading, playing outside = "activity".
+- cried, was crying, screamed, was unsettled for a time = "cry"; what calmed the baby goes to soothed_by.
 - the first time the baby did something new (smiled, sat up, crawled, first tooth, first word, first steps) = "milestone".
 - Anything else the parent wants to record about the baby = "note". Chat, the weather or words that make no sense give {"events": []}.
 
@@ -283,7 +285,7 @@ def to_proposal(ev: dict, now: datetime) -> dict:
     end = None
     data: dict[str, Any] = {}
     notes = None
-    if kind in ("sleep", "nursing", "activity"):
+    if kind in ("sleep", "nursing", "activity", "cry"):
         start, end = _span(ev, now)
         if kind == "nursing" and start is None and end is None:
             mins = (ev.get("left_minutes") or 0) + (ev.get("right_minutes") or 0)
@@ -301,6 +303,8 @@ def to_proposal(ev: dict, now: datetime) -> dict:
                 end = at + timedelta(minutes=(left or 0) + (right or 0))
         elif kind == "activity":
             data = {"kind": ev["kind"]}
+        elif kind == "cry":
+            data = {"soothed_by": ev.get("soothed_by")}
     elif kind == "pump":
         u = ev.get("unit", "ml")
         data = {"left_ml": _ml(ev.get("left_amount"), u), "right_ml": _ml(ev.get("right_amount"), u),
@@ -350,7 +354,8 @@ def _dur(seconds: float) -> str:
 def summary(p: dict, ctx: Ctx) -> str:
     units = ctx.fam.settings.get("units", {})
     word = "Diaper" if wording(ctx.fam) == "diaper" else "Nappy"
-    labels = {"sleep": "Sleep", "nursing": "Breastfeed", "pump": "Pump", "activity": "Activity", "nappy": word}
+    labels = {"sleep": "Sleep", "nursing": "Breastfeed", "pump": "Pump", "activity": "Activity", "nappy": word,
+              "cry": "Crying"}
     if p["action"] == "timer":
         what = {"start": "start", "pause": "pause", "resume": "resume", "switch": "switch",
                 "cancel": "cancel", "complete": "stop and save"}[p["timer_action"]]
@@ -393,6 +398,8 @@ def summary(p: dict, ctx: Ctx) -> str:
         detail = d["title"]
     elif t == "note":
         detail = (p.get("notes") or "")[:60]
+    elif t == "cry":
+        detail = f"soothed by {d['soothed_by']}" if d.get("soothed_by") else ""
     when = _hm(p["started_at"], ctx)
     if p.get("ended_at"):
         when += f" to {_hm(p['ended_at'], ctx)} ({_dur((p['ended_at'] - p['started_at']).total_seconds())})"

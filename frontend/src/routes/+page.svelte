@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { app, child, serverNow, units, wording } from '#lib/app.svelte.ts';
+	import CrySheet from '#lib/CrySheet.svelte';
 	import EntrySheet from '#lib/EntrySheet.svelte';
 	import { fmtAgo, fmtDur, fmtTime, fmtUnit } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
@@ -9,7 +10,8 @@
 	import { trackers, type Entry, type EntryType } from '#lib/trackers.ts';
 
 	let sheet = $state<{ type: EntryType; entry?: Entry } | null>(null);
-	const list = $derived(trackers(wording()));
+	let cryHelp = $state(false);
+	const list = $derived(trackers(wording()).filter((t) => t.type !== 'cry'));
 	const s = $derived(app.status);
 	const timerOf = (type: string) => s?.timers.find((t) => t.type === type);
 
@@ -52,6 +54,10 @@
 			</button>
 		{/each}
 	</div>
+	<button class="tile cry" style="--c: var(--coral)" onclick={() => (cryHelp = true)}>
+		<Icon name="cry" size={30} />
+		<span class="cry-text"><strong>Crying?</strong><span>Find out what to check first</span></span>
+	</button>
 	<div class="tiles">
 		{#each list.slice(4) as t (t.type)}
 			<button class="tile" style="--c: var({t.color})" onclick={() => (sheet = { type: t.type })}>
@@ -78,6 +84,9 @@
 
 	{#if sheet}
 		<EntrySheet type={sheet.type} entry={sheet.entry} childId={c.id} onclose={() => (sheet = null)} />
+	{/if}
+	{#if cryHelp}
+		<CrySheet childId={c.id} onclose={() => (cryHelp = false)} onmanual={() => ((cryHelp = false), (sheet = { type: 'cry' }))} />
 	{/if}
 {/if}
 
@@ -132,6 +141,22 @@
 	.tile span {
 		font-size: 0.85rem;
 		font-weight: 600;
+	}
+	.tile.cry {
+		width: 100%;
+		flex-direction: row;
+		align-items: center;
+		gap: 14px;
+		min-height: 76px;
+		margin-bottom: 14px;
+	}
+	.cry-text {
+		display: flex;
+		flex-direction: column;
+	}
+	.cry-text strong {
+		font-size: 1.15rem;
+		margin: 0;
 	}
 	.totals {
 		display: grid;

@@ -1,0 +1,28 @@
+[project]
+name = "frecklebubby-sleep-research"
+version = "0.1.0"
+description = "Research kit for the Frecklebubby sleep model (Liu et al. 2019 infant-sleep data)"
+requires-python = ">=3.14"
+dependencies = [
+    "numpy>=2.3",
+    "scipy>=1.16",
+    "pandas>=2.3",
+    "scikit-learn>=1.7",
+    "matplotlib>=3.10",
+    # The app itself: replay_app_db.py and the equivalence tests call its service functions.
+    "frecklebubby",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+frecklebubby = { path = "../..", editable = true }
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"

@@ -114,7 +114,7 @@
 		<form class="stack" onsubmit={create}>
 			<label class="field"><span>Remind me about</span>
 				<select bind:value={type}>
-					{#each trackers(wording()).filter((t) => t.type !== 'note') as t (t.type)}<option value={t.type}>{t.label}</option>{/each}
+					{#each trackers(wording()).filter((t) => t.type !== 'note' && t.type !== 'cry') as t (t.type)}<option value={t.type}>{t.label}</option>{/each}
 					<option value="sleep_alert">Next sleep (alert before the window)</option>
 				</select></label>
 			{#if type === 'sleep_alert'}

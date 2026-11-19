@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 EntryType = Literal[
     "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-    "growth", "temperature", "medicine", "activity", "milestone", "note",
+    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry",
 ]
 TimerType = Literal["sleep", "nursing", "pump", "activity"]
 TimerAction = Literal["start", "pause", "resume", "switch", "cancel", "complete"]
@@ -125,14 +125,24 @@ class MilestoneData(_Data):
     title: Text100
 
 
+class CryData(_Data):
+    """A crying episode. The sound fields come from the experimental cry helper; all fields are optional."""
+
+    sound_reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)] | None = None
+    sound_confidence: float | None = Field(None, ge=0, le=1)
+    likely_needs: list[Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)]] | None = (
+        Field(None, max_length=12))
+    soothed_by: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)] | None = None
+
+
 DATA_MODELS: dict[str, type[_Data]] = {
     "sleep": SleepData, "nursing": NursingData, "bottle": BottleData, "solids": SolidsData,
     "nappy": NappyData, "potty": PottyData, "pump": PumpData, "growth": GrowthData,
     "temperature": TemperatureData, "medicine": MedicineData, "activity": ActivityData,
-    "milestone": MilestoneData, "note": _Data,
+    "milestone": MilestoneData, "note": _Data, "cry": CryData,
 }
 END_REQUIRED = {"sleep"}
-END_OPTIONAL = {"nursing", "pump", "activity"}
+END_OPTIONAL = {"nursing", "pump", "activity", "cry"}
 
 # --- users, families, children --------------------------------------------------------------------
 
@@ -331,6 +341,14 @@ class Prediction(BaseModel):
     samples: int
     age_range_minutes: tuple[int, int]
     note: str
+    # Optional (M7). Absent without a sleep norms file, except `method`.
+    earliest: datetime | None = Field(None, description="Start of the 80 % interval for the start of the sleep")
+    latest: datetime | None = Field(None, description="End of the 80 % interval for the start of the sleep")
+    nap_index: int | None = Field(None, description="Which nap of the day (1 = first); null for bedtime")
+    method: str | None = Field(None, description="personal_blend | age_norm | wake_window_table")
+    confidence: str | None = Field(None, description="low | medium | high, from the number of recent samples")
+    duration_minutes: int | None = Field(None, description="Expected length of this sleep")
+    history_days: int | None = Field(None, description="Complete logged days used")
 
 
 class Citation(BaseModel):
@@ -371,6 +389,11 @@ class ActivityDay(BaseModel):
     seconds: int = 0
 
 
+class CryDay(BaseModel):
+    count: int = 0
+    seconds: int = 0
+
+
 class DayReport(BaseModel):
     date: date
     sleep: SleepDay = SleepDay()
@@ -379,6 +402,7 @@ class DayReport(BaseModel):
     pump_ml: float = 0
     medicine_count: int = 0
     activities: dict[str, ActivityDay] = {}
+    crying: CryDay = CryDay()
 
 
 class DailyReport(BaseModel):

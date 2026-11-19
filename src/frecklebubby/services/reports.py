@@ -78,6 +78,9 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
             a = r.activities.setdefault(d["kind"], ActivityDay())
             a.count += 1
             a.seconds += duration
+        elif e.type == "cry":
+            r.crying.count += 1
+            r.crying.seconds += duration
     return {"timezone": ctx.fam.timezone, "sleep_recommendations": recommendations(age_months(child, now)),
             "days": reports}
 
