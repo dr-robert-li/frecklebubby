@@ -19,6 +19,9 @@ dependencies = [
     "pyyaml>=6.0.3",
 ]
 
+[project.optional-dependencies]
+import = ["huckleberry-api @ git+https://github.com/dr-robert-li/py-huckleberry-api"]
+
 [project.scripts]
 frecklebubby = "frecklebubby.main:run"
 frecklebubby-mcp = "frecklebubby.mcp_server:main"
