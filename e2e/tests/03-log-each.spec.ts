@@ -1,4 +1,4 @@
-import { expect, local, openTile, shot, test, type Page } from './fixtures';
+import { expect, local, openTile, shot, test, todayAgo, type Page } from './fixtures';
 
 const timeline = (page: Page) => page.getByRole('list', { name: 'Timeline' });
 
@@ -99,14 +99,15 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	// a sleep logged afterwards, with where and how
 	s = await openTile(page, 'Sleep');
 	await s.getByRole('tab', { name: 'Log a past one' }).click();
-	const now = Date.now();
-	await s.getByLabel('Start').fill(local(now - 25 * 60_000));
-	await s.getByLabel('End').fill(local(now));
+	const [start, end] = [todayAgo(25), local()];
+	const mins = (Date.parse(`${end}Z`) - Date.parse(`${start}Z`)) / 60_000;
+	await s.getByLabel('Start').fill(start);
+	await s.getByLabel('End').fill(end);
 	await s.getByRole('button', { name: 'Own bed' }).click();
 	await s.getByRole('button', { name: 'Happy' }).first().click();
 	await shot(page, '04-sleep-past-sheet');
 	await s.getByRole('button', { name: 'Save' }).click();
-	await expectLogged(page, 'Sleep', '25 min · Own bed');
+	await expectLogged(page, 'Sleep', `${mins} min · Own bed`);
 
 	await expect(timeline(page).getByRole('listitem')).toHaveCount(12);
 	await shot(page, '04-home-timeline', true);

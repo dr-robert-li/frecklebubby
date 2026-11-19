@@ -4,6 +4,7 @@
 	import { fmtDay, localDay } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
 	import Sheet from '#lib/Sheet.svelte';
+	import { tick } from 'svelte';
 
 	type Citation = { n: number; title: string; publisher: string; author?: string; url?: string; year?: number; kind: string; licence?: string };
 	type Msg = { id?: number; role: 'user' | 'assistant'; content: string; citations: Citation[] };
@@ -54,6 +55,8 @@
 		messages.push({ role: 'assistant', content: '', citations: [] });
 		const answer = messages[messages.length - 1];
 		streaming = true;
+		// Show the new question at the top of the screen; the answer grows below it.
+		tick().then(() => [...document.querySelectorAll('.msgs li.user')].at(-1)?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
 		try {
 			const res = await apiRaw(`/children/${cid}/assistant/chat`, {
 				method: 'POST',
@@ -151,13 +154,17 @@
 			{#each messages as m, i (i)}
 				<li class={m.role}>
 					{#if m.role === 'assistant'}
-						<p>
-							{#each pieces(m.content || (streaming && i === messages.length - 1 ? '…' : '')) as p, j (j)}
-								{#if typeof p === 'number' && cite(m.citations, p)}
-									<button class="mark" onclick={() => (source = cite(m.citations, p as number)!)} aria-label="Source {p}">{p}</button>
-								{:else}{typeof p === 'number' ? `[${p}]` : p}{/if}
-							{/each}
-						</p>
+						{@const live = streaming && i === messages.length - 1}
+						{#each (m.content || (live ? '…' : '')).split(/\n\n+/) as para, k (k)}
+							<p class:urgent={para.startsWith('Urgent:')}>
+								{#each pieces(para) as p, j (j)}
+									{#if typeof p === 'number' && cite(m.citations, p)}
+										<button class="mark" onclick={() => (source = cite(m.citations, p as number)!)} aria-label="Source {p}">{p}</button>
+									{:else if typeof p === 'number' && live}<span class="mark">{p}</span>
+									{:else}{typeof p === 'number' ? `[${p}]` : p}{/if}
+								{/each}
+							</p>
+						{/each}
 						{@render chips(m.citations)}
 					{:else}
 						<p>{m.content}</p>
@@ -292,6 +299,18 @@
 	.msgs li p {
 		margin: 0;
 		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+	.msgs li p + p {
+		margin-top: 10px;
+	}
+	.msgs p.urgent {
+		background: var(--danger-bg);
+		color: var(--danger);
+		border-left: 6px solid #c2334f;
+		border-radius: 12px;
+		padding: 8px 10px;
+		font-weight: 700;
 	}
 	.msgs .user {
 		align-self: flex-end;
@@ -322,6 +341,8 @@
 		border: 1.5px solid var(--line);
 	}
 	.mark {
+		display: inline-block;
+		border-radius: 999px;
 		min-height: 24px;
 		min-width: 24px;
 		padding: 0 6px;

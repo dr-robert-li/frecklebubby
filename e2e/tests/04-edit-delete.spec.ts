@@ -1,9 +1,8 @@
-import { expect, local, shot, test } from './fixtures';
+import { expect, shot, test, todayAgo } from './fixtures';
 
 test('a parent fixes the time of an entry and deletes another', async ({ page, api, family }) => {
-	const at = Date.now() - 20 * 60_000;
-	for (const [type, data, t] of [['bottle', { amount_ml: 90 }, at], ['nappy', { mode: 'pee' }, at - 60_000]] as const)
-		expect((await api.post(`children/${family.childId}/entries`, { data: { type, started_at: local(t), data } })).ok()).toBeTruthy();
+	for (const [type, data, t] of [['bottle', { amount_ml: 90 }, 20], ['nappy', { mode: 'pee' }, 21]] as const)
+		expect((await api.post(`children/${family.childId}/entries`, { data: { type, started_at: todayAgo(t), data } })).ok()).toBeTruthy();
 
 	await page.goto('/');
 	const timeline = page.getByRole('list', { name: 'Timeline' });
@@ -12,7 +11,7 @@ test('a parent fixes the time of an entry and deletes another', async ({ page, a
 
 	const sheet = page.getByRole('dialog');
 	await expect(sheet.getByRole('heading', { name: 'Edit bottle' })).toBeVisible();
-	const newTime = local(Date.now() - 10 * 60_000);
+	const newTime = todayAgo(10);
 	await sheet.getByLabel('Time').fill(newTime);
 	await sheet.getByLabel('Amount (ml)').fill('100');
 	await shot(page, '05-edit-sheet');

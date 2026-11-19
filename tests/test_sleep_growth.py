@@ -66,6 +66,21 @@ async def test_prediction(client):
     s.close()
 
 
+async def test_no_prediction_after_a_night_waking(client):
+    # Seen in the e2e run: "Bedtime from 04:15" shown at 02:00 after a sleep that ended at 23:50.
+    _, cid = await make_family(client, birthdate="2025-01-01")
+    s, ctx = ctx_for("a@example.com")
+    child = get_child(s, ctx, cid)
+    add_sleep(s, cid, local(14, 13), local(14, 14))
+    add_sleep(s, cid, local(14, 19), local(14, 23, 50))
+    s.commit()
+    assert predict(s, child, BNE, now=local(15, 2)) is None
+    add_sleep(s, cid, local(15, 2, 30), local(15, 6, 30))  # woke for the day
+    s.commit()
+    assert predict(s, child, BNE, now=local(15, 7))["kind"] == "nap"
+    s.close()
+
+
 async def test_prediction_api_few_samples(client):
     h, cid = await make_family(client, birthdate="2026-06-01")
     r = await client.get(f"{API}/children/{cid}/sleep/prediction", headers=h)

@@ -60,7 +60,7 @@
 	<section class="card" aria-live="polite">
 		<h2>{{ pending: 'Waiting to start', running: 'Importing…', done: 'Import complete', failed: 'Import failed' }[job.status]}</h2>
 		{#if job.progress.stage && job.status === 'running'}<p class="muted">Now: {job.progress.stage}</p>{/if}
-		<progress max="1" value={job.status === 'done' ? 1 : undefined} aria-label="Import progress"></progress>
+		{#if job.status !== 'failed'}<progress max="1" value={job.status === 'done' ? 1 : undefined} aria-label="Import progress"></progress>{/if}
 		<p>{job.progress.children ?? 0} {job.progress.children === 1 ? 'child' : 'children'} · {total} entries{job.progress.skipped ? ` · ${job.progress.skipped} skipped` : ''}</p>
 		{#if Object.keys(job.progress.entries ?? {}).length}
 			<ul class="counts">

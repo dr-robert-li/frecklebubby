@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, local, shot, test } from './fixtures';
+import { expect, local, shot, test, todayAgo } from './fixtures';
 
 const DAY = 86400_000;
 
@@ -17,7 +17,7 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 		for (const [h, mode] of [['08', 'pee'], ['12', 'poo'], ['15', 'both'], ['18', 'pee']]) entries.push({ type: 'nappy', started_at: `${d}T${h}:30`, data: { mode } });
 	}
 	entries.push({ type: 'growth', started_at: `${day(3)}T09:00`, data: { weight_kg: 6.9, height_cm: 64.5, head_cm: 41 } });
-	entries.push({ type: 'bottle', started_at: local(now - 5 * 60_000), data: { amount_ml: 90 } });
+	entries.push({ type: 'bottle', started_at: todayAgo(5), data: { amount_ml: 90 } });
 	for (const data of entries) expect((await api.post(base, { data })).ok(), JSON.stringify(data)).toBeTruthy();
 
 	await page.goto('/history');

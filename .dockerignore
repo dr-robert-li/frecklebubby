@@ -1,0 +1,15 @@
+# Files the container build does not need (read by docker and podman).
+.git
+.planning
+.venv
+.env
+.env.*
+**/node_modules
+**/__pycache__
+data
+e2e
+tests
+frontend/.svelte-kit
+src/frecklebubby/static
+*.db
+*.gguf

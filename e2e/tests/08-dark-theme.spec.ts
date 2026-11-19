@@ -1,9 +1,9 @@
-import { expect, local, openTile, shot, test } from './fixtures';
+import { expect, openTile, shot, test, todayAgo } from './fixtures';
 
 test('night theme for feeds in the dark, on every screen', async ({ page, api, family }) => {
 	const base = `children/${family.childId}/entries`;
-	await api.post(base, { data: { type: 'bottle', started_at: local(Date.now() - 30 * 60_000), data: { amount_ml: 120, milk_type: 'Breast Milk' } } });
-	await api.post(base, { data: { type: 'nappy', started_at: local(Date.now() - 20 * 60_000), data: { mode: 'both', color: 'yellow' } } });
+	await api.post(base, { data: { type: 'bottle', started_at: todayAgo(30), data: { amount_ml: 120, milk_type: 'Breast Milk' } } });
+	await api.post(base, { data: { type: 'nappy', started_at: todayAgo(20), data: { mode: 'both', color: 'yellow' } } });
 	await api.post(`children/${family.childId}/timers/nursing/start`, { data: { side: 'right' } });
 
 	await page.goto('/settings/appearance');

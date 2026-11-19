@@ -97,6 +97,6 @@ export const AI_DOWN = 'The assistant is not available now.';
 /** Message for features that may not exist yet on this server or whose model is down. */
 export function softMessage(e: unknown, fallback = AI_DOWN): string {
 	if (e instanceof ApiError && (e.status === 404 || e.status === 503 || e.status === 0 || e.status >= 500))
-		return e.status === 503 ? e.message : fallback;
+		return e.status === 503 || e.status === 501 ? e.message : fallback;
 	return e instanceof Error ? e.message : fallback;
 }

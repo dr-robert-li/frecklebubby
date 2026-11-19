@@ -83,6 +83,9 @@ def predict(s: Session, child: Child, tz, now: datetime | None = None, default: 
     ww = round(min(max(ww, lo), hi))
     start = last.ended_at + timedelta(minutes=ww) - MARGIN
     end = start + 2 * MARGIN
+    # A night waking (woke in the night, next window also in the night): the child sleeps again the same night.
+    if is_night(child, last.ended_at.astimezone(tz), 0) and is_night(child, start.astimezone(tz), 0):
+        return None
     kind = "bedtime" if is_night(child, end.astimezone(tz)) else "nap"
     return {"start": start, "end": end, "kind": kind, "basis": basis, "wake_window_minutes": ww,
             "samples": used, "age_range_minutes": (lo, hi), "note": note}

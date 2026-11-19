@@ -129,3 +129,29 @@ async def test_sleep_plan(client, fake_llm):
     assert (await client.get(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()["id"] == plan["id"]
     fake_llm.down = True
     assert (await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)).status_code == 503
+
+
+async def test_sleep_plan_moves_marks_out_of_advice_text(client, fake_llm):
+    # Gemma 4 wrote "... settle down. cites: [2]" into the text in the live e2e run.
+    h, cid = await make_family(client)
+    fake_llm.replies.append({
+        "summary": "Plan.", "schedule": [{"time": "07:00", "kind": "wake", "label": "Wake up"}],
+        "advice": [{"text": "Start a calm routine. cites: [1]", "cites": [1]},
+                   {"text": "Dim the lights [1].", "cites": []},
+                   {"text": "Keep it the same [1], [42]", "cites": []}],
+    })
+    plan = (await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()
+    assert plan["advice"] == [{"text": "Start a calm routine.", "cites": [1]},
+                              {"text": "Dim the lights.", "cites": [1]},
+                              {"text": "Keep it the same", "cites": [1]}]
+
+
+async def test_sleep_plan_tries_again_after_invalid_json(client, fake_llm):
+    h, cid = await make_family(client)
+    plan = {"summary": "Plan.", "schedule": [{"time": "07:00", "kind": "wake", "label": "Wake up"}],
+            "advice": [{"text": "Keep a routine.", "cites": []}]}
+    fake_llm.replies += ['{"summary": "cut o', plan]
+    r = await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)
+    assert r.status_code == 200 and r.json()["summary"] == "Plan."
+    fake_llm.replies += ["not json", "still not json"]
+    assert (await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)).status_code == 503

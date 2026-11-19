@@ -1,0 +1,70 @@
+# Frecklebubby and its AI model server.
+# Start: docker compose up -d   (or: podman compose up -d)
+# Settings come from the file .env next to this file. Copy .env.example to .env and fill it in first.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: frecklebubby:0.1.0
+    restart: unless-stopped
+    ports:
+      - "${FRECKLEBUBBY_PORT:-8000}:8000"
+    environment:
+      # Safe default: Clerk sign-in. Development sign-in only when .env says AUTH_MODE=dev.
+      AUTH_MODE: ${AUTH_MODE:-clerk}
+      CLERK_DOMAIN: ${CLERK_DOMAIN:-}
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY:-}
+      CLERK_OAUTH_CLIENT_ID: ${CLERK_OAUTH_CLIENT_ID:-}
+      CLERK_OAUTH_CLIENT_SECRET: ${CLERK_OAUTH_CLIENT_SECRET:-}
+      BASE_URL: ${BASE_URL:-}
+      ALLOWED_EMAILS: ${ALLOWED_EMAILS:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://llama:8080/v1}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      DATA_DIR: /data
+    volumes:
+      - data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      # Only "started": the app works (without the assistant) while the model still downloads.
+      llama:
+        condition: service_started
+
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    restart: unless-stopped
+    # The fixed bundled model (Gemma 4 E4B, Apache-2.0, about 5 GB). The first start downloads it.
+    command:
+      - -hf
+      - unsloth/gemma-4-E4B-it-GGUF:Q4_K_M
+      - --no-mmproj
+      - --jinja
+      - --reasoning-budget
+      - "0"
+      - --chat-template-kwargs
+      - '{"enable_thinking":false}'
+      - -c
+      - "8192"
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+    volumes:
+      - models:/root/.cache
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30m
+
+volumes:
+  data:
+  models:

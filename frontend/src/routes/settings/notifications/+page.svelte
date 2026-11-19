@@ -37,7 +37,11 @@
 			if (permission !== 'granted') throw new Error('Notifications are blocked. Allow them in your browser settings.');
 			const reg = (await navigator.serviceWorker.getRegistration()) ?? (await navigator.serviceWorker.register('/sw.js'));
 			await navigator.serviceWorker.ready;
-			const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key(app.config!.vapid_public_key) });
+			const sub = await reg.pushManager
+				.subscribe({ userVisibleOnly: true, applicationServerKey: key(app.config!.vapid_public_key) })
+				.catch(() => {
+					throw new Error('This browser could not turn on notifications. Check that this site may show notifications, then try again.');
+				});
 			await api('/push/subscriptions', { method: 'POST', body: sub.toJSON() });
 			subscribed = true;
 			toast('Notifications on');

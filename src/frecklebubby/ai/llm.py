@@ -63,11 +63,16 @@ async def complete(family: Family, messages: list[dict], schema: dict | None = N
 
 
 async def complete_json(family: Family, messages: list[dict], schema: dict, max_tokens: int = 1024) -> dict:
-    out = await complete(family, messages, schema, max_tokens)
-    try:
-        return json.loads(out)
-    except ValueError as err:
-        raise _fail(err) from err
+    # The live e2e run saw one sleep plan with invalid JSON that the next identical call did not repeat: try twice.
+    for attempt in (1, 2):
+        out = await complete(family, messages, schema, max_tokens)
+        try:
+            return json.loads(out)
+        except ValueError as err:
+            log.warning("Model gave invalid JSON (%d characters), attempt %d", len(out), attempt)
+            if attempt == 2:
+                raise _fail(err) from err
+    raise AssertionError("unreachable")
 
 
 @asynccontextmanager

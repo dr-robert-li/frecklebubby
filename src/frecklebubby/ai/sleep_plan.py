@@ -1,5 +1,6 @@
 """Sleep plan: the assistant pipeline with a fixed question and JSON schema output. Stored in sleep_plan."""
 
+import re
 from datetime import timedelta
 
 from sqlalchemy import select
@@ -86,14 +87,21 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
     out = await llm.complete_json(ctx.fam, [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
                                   SCHEMA, max_tokens=2000)
     valid = {c["n"] for c in citations}
-    advice = [{"text": a["text"], "cites": [n for n in dict.fromkeys(a.get("cites", [])) if n in valid]}
-              for a in out.get("advice", [])]
+    advice = [_advice(a, valid) for a in out.get("advice", [])]
     used = {n for a in advice for n in a["cites"]}
     content = {"summary": out.get("summary", ""), "schedule": out.get("schedule", []), "advice": advice}
     plan = SleepPlan(child_id=child.id, content=content, citations=[c for c in citations if c["n"] in used])
     s.add(plan)
     s.commit()
     return plan_out(plan)
+
+
+def _advice(a: dict, valid: set[int]) -> dict:
+    """The model sometimes also writes its marks into the text ("... cites: [2]"): move them to `cites`."""
+    marks = [int(n) for n in re.findall(r"\[(\d+)\]", a["text"])]
+    text = re.sub(r"\s*(?:\(?\s*(?:cites?|sources?)\s*:?\s*)?(?:\[\d+\][,\s]*)+\)?", " ", a["text"])
+    text = re.sub(r"\s+([.,;:!?])", r"\1", text).strip()
+    return {"text": text, "cites": [n for n in dict.fromkeys([*a.get("cites", []), *marks]) if n in valid]}
 
 
 def plan_out(plan: SleepPlan | None) -> dict | None:

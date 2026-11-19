@@ -24,7 +24,7 @@
 		form.append('file', file);
 		try {
 			const r = await api<{ title: string; chunks: number }>('/knowledge/uploads', { method: 'POST', form });
-			toast(`Added "${r.title}" (${r.chunks} parts)`);
+			toast(`Added "${r.title}" (${r.chunks} ${r.chunks === 1 ? "part" : "parts"})`);
 			load();
 		} catch (e) {
 			error = softMessage(e, 'Uploads are not available now.');
