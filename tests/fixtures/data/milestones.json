@@ -1,0 +1,5 @@
+[
+  {"key": "2m_smiles", "age_months": 2, "domain": "social", "text": "Smiles when you talk to or smile at them", "source": {"title": "CDC milestones 2 months", "publisher": "CDC", "url": "https://www.cdc.gov/ncbddd/actearly/milestones/milestones-2mo.html"}},
+  {"key": "4m_holds_head", "age_months": 4, "domain": "movement", "text": "Holds head steady without support when you are holding them", "source": {"title": "CDC milestones 4 months", "publisher": "CDC", "url": "https://www.cdc.gov/ncbddd/actearly/milestones/milestones-4mo.html"}},
+  {"key": "2m_looks_at_face", "age_months": 2, "domain": "social", "text": "Looks at your face", "source": {"title": "CDC milestones 2 months", "publisher": "CDC", "url": "https://www.cdc.gov/ncbddd/actearly/milestones/milestones-2mo.html"}}
+]

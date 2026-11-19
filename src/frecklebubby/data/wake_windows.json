@@ -1,0 +1,66 @@
+{
+  "wake_windows": {
+    "basis": "common practice, not a medical standard",
+    "note": "Common-practice ranges used by baby sleep guides. They are not a medical standard.",
+    "bands": [
+      {"min_months": 0, "max_months": 1, "min_minutes": 45, "max_minutes": 75},
+      {"min_months": 1, "max_months": 2, "min_minutes": 60, "max_minutes": 90},
+      {"min_months": 2, "max_months": 3, "min_minutes": 75, "max_minutes": 105},
+      {"min_months": 3, "max_months": 4, "min_minutes": 75, "max_minutes": 120},
+      {"min_months": 4, "max_months": 6, "min_minutes": 90, "max_minutes": 150},
+      {"min_months": 6, "max_months": 8, "min_minutes": 120, "max_minutes": 180},
+      {"min_months": 8, "max_months": 10, "min_minutes": 150, "max_minutes": 210},
+      {"min_months": 10, "max_months": 13, "min_minutes": 180, "max_minutes": 240},
+      {"min_months": 13, "max_months": 18, "min_minutes": 195, "max_minutes": 330},
+      {"min_months": 18, "max_months": 36, "min_minutes": 300, "max_minutes": 390},
+      {"min_months": 36, "max_months": null, "min_minutes": 330, "max_minutes": 420}
+    ]
+  },
+  "total_sleep": [
+    {
+      "min_months": 0, "max_months": 4, "min_hours": 14, "max_hours": 17,
+      "citation": {
+        "title": "National Sleep Foundation's sleep time duration recommendations: methodology and results summary (Hirshkowitz M, et al. Sleep Health 2015;1(1):40-43)",
+        "publisher": "National Sleep Foundation / Sleep Health",
+        "url": "https://doi.org/10.1016/j.sleh.2014.12.010",
+        "year": 2015
+      }
+    },
+    {
+      "min_months": 4, "max_months": 12, "min_hours": 12, "max_hours": 15,
+      "citation": {
+        "title": "National Sleep Foundation's sleep time duration recommendations: methodology and results summary (Hirshkowitz M, et al. Sleep Health 2015;1(1):40-43)",
+        "publisher": "National Sleep Foundation / Sleep Health",
+        "url": "https://doi.org/10.1016/j.sleh.2014.12.010",
+        "year": 2015
+      }
+    },
+    {
+      "min_months": 4, "max_months": 13, "min_hours": 12, "max_hours": 16,
+      "citation": {
+        "title": "Recommended Amount of Sleep for Pediatric Populations: A Consensus Statement of the American Academy of Sleep Medicine (Paruthi S, et al. J Clin Sleep Med 2016;12(6):785-786)",
+        "publisher": "American Academy of Sleep Medicine / Journal of Clinical Sleep Medicine",
+        "url": "https://doi.org/10.5664/jcsm.5866",
+        "year": 2016
+      }
+    },
+    {
+      "min_months": 13, "max_months": 36, "min_hours": 11, "max_hours": 14,
+      "citation": {
+        "title": "Recommended Amount of Sleep for Pediatric Populations: A Consensus Statement of the American Academy of Sleep Medicine (Paruthi S, et al. J Clin Sleep Med 2016;12(6):785-786)",
+        "publisher": "American Academy of Sleep Medicine / Journal of Clinical Sleep Medicine",
+        "url": "https://doi.org/10.5664/jcsm.5866",
+        "year": 2016
+      }
+    },
+    {
+      "min_months": 36, "max_months": 72, "min_hours": 10, "max_hours": 13,
+      "citation": {
+        "title": "Recommended Amount of Sleep for Pediatric Populations: A Consensus Statement of the American Academy of Sleep Medicine (Paruthi S, et al. J Clin Sleep Med 2016;12(6):785-786)",
+        "publisher": "American Academy of Sleep Medicine / Journal of Clinical Sleep Medicine",
+        "url": "https://doi.org/10.5664/jcsm.5866",
+        "year": 2016
+      }
+    }
+  ]
+}
