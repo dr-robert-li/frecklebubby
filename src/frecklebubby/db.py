@@ -47,7 +47,8 @@ def init_db(data_dir: Path) -> None:
     # shortcut: no Alembic yet; add it before the first schema change after v0.1.0.
     Base.metadata.create_all(engine)
     with engine.begin() as conn:
-        conn.execute(text("CREATE VIRTUAL TABLE IF NOT EXISTS kb_chunk USING fts5(source_id UNINDEXED, heading, text)"))
+        conn.execute(text("CREATE VIRTUAL TABLE IF NOT EXISTS kb_chunk USING fts5(source_id UNINDEXED, heading, text, "
+                          "tokenize='porter unicode61')"))
     SessionLocal.configure(bind=engine)
 
 

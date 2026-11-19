@@ -10,7 +10,7 @@ EXPECTED = {
     "list_children", "get_status", "sleep_timer", "log_sleep", "nursing_timer", "log_nursing", "log_bottle",
     "pump_timer", "log_pump", "activity_timer", "log_activity", "log_solids", "log_nappy", "log_potty", "log_growth",
     "log_temperature", "log_medicine", "log_milestone", "log_note", "list_entries", "update_entry", "delete_entry",
-    "get_daily_report", "get_sleep_prediction", "get_milestones",
+    "get_daily_report", "get_sleep_prediction", "get_milestones", "get_insights", "search_knowledge",
 }
 
 
@@ -59,6 +59,9 @@ async def test_tools(client):
         status = await call(mcp, "get_status")
         assert status["timezone"] == "Australia/Brisbane"
         assert (await call(mcp, "get_milestones"))["bands"]
+        assert isinstance((await call(mcp, "get_insights"))["result"], list)
+        hits = (await call(mcp, "search_knowledge", query="how many wet nappies"))["result"]
+        assert hits and hits[0]["url"].startswith("https://")
 
     # A second child makes the child argument required.
     await client.post("/api/v1/children", headers=h, json={"name": "Bo", "birthdate": "2025-01-01"})

@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastmcp.server.auth.providers.clerk import ClerkProvider
 from starlette.routing import Route
 
-from .api import children, core, notify
+from .api import ai, children, core, notify
 from .config import get_settings
 from .db import SessionLocal, init_db, utcnow
 from .mcp_server import create_mcp
@@ -101,6 +101,7 @@ def create_app(scheduler: bool = True) -> FastAPI:
     app.include_router(core.router, prefix=API)
     app.include_router(children.router, prefix=API)
     app.include_router(notify.router, prefix=API)
+    app.include_router(ai.router, prefix=API)
     # Later milestones add their routers here, one line each, for example:
     # app.include_router(nl.router, prefix=API)
 

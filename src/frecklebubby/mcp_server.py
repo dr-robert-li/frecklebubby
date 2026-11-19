@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 from .auth import DEV_USER
 from .config import get_settings
 from .db import SessionLocal, init_db, utcnow
+from .knowledge import store
 from .models import Child, User
 from .schemas import (
     ActivityKind,
@@ -46,7 +47,7 @@ from .schemas import (
     Status,
     TimerBody,
 )
-from .services import Ctx, ServiceError, children, entries, milestones, plain_errors, reports, sleep, timers
+from .services import Ctx, ServiceError, children, entries, insights, milestones, plain_errors, reports, sleep, timers
 from .services.families import context, sign_in
 
 log = logging.getLogger(__name__)
@@ -510,6 +511,26 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         with call() as (s, ctx):
             c = child_of(s, ctx, child)
             return MilestonesOut.model_validate(milestones.milestones(s, ctx, c.id)).model_dump(mode="json")
+
+    @mcp.tool(annotations=READ)
+    def get_insights(child: ChildArg = None) -> list[dict[str, Any]]:
+        """Insight cards from the child's data, without the AI model: urgent warning signs (red flags), milestones
+        to watch, total sleep against the recommended range, growth percentiles. Each card cites its sources."""
+        with call() as (s, ctx):
+            c = child_of(s, ctx, child)
+            return insights.insights(s, ctx, c.id)
+
+    @mcp.tool(annotations=READ)
+    def search_knowledge(
+        query: Annotated[str, Field(description="Question or words to look for, for example 'wet nappies per day'.",
+                                    min_length=1, max_length=500)],
+        limit: Annotated[int, Field(description="Maximum number of passages.", ge=1, le=10)] = 6,
+    ) -> list[dict[str, Any]]:
+        """Search the bundled pediatric library (NHS, CDC and others) and the family's own uploads. Returns passages
+        with title, publisher, url and text. Cite the source when you use a passage."""
+        with call() as (s, ctx):
+            return [{k: h[k] for k in ("title", "publisher", "url", "year", "kind", "heading", "text")}
+                    for h in store.search(s, ctx.fam, query, limit)]
 
     return mcp
 

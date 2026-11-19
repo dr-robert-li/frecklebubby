@@ -1,0 +1,164 @@
+{
+  "_about": "Machine-readable form of red_flags.md. Thresholds and citations are copied from that file (retrieved 2026-11-20). Do not change a number here without changing red_flags.md and its source.",
+  "rules": [
+    {
+      "id": "fever_under_3m",
+      "severity": "urgent",
+      "min_celsius": 38.0,
+      "max_age_months": 3,
+      "window_hours": 24,
+      "title": "High temperature in a baby under 3 months",
+      "body": "A temperature of {value} was logged at {time}. For a baby under 3 months, a temperature of 38°C or higher needs urgent medical help. Contact a doctor now or go to the nearest hospital emergency department.",
+      "citations": [
+        {"title": "High temperature (fever) in children", "publisher": "NHS", "url": "https://www.nhs.uk/symptoms/fever-in-children/"},
+        {"title": "When to get urgent medical help for babies and children under 5", "publisher": "NHS", "url": "https://www.nhs.uk/baby/health/when-to-get-urgent-medical-help-for-babies-and-children-under-5/"},
+        {"title": "Fever and high temperature in children and babies - when to see a doctor", "publisher": "healthdirect", "url": "https://www.healthdirect.gov.au/symptoms/fever-and-high-temperature-in-children"},
+        {"title": "Fever in babies", "publisher": "Pregnancy, Birth and Baby", "url": "https://www.pregnancybirthbaby.org.au/babies/health-and-wellbeing/fever-in-babies"}
+      ]
+    },
+    {
+      "id": "fever_3_to_6m",
+      "severity": "urgent",
+      "min_celsius": 39.0,
+      "min_age_months": 3,
+      "max_age_months": 6,
+      "window_hours": 24,
+      "title": "High temperature in a baby 3 to 6 months old",
+      "body": "A temperature of {value} was logged at {time}. The NHS says a baby 3 to 6 months old with a temperature of 39°C or higher needs urgent medical help. Contact a doctor now or call your local emergency number.",
+      "citations": [
+        {"title": "High temperature (fever) in children", "publisher": "NHS", "url": "https://www.nhs.uk/symptoms/fever-in-children/"},
+        {"title": "When to get urgent medical help for babies and children under 5", "publisher": "NHS", "url": "https://www.nhs.uk/baby/health/when-to-get-urgent-medical-help-for-babies-and-children-under-5/"}
+      ]
+    },
+    {
+      "id": "fever_5_days",
+      "severity": "urgent",
+      "min_celsius": 38.0,
+      "min_age_months": 3,
+      "max_age_months": 60,
+      "min_days": 5,
+      "title": "High temperature for more than 5 days",
+      "body": "Temperatures of 38°C or higher have been logged since {since}. The NHS says to get medical advice when a high temperature lasts 5 days or more. Contact a doctor.",
+      "citations": [
+        {"title": "When to get urgent medical help for babies and children under 5", "publisher": "NHS", "url": "https://www.nhs.uk/baby/health/when-to-get-urgent-medical-help-for-babies-and-children-under-5/"},
+        {"title": "High temperature (fever) in children", "publisher": "NHS", "url": "https://www.nhs.uk/symptoms/fever-in-children/"}
+      ]
+    },
+    {
+      "id": "fever_24h_under_2y",
+      "severity": "attention",
+      "min_celsius": 38.0,
+      "max_age_months": 24,
+      "min_hours": 24,
+      "title": "Fever for more than 24 hours",
+      "body": "Temperatures of 38°C or higher have been logged since {since}. HealthyChildren.org (AAP) says to call the doctor when a child younger than 2 years has a fever for more than 24 hours.",
+      "citations": [
+        {"title": "Fever: When to Call the Pediatrician", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/health-issues/conditions/fever/Pages/When-to-Call-the-Pediatrician.aspx"}
+      ]
+    },
+    {
+      "id": "fever_above_40_repeated",
+      "severity": "attention",
+      "above_celsius": 40.0,
+      "min_readings": 2,
+      "window_hours": 48,
+      "title": "Temperature above 40°C more than once",
+      "body": "Temperatures above 40°C were logged {count} times since {since}. HealthyChildren.org (AAP) says to call the doctor when the temperature rises above 40°C repeatedly, at any age.",
+      "citations": [
+        {"title": "Fever: When to Call the Pediatrician", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/health-issues/conditions/fever/Pages/When-to-Call-the-Pediatrician.aspx"}
+      ]
+    },
+    {
+      "id": "low_temperature",
+      "severity": "urgent",
+      "below_celsius": 36.0,
+      "max_age_months": 60,
+      "window_hours": 24,
+      "title": "Low temperature",
+      "body": "A temperature of {value} was logged at {time}. The NHS says a temperature lower than 36°C needs urgent medical help. Check it 2 more times within 10 minutes. If it stays low, call your local emergency number or go to the emergency department.",
+      "citations": [
+        {"title": "When to get urgent medical help for babies and children under 5", "publisher": "NHS", "url": "https://www.nhs.uk/baby/health/when-to-get-urgent-medical-help-for-babies-and-children-under-5/"}
+      ]
+    },
+    {
+      "id": "no_wet_nappy_12h",
+      "severity": "urgent",
+      "hours": 12,
+      "max_age_months": 60,
+      "title": "No wet {nappy} for 12 hours",
+      "body": "The last wet {nappy} was logged at {time}, {hours} hours ago. The NHS says no wet {nappies} for at least 12 hours is a sign of serious illness. Get medical help now. If you changed a wet {nappy} and did not log it, you can ignore this.",
+      "citations": [
+        {"title": "When to get urgent medical help for babies and children under 5", "publisher": "NHS", "url": "https://www.nhs.uk/baby/health/when-to-get-urgent-medical-help-for-babies-and-children-under-5/"}
+      ]
+    },
+    {
+      "id": "no_wet_nappy_8h",
+      "severity": "attention",
+      "hours": 8,
+      "max_age_months": 6,
+      "title": "No wet {nappy} for 8 hours",
+      "body": "The last wet {nappy} was logged at {time}, {hours} hours ago. The NHS lists no wet {nappy} in the past 8 hours (in a baby who cries all the time) as a reason to call for help, and Pregnancy, Birth and Baby says to see a doctor if a baby has had no wet {nappy} for 4 to 6 hours with other signs of dehydration. If you are worried, contact a doctor. If you changed a wet {nappy} and did not log it, you can ignore this.",
+      "citations": [
+        {"title": "Soothing a crying baby", "publisher": "NHS", "url": "https://www.nhs.uk/baby/caring-for-a-newborn/soothing-a-crying-baby/"},
+        {"title": "Dehydration in babies", "publisher": "Pregnancy, Birth and Baby", "url": "https://www.pregnancybirthbaby.org.au/babies/health-and-wellbeing/dehydration-in-babies"}
+      ]
+    },
+    {
+      "id": "stool_black",
+      "severity": "urgent",
+      "colors": ["black"],
+      "min_age_days": 7,
+      "window_hours": 72,
+      "title": "Black poo",
+      "body": "A black poo was logged at {time}. After the first meconium poos, black poo can be a sign of blood. Talk to your doctor about it soon.",
+      "citations": [
+        {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"}
+      ]
+    },
+    {
+      "id": "stool_red",
+      "severity": "urgent",
+      "colors": ["red"],
+      "window_hours": 72,
+      "title": "Red poo or blood in poo",
+      "body": "A red poo was logged at {time}. Any amount of blood in poo should be checked by a doctor. Contact a doctor soon (the NHS says to ask for an urgent GP appointment).",
+      "citations": [
+        {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"},
+        {"title": "Reflux in babies", "publisher": "NHS", "url": "https://www.nhs.uk/conditions/reflux-in-babies/"}
+      ]
+    },
+    {
+      "id": "stool_pale",
+      "severity": "urgent",
+      "colors": ["gray"],
+      "window_hours": 72,
+      "title": "Pale or grey poo",
+      "body": "A pale or grey poo was logged at {time}. Pale poo can be a sign of a liver problem or jaundice. Tell a doctor or health visitor as soon as possible.",
+      "citations": [
+        {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"},
+        {"title": "How to change your baby's nappy", "publisher": "NHS", "url": "https://www.nhs.uk/baby/caring-for-a-newborn/how-to-change-your-babys-nappy/"}
+      ]
+    },
+    {
+      "id": "allergic_reaction",
+      "severity": "urgent",
+      "window_hours": 48,
+      "title": "Allergic reaction after food",
+      "body": "An allergic reaction was logged at {time} ({foods}). Breathing problems, a swollen throat or tongue, or a child who goes pale and floppy is a medical emergency: call your local emergency number now. For milder signs, such as a rash or swollen lips, talk to a doctor before you give this food again.",
+      "citations": [
+        {"title": "Food allergies in babies and young children", "publisher": "NHS", "url": "https://www.nhs.uk/baby/weaning-and-feeding/food-allergies-in-babies-and-young-children/"},
+        {"title": "Allergic and anaphylactic reactions", "publisher": "RCH Kids Health Info", "url": "https://www.rch.org.au/kidsinfo/fact_sheets/allergic_and_anaphylactic_reactions/"}
+      ]
+    }
+  ],
+  "wet_nappy_baseline": {
+    "per_day": 6,
+    "min_age_days": 7,
+    "max_age_months": 6,
+    "days": 3,
+    "text": "The NHS says a baby should have around 6 wet {nappies} a day from a few days after the birth.",
+    "citations": [
+      {"title": "Formula milk: common questions", "publisher": "NHS", "url": "https://www.nhs.uk/baby/breastfeeding-and-bottle-feeding/bottle-feeding/formula-milk-questions/"}
+    ]
+  }
+}
