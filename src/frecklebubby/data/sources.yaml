@@ -1,0 +1,676 @@
+- id: aap-safe-sleep-2022
+  title: 'Sleep-Related Infant Deaths: Updated 2022 Recommendations for Reducing Infant Deaths in the
+    Sleep Environment'
+  author: Rachel Y. Moon, Rebecca F. Carlin, Ivan Hand; AAP Task Force on Sudden Infant Death Syndrome
+  publisher: Pediatrics (American Academy of Pediatrics)
+  year: 2022
+  url: https://publications.aap.org/pediatrics/article/150/1/e2022057990/188304/Sleep-Related-Infant-Deaths-Updated-2022
+  kind: guideline
+  topics:
+  - safe-sleep
+  - sleep
+  - sids
+  summary: The US pediatricians' policy statement on how to lower the risk of SIDS and sleep-related deaths,
+    covering sleep position, surface, bedding, room sharing and other risk factors. Pediatrics 2022;150(1):e2022057990,
+    doi:10.1542/peds.2022-057990.
+  live_fetch: false
+- id: hc-safe-sleep
+  title: A Parent's Guide to Safe Sleep
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2026
+  url: https://www.healthychildren.org/English/ages-stages/baby/sleep/Pages/A-Parents-Guide-to-Safe-Sleep.aspx
+  kind: web
+  topics:
+  - safe-sleep
+  - sleep
+  - sids
+  summary: Parent-facing page that turns the AAP safe-sleep policy into everyday steps for where and how
+    a baby should sleep.
+- id: hc-fever-when-to-call
+  title: 'Fever: When to Call the Pediatrician'
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2022
+  url: https://www.healthychildren.org/English/health-issues/conditions/fever/Pages/When-to-Call-the-Pediatrician.aspx
+  kind: web
+  topics:
+  - fever
+  - illness
+  summary: Lists the situations in which a parent should call the child's doctor about a fever, including
+    the rule for babies under 3 months.
+- id: hc-starting-solids
+  title: When Can Babies Start Solid Foods? Readiness & Feeding Tips
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2026
+  url: https://www.healthychildren.org/English/ages-stages/baby/feeding-nutrition/Pages/Starting-Solid-Foods.aspx
+  kind: web
+  topics:
+  - solids
+  - feeding
+  summary: Explains the signs that a baby is ready for solid food and how to begin offering it.
+- id: hc-breastfeeding
+  title: Breastfeeding (topic hub)
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2026
+  url: https://www.healthychildren.org/English/ages-stages/baby/breastfeeding/Pages/default.aspx
+  kind: web
+  topics:
+  - breastfeeding
+  - feeding
+  summary: Index of AAP articles on starting and continuing breastfeeding, with links to detail pages.
+- id: hc-formula-amounts
+  title: Amount and Schedule of Baby Formula Feedings
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2022
+  url: https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/amount-and-schedule-of-formula-feedings.aspx
+  kind: web
+  topics:
+  - formula
+  - feeding
+  summary: Gives typical formula amounts and feeding intervals by age, with the advice to watch the baby's
+    cues and growth.
+- id: hc-milestones-1-month
+  title: Developmental Milestones at 1 Month Old
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2026
+  url: https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-1-Month.aspx
+  kind: web
+  topics:
+  - development
+  - milestones
+  summary: One of a series of AAP pages describing what babies usually do at each age, with a note on
+    when to call the doctor.
+- id: hc-milestones-matter
+  title: 'Milestones Matter: Your Child''s Growth & Development By Age 5'
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2026
+  url: https://www.healthychildren.org/English/family-life/health-management/Pages/Milestones-Matter.aspx
+  kind: web
+  topics:
+  - development
+  - milestones
+  summary: Overview of developmental milestones to age 5 that points parents to CDC checklists and screening
+    at checkups.
+- id: hc-baby-poop-colors
+  title: The Many Colors of Baby Poop
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2026
+  url: https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx
+  kind: web
+  topics:
+  - nappies
+  - illness
+  summary: Describes which stool colours are normal in babies and which (red, black, white) should be
+    reported to a doctor.
+- id: rcn-baby-sleep-2-12
+  title: 'Baby sleep patterns at 2-12 months: what to expect'
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/sleep/understanding-sleep/baby-sleep-2-12-months
+  kind: web
+  topics:
+  - sleep
+  - development
+  summary: Describes how baby sleep changes during the first year and why some night waking is normal.
+  live_fetch: false
+- id: rcn-newborn-sleep-routines
+  title: 'Baby & newborn sleep routines: a guide'
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/newborns/sleep/settling-routines/newborn-sleep-routines
+  kind: web
+  topics:
+  - sleep
+  - settling
+  summary: Practical guide to building a flexible sleep routine for a newborn.
+  live_fetch: false
+- id: rcn-settling-3-6
+  title: How to get babies to sleep at 3-6 months
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/sleep/settling-routines/helping-babies-sleep-settle-3-6-months
+  kind: web
+  topics:
+  - sleep
+  - settling
+  summary: Settling ideas for babies aged 3 to 6 months, such as separating day from night and putting
+    baby down drowsy.
+  live_fetch: false
+- id: rcn-responsive-settling
+  title: 'Responsive settling at 6-18 months: how to move towards self-settling'
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/sleep/settling-routines/responsive-settling-at-6-18-months-reducing-settling-help
+  kind: web
+  topics:
+  - sleep
+  - settling
+  summary: Explains a gradual way to reduce the help a baby needs to fall asleep.
+  live_fetch: false
+- id: rcn-introducing-solids
+  title: 'Introducing solids: why, when, what & how'
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/breastfeeding-bottle-feeding-solids/solids-drinks/introducing-solids
+  kind: web
+  topics:
+  - solids
+  - feeding
+  - allergy
+  summary: Explains when and how to start solid food, first food choices and safety points.
+  live_fetch: false
+- id: rcn-breastfeeding-overview
+  title: 'Breastfeeding: good for baby, good for you'
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/newborns/breastfeeding-bottle-feeding/breastfeeding-resources/breastfeeding-overview
+  kind: web
+  topics:
+  - breastfeeding
+  - feeding
+  summary: Overview of the benefits of breastfeeding and where to get help.
+  live_fetch: false
+- id: rcn-development-5-6
+  title: Baby development at 5-6 months
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/development/development-tracker-3-12-months/5-6-months
+  kind: web
+  topics:
+  - development
+  - milestones
+  summary: One of a series of age-by-age pages describing what babies typically do at each stage.
+  live_fetch: false
+- id: rcn-fever
+  title: High temperature or fever in children
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/health-daily-care/health-concerns/fever
+  kind: web
+  topics:
+  - fever
+  - illness
+  summary: What fever is, how to care for a child at home and when to see a doctor.
+  live_fetch: false
+- id: rcn-take-temperature
+  title: How to take temperature in children
+  author: Raising Children Network
+  publisher: Raising Children Network (Australia)
+  year: 2026
+  url: https://raisingchildren.net.au/babies/health-daily-care/health-concerns/taking-your-childs-temperature
+  kind: web
+  topics:
+  - fever
+  - illness
+  summary: How to take a child's temperature with different thermometers.
+  live_fetch: false
+- id: rednose-newborn-1yr
+  title: 'Safe sleep and safer pregnancy: Newborn to 1 year'
+  author: Red Nose Australia
+  publisher: Red Nose Australia
+  year: 2026
+  url: https://rednose.org.au/safe-sleep-and-safer-pregnancy/newborn-to-1-year/
+  kind: web
+  topics:
+  - safe-sleep
+  - sleep
+  - sids
+  summary: Red Nose's safe sleeping advice for babies from birth to 1 year.
+- id: nhmrc-infant-feeding
+  title: 'Infant Feeding Guidelines: information for health workers'
+  author: National Health and Medical Research Council
+  publisher: NHMRC (Australia)
+  year: 2012
+  url: https://www.nhmrc.gov.au/about-us/publications/infant-feeding-guidelines-information-health-workers
+  kind: guideline
+  topics:
+  - feeding
+  - breastfeeding
+  - formula
+  - solids
+  - allergy
+  summary: Australian national guidelines on breastfeeding, formula and starting solids, written for health
+    workers; the page links the guideline and its literature review.
+- id: nhmrc-adg
+  title: Australian Dietary Guidelines
+  author: National Health and Medical Research Council
+  publisher: NHMRC (Australia)
+  year: 2013
+  url: https://www.nhmrc.gov.au/adg
+  kind: guideline
+  topics:
+  - feeding
+  - solids
+  summary: Australia's national dietary guidelines, which include a section on infants.
+- id: pbb-fever-babies
+  title: Fever in babies
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2024
+  url: https://www.pregnancybirthbaby.org.au/babies/health-and-wellbeing/fever-in-babies
+  kind: web
+  topics:
+  - fever
+  - illness
+  summary: Describes fever in babies, home care and when to seek urgent care, including the under-3-months
+    rule.
+- id: pbb-safe-sleep
+  title: Safe sleep for babies
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2026
+  url: https://www.pregnancybirthbaby.org.au/babies/sleep-and-settling/safe-sleep-for-babies
+  kind: web
+  topics:
+  - safe-sleep
+  - sleep
+  - sids
+  summary: Australian advice on safe sleep positions, sleep spaces and room sharing.
+- id: pbb-getting-baby-to-sleep
+  title: Getting your baby to sleep
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2025
+  url: https://www.pregnancybirthbaby.org.au/babies/sleep-and-settling/getting-your-baby-to-sleep
+  kind: web
+  topics:
+  - sleep
+  - settling
+  summary: Tips for settling a baby to sleep and building a routine.
+- id: pbb-sleep-patterns
+  title: Baby sleep patterns by age
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2025
+  url: https://www.pregnancybirthbaby.org.au/babies/sleep-and-settling/sleep-patterns-for-babies
+  kind: web
+  topics:
+  - sleep
+  - development
+  summary: Typical baby sleep patterns and how they change through the first year.
+- id: pbb-night-feeding
+  title: Night feeding
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2024
+  url: https://www.pregnancybirthbaby.org.au/babies/feeding-and-nutrition/night-feeding
+  kind: web
+  topics:
+  - feeding
+  - sleep
+  - breastfeeding
+  - formula
+  summary: Explains why babies feed at night and how night feeds change with age.
+- id: pbb-dehydration
+  title: Dehydration in babies
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2025
+  url: https://www.pregnancybirthbaby.org.au/babies/health-and-wellbeing/dehydration-in-babies
+  kind: web
+  topics:
+  - illness
+  - nappies
+  summary: Signs of dehydration in babies and when to see a doctor.
+- id: pbb-allergy-foods
+  title: How to introduce allergy foods
+  author: Pregnancy, Birth and Baby
+  publisher: Pregnancy, Birth and Baby (Australian Government)
+  year: 2026
+  url: https://www.pregnancybirthbaby.org.au/babies/feeding-and-nutrition/allergy-foods
+  kind: web
+  topics:
+  - allergy
+  - solids
+  - feeding
+  summary: How to offer common allergy-causing foods to a baby and how to recognise a reaction.
+- id: hd-fever-children
+  title: Fever and high temperature in children and babies - when to see a doctor
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2024
+  url: https://www.healthdirect.gov.au/symptoms/fever-and-high-temperature-in-children
+  kind: web
+  topics:
+  - fever
+  - illness
+  summary: Defines fever, gives home care steps and lists when a baby or child needs a doctor or emergency
+    department.
+- id: hd-serious-illness
+  title: Symptoms of serious illness in babies and children
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2025
+  url: https://www.healthdirect.gov.au/symptoms/symptoms-of-serious-illness-in-babies-and-children
+  kind: web
+  topics:
+  - illness
+  - fever
+  summary: Warning signs that a baby or child may be seriously unwell.
+- id: hd-feeding-newborn
+  title: Feeding your newborn baby
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2023
+  url: https://www.healthdirect.gov.au/life-stages/pregnancy-and-post-natal-health/feeding-your-baby-what-are-the-options
+  kind: web
+  topics:
+  - feeding
+  - breastfeeding
+  - formula
+  summary: Compares breastfeeding and formula feeding for a newborn.
+- id: hd-sleep-tips-children
+  title: Sleep tips for children
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2026
+  url: https://www.healthdirect.gov.au/healthy-living/physical-wellbeing/sleep-tips-for-children
+  kind: web
+  topics:
+  - sleep
+  summary: Sleep habits and amounts for children.
+- id: hd-sids
+  title: Sudden infant death syndrome (SIDS)
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2024
+  url: https://www.healthdirect.gov.au/life-stages/pregnancy-and-post-natal-health/sudden-infant-death-syndrome-sids
+  kind: web
+  topics:
+  - safe-sleep
+  - sleep
+  - sids
+  summary: What SIDS is and how parents can lower the risk.
+- id: hd-dehydration
+  title: Dehydration
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2026
+  url: https://www.healthdirect.gov.au/healthy-living/food-and-nutrition/dehydration
+  kind: web
+  topics:
+  - illness
+  - nappies
+  summary: Signs and care for dehydration, with a section on babies.
+- id: hd-anaphylaxis
+  title: Anaphylaxis
+  author: healthdirect
+  publisher: healthdirect Australia
+  year: 2026
+  url: https://www.healthdirect.gov.au/conditions/allergies/anaphylaxis
+  kind: web
+  topics:
+  - allergy
+  - illness
+  summary: Symptoms of a severe allergic reaction and the emergency steps.
+- id: aba-feeding-cues
+  title: Feeding cues
+  author: Australian Breastfeeding Association
+  publisher: Australian Breastfeeding Association
+  year: 2026
+  url: https://www.breastfeeding.asn.au/resources/feeding-cues
+  kind: web
+  topics:
+  - breastfeeding
+  - feeding
+  summary: Describes early and late hunger signs in a baby.
+- id: aba-feeds-nappies-first-week
+  title: Feeds and nappies in the first week
+  author: Australian Breastfeeding Association
+  publisher: Australian Breastfeeding Association
+  year: 2026
+  url: https://www.breastfeeding.asn.au/resources/feeds-and-nappies-first-week
+  kind: web
+  topics:
+  - breastfeeding
+  - nappies
+  - feeding
+  summary: Shows how a baby's feeds and nappies change over the first week as signs of enough milk.
+- id: aba-enough-milk
+  title: Is my baby getting enough breastmilk?
+  author: Australian Breastfeeding Association
+  publisher: Australian Breastfeeding Association
+  year: 2026
+  url: https://www.breastfeeding.asn.au/resources/baby-getting-enough-breastmilk
+  kind: web
+  topics:
+  - breastfeeding
+  - nappies
+  - growth
+  summary: Signs that a breastfed baby is getting enough milk.
+- id: ascia-introducing-foods
+  title: Introducing Solid Foods to Babies for Food Allergy Prevention - Fast Facts
+  author: Australasian Society of Clinical Immunology and Allergy (ASCIA)
+  publisher: ASCIA
+  year: 2026
+  url: https://www.allergy.org.au/patients/fast-facts/infant-feeding-and-allergy-prevention
+  kind: web
+  topics:
+  - allergy
+  - solids
+  summary: Patient summary of the ASCIA guideline on when and how to give babies common allergy-causing
+    foods.
+  live_fetch: false
+- id: who-iycf
+  title: Infant and young child feeding (fact sheet)
+  author: World Health Organization
+  publisher: WHO
+  year: 2026
+  url: https://www.who.int/news-room/fact-sheets/detail/infant-and-young-child-feeding
+  kind: web
+  topics:
+  - feeding
+  - breastfeeding
+  - solids
+  summary: WHO fact sheet on recommended feeding practices from birth to 2 years and global figures.
+- id: who-growth-standards
+  title: WHO Child Growth Standards
+  author: World Health Organization
+  publisher: WHO
+  year: 2006
+  url: https://www.who.int/tools/child-growth-standards
+  kind: guideline
+  topics:
+  - growth
+  summary: The WHO reference curves for weight, length/height and head circumference of children aged
+    0 to 5 years.
+- id: rch-fever
+  title: Fever in children
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2026
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/Fever_in_children/
+  kind: web
+  topics:
+  - fever
+  - illness
+  summary: Fact sheet on fever, home care and when to get help, with separate rules for under 1 month
+    and under 3 months.
+- id: rch-crying-unsettled
+  title: Crying and unsettled babies
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2026
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/Crying_and_unsettled_babies/
+  kind: web
+  topics:
+  - crying
+  - settling
+  summary: Explains normal crying patterns in young babies and how parents can cope.
+- id: rch-constipation
+  title: Constipation
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2020
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/Constipation/
+  kind: web
+  topics:
+  - nappies
+  - illness
+  summary: Fact sheet on constipation in children.
+- id: rch-sleep-problems
+  title: 'Sleep problems: babies and toddlers'
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2025
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/Sleep_problems_babies_and_toddlers/
+  kind: web
+  topics:
+  - sleep
+  - settling
+  summary: Common sleep problems in babies and toddlers and ways to approach them.
+- id: rch-reflux
+  title: Reflux (GOR) and GORD
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2018
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/Reflux_GOR/
+  kind: web
+  topics:
+  - illness
+  - feeding
+  summary: What reflux is in babies and when it needs care.
+- id: rch-gastro
+  title: Gastroenteritis (gastro)
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2026
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/gastroenteritis_gastro/
+  kind: web
+  topics:
+  - illness
+  - nappies
+  summary: Care of a child with gastro and signs of dehydration.
+- id: rch-allergic-reactions
+  title: Allergic and anaphylactic reactions
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne (Kids Health Info)
+  year: 2026
+  url: https://www.rch.org.au/kidsinfo/fact_sheets/allergic_and_anaphylactic_reactions/
+  kind: web
+  topics:
+  - allergy
+  - illness
+  summary: Signs of mild and severe allergic reactions and first aid.
+- id: rch-crying-guideline
+  title: 'Clinical Practice Guidelines: Unsettled or crying babies'
+  author: Royal Children's Hospital Melbourne
+  publisher: Royal Children's Hospital Melbourne
+  year: 2025
+  url: https://www.rch.org.au/clinicalguide/guideline_index/crying_baby_infant_distress/
+  kind: guideline
+  topics:
+  - crying
+  - settling
+  summary: Clinician guideline on assessing and managing a crying infant.
+- id: book-weissbluth
+  title: Healthy Sleep Habits, Happy Child (5th edition)
+  author: Marc Weissbluth
+  publisher: Ballantine Books
+  year: 2021
+  url: https://openlibrary.org/isbn/9780593158548
+  isbn: '9780593158548'
+  kind: book
+  topics:
+  - sleep
+  - settling
+  summary: A paediatrician's guide to sleep that argues for early bedtimes and regular naps; its sleep-training
+    views are one approach among several.
+- id: book-ferber
+  title: Solve Your Child's Sleep Problems (new, revised and expanded edition)
+  author: Richard Ferber
+  publisher: Fireside (Simon & Schuster)
+  year: 2006
+  url: https://openlibrary.org/isbn/9780671620998
+  isbn: '9780671620998'
+  kind: book
+  topics:
+  - sleep
+  - settling
+  summary: Source of graduated-check ("Ferber") sleep training for toddlers and babies with a general
+    guide to sleep problems.
+- id: book-mindell
+  title: Sleeping Through the Night, Revised Edition
+  author: Jodi A. Mindell
+  publisher: HarperCollins
+  year: 2010
+  url: https://openlibrary.org/isbn/9780062030900
+  isbn: '9780062030900'
+  kind: book
+  topics:
+  - sleep
+  - settling
+  summary: Parent guide by a sleep psychologist on helping infants and young children sleep, with step-by-step
+    plans.
+- id: book-karp
+  title: 'The Happiest Baby on the Block: Fully Revised and Updated Second Edition'
+  author: Harvey Karp
+  publisher: Bantam
+  year: 2015
+  url: https://openlibrary.org/isbn/9780553393231
+  isbn: '9780553393231'
+  kind: book
+  topics:
+  - crying
+  - settling
+  summary: Describes the "5 S" soothing method for fussy young babies.
+- id: book-brazelton
+  title: 'Touchpoints: Birth to Three'
+  author: T. Berry Brazelton
+  publisher: Da Capo / Hachette
+  year: 2006
+  url: https://openlibrary.org/isbn/9780738210490
+  isbn: '9780738210490'
+  kind: book
+  topics:
+  - development
+  - crying
+  - sleep
+  summary: Maps predictable bursts of development and regression in the first three years and what they
+    mean for parents.
+- id: book-west
+  title: The Sleep Lady's Good Night, Sleep Tight
+  author: Kim West
+  publisher: Vanguard / Hachette
+  year: 2009
+  url: https://openlibrary.org/isbn/9781593155582
+  isbn: '9781593155582'
+  kind: book
+  topics:
+  - sleep
+  - settling
+  summary: A gradual "shuffle" sleep-training approach that keeps the parent in the room while the child
+    learns to fall asleep.
+- id: book-aap-caring
+  title: 'Caring for Your Baby and Young Child: Birth to Age 5 (8th edition)'
+  author: American Academy of Pediatrics; Tanya Altmann (ed.)
+  publisher: Bantam / Random House
+  year: 2024
+  url: https://openlibrary.org/isbn/9780593598191
+  isbn: '9780593598191'
+  kind: book
+  topics:
+  - feeding
+  - sleep
+  - development
+  - illness
+  - teeth
+  - toilet-training
+  - growth
+  summary: The AAP's general parenting reference covering feeding, sleep, development, health problems
+    and safety for children up to age 5.

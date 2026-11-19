@@ -1,0 +1,1751 @@
+[
+ {
+  "key": "2m-social-1",
+  "age_months": 2,
+  "domain": "social",
+  "text": "Calms down when spoken to or picked up",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-social-2",
+  "age_months": 2,
+  "domain": "social",
+  "text": "Looks at your face",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-social-3",
+  "age_months": 2,
+  "domain": "social",
+  "text": "Seems happy to see you when you walk up to her",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-social-4",
+  "age_months": 2,
+  "domain": "social",
+  "text": "Smiles when you talk to or smile at her",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-language-1",
+  "age_months": 2,
+  "domain": "language",
+  "text": "Makes sounds other than crying",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-language-2",
+  "age_months": 2,
+  "domain": "language",
+  "text": "Reacts to loud sounds",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-cognitive-1",
+  "age_months": 2,
+  "domain": "cognitive",
+  "text": "Watches you as you move",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-cognitive-2",
+  "age_months": 2,
+  "domain": "cognitive",
+  "text": "Looks at a toy for several seconds",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-movement-1",
+  "age_months": 2,
+  "domain": "movement",
+  "text": "Holds head up when on tummy",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-movement-2",
+  "age_months": 2,
+  "domain": "movement",
+  "text": "Moves both arms and both legs",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "2m-movement-3",
+  "age_months": 2,
+  "domain": "movement",
+  "text": "Opens hands briefly",
+  "source": {
+   "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-months.html"
+  }
+ },
+ {
+  "key": "4m-social-1",
+  "age_months": 4,
+  "domain": "social",
+  "text": "Smiles on his own to get your attention",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-social-2",
+  "age_months": 4,
+  "domain": "social",
+  "text": "Chuckles (not yet a full laugh) when you try to make him laugh",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-social-3",
+  "age_months": 4,
+  "domain": "social",
+  "text": "Looks at you, moves, or makes sounds to get or keep your attention",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-language-1",
+  "age_months": 4,
+  "domain": "language",
+  "text": "Makes sounds like “oooo”, “aahh” (cooing)",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-language-2",
+  "age_months": 4,
+  "domain": "language",
+  "text": "Makes sounds back when you talk to him",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-language-3",
+  "age_months": 4,
+  "domain": "language",
+  "text": "Turns head towards the sound of your voice",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-cognitive-1",
+  "age_months": 4,
+  "domain": "cognitive",
+  "text": "If hungry, opens mouth when he sees breast or bottle",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-cognitive-2",
+  "age_months": 4,
+  "domain": "cognitive",
+  "text": "Looks at her hands with interest",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-movement-1",
+  "age_months": 4,
+  "domain": "movement",
+  "text": "Holds head steady without support when you are holding him",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-movement-2",
+  "age_months": 4,
+  "domain": "movement",
+  "text": "Holds a toy when you put it in his hand",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-movement-3",
+  "age_months": 4,
+  "domain": "movement",
+  "text": "Uses his arm to swing at toys",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-movement-4",
+  "age_months": 4,
+  "domain": "movement",
+  "text": "Brings hands to mouth",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "4m-movement-5",
+  "age_months": 4,
+  "domain": "movement",
+  "text": "Pushes up onto elbows/forearms when on tummy",
+  "source": {
+   "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-months.html"
+  }
+ },
+ {
+  "key": "6m-social-1",
+  "age_months": 6,
+  "domain": "social",
+  "text": "Knows familiar people",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-social-2",
+  "age_months": 6,
+  "domain": "social",
+  "text": "Likes to look at self in a mirror",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-social-3",
+  "age_months": 6,
+  "domain": "social",
+  "text": "Laughs",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-language-1",
+  "age_months": 6,
+  "domain": "language",
+  "text": "Takes turns making sounds with you",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-language-2",
+  "age_months": 6,
+  "domain": "language",
+  "text": "Blows “raspberries” (sticks tongue out and blows)",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-language-3",
+  "age_months": 6,
+  "domain": "language",
+  "text": "Makes squealing noises",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-cognitive-1",
+  "age_months": 6,
+  "domain": "cognitive",
+  "text": "Puts things in her mouth to explore them",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-cognitive-2",
+  "age_months": 6,
+  "domain": "cognitive",
+  "text": "Reaches to grab a toy she wants",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-cognitive-3",
+  "age_months": 6,
+  "domain": "cognitive",
+  "text": "Closes lips to show she doesn’t want more food",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-movement-1",
+  "age_months": 6,
+  "domain": "movement",
+  "text": "Rolls from tummy to back",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-movement-2",
+  "age_months": 6,
+  "domain": "movement",
+  "text": "Pushes up with straight arms when on tummy",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "6m-movement-3",
+  "age_months": 6,
+  "domain": "movement",
+  "text": "Leans on hands to support herself when sitting",
+  "source": {
+   "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/6-months.html"
+  }
+ },
+ {
+  "key": "9m-social-1",
+  "age_months": 9,
+  "domain": "social",
+  "text": "Is shy, clingy, or fearful around strangers",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-social-2",
+  "age_months": 9,
+  "domain": "social",
+  "text": "Shows several facial expressions, like happy, sad, angry, and surprised",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-social-3",
+  "age_months": 9,
+  "domain": "social",
+  "text": "Looks when you call her name",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-social-4",
+  "age_months": 9,
+  "domain": "social",
+  "text": "Reacts when you leave (looks, reaches for you, or cries)",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-social-5",
+  "age_months": 9,
+  "domain": "social",
+  "text": "Smiles or laughs when you play peek-a-boo",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-language-1",
+  "age_months": 9,
+  "domain": "language",
+  "text": "Makes a lot of different sounds like “mamamama” and “bababababa”",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-language-2",
+  "age_months": 9,
+  "domain": "language",
+  "text": "Lifts arms up to be picked up",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-cognitive-1",
+  "age_months": 9,
+  "domain": "cognitive",
+  "text": "Looks for objects when dropped out of sight (like his spoon or toy)",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-cognitive-2",
+  "age_months": 9,
+  "domain": "cognitive",
+  "text": "Bangs two things together",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-movement-1",
+  "age_months": 9,
+  "domain": "movement",
+  "text": "Gets to a sitting position by herself",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-movement-2",
+  "age_months": 9,
+  "domain": "movement",
+  "text": "Moves things from one hand to her other hand",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-movement-3",
+  "age_months": 9,
+  "domain": "movement",
+  "text": "Uses fingers to “rake” food towards himself",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "9m-movement-4",
+  "age_months": 9,
+  "domain": "movement",
+  "text": "Sits without support",
+  "source": {
+   "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/9-months.html"
+  }
+ },
+ {
+  "key": "12m-social-1",
+  "age_months": 12,
+  "domain": "social",
+  "text": "Plays games with you, like pat-a-cake",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-language-1",
+  "age_months": 12,
+  "domain": "language",
+  "text": "Waves “bye-bye”",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-language-2",
+  "age_months": 12,
+  "domain": "language",
+  "text": "Calls a parent “mama” or “dada” or another special name",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-language-3",
+  "age_months": 12,
+  "domain": "language",
+  "text": "Understands “no” (pauses briefly or stops when you say it)",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-cognitive-1",
+  "age_months": 12,
+  "domain": "cognitive",
+  "text": "Puts something in a container, like a block in a cup",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-cognitive-2",
+  "age_months": 12,
+  "domain": "cognitive",
+  "text": "Looks for things he sees you hide, like a toy under a blanket",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-movement-1",
+  "age_months": 12,
+  "domain": "movement",
+  "text": "Pulls up to stand",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-movement-2",
+  "age_months": 12,
+  "domain": "movement",
+  "text": "Walks, holding on to furniture",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-movement-3",
+  "age_months": 12,
+  "domain": "movement",
+  "text": "Drinks from a cup without a lid, as you hold it",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "12m-movement-4",
+  "age_months": 12,
+  "domain": "movement",
+  "text": "Picks things up between thumb and pointer finger, like small bits of food",
+  "source": {
+   "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/1-year.html"
+  }
+ },
+ {
+  "key": "15m-social-1",
+  "age_months": 15,
+  "domain": "social",
+  "text": "Copies other children while playing, like taking toys out of a container when another child does",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-social-2",
+  "age_months": 15,
+  "domain": "social",
+  "text": "Shows you an object she likes",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-social-3",
+  "age_months": 15,
+  "domain": "social",
+  "text": "Claps when excited",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-social-4",
+  "age_months": 15,
+  "domain": "social",
+  "text": "Hugs stuffed doll or other toy",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-social-5",
+  "age_months": 15,
+  "domain": "social",
+  "text": "Shows you affection (hugs, cuddles, or kisses you)",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-language-1",
+  "age_months": 15,
+  "domain": "language",
+  "text": "Tries to say one or two words besides “mama” or “dada,” like “ba” for ball or “da” for dog",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-language-2",
+  "age_months": 15,
+  "domain": "language",
+  "text": "Looks at a familiar object when you name it",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-language-3",
+  "age_months": 15,
+  "domain": "language",
+  "text": "Follows directions given with both a gesture and words. For example, he gives you a toy when you hold out your hand and say, “Give me the toy.”",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-language-4",
+  "age_months": 15,
+  "domain": "language",
+  "text": "Points to ask for something or to get help",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-cognitive-1",
+  "age_months": 15,
+  "domain": "cognitive",
+  "text": "Tries to use things the right way, like a phone, cup, or book",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-cognitive-2",
+  "age_months": 15,
+  "domain": "cognitive",
+  "text": "Stacks at least two small objects, like blocks",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-movement-1",
+  "age_months": 15,
+  "domain": "movement",
+  "text": "Takes a few steps on his own",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "15m-movement-2",
+  "age_months": 15,
+  "domain": "movement",
+  "text": "Uses fingers to feed herself some food",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "18m-social-1",
+  "age_months": 18,
+  "domain": "social",
+  "text": "Moves away from you, but looks to make sure you are close by",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-social-2",
+  "age_months": 18,
+  "domain": "social",
+  "text": "Points to show you something interesting",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-social-3",
+  "age_months": 18,
+  "domain": "social",
+  "text": "Puts hands out for you to wash them",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-social-4",
+  "age_months": 18,
+  "domain": "social",
+  "text": "Looks at a few pages in a book with you",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-social-5",
+  "age_months": 18,
+  "domain": "social",
+  "text": "Helps you dress him by pushing arm through sleeve or lifting up foot",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-language-1",
+  "age_months": 18,
+  "domain": "language",
+  "text": "Tries to say three or more words besides “mama” or “dada”",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-language-2",
+  "age_months": 18,
+  "domain": "language",
+  "text": "Follows one-step directions without any gestures, like giving you the toy when you say, “Give it to me.”",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-cognitive-1",
+  "age_months": 18,
+  "domain": "cognitive",
+  "text": "Copies you doing chores, like sweeping with a broom",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-cognitive-2",
+  "age_months": 18,
+  "domain": "cognitive",
+  "text": "Plays with toys in a simple way, like pushing a toy car",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-movement-1",
+  "age_months": 18,
+  "domain": "movement",
+  "text": "Walks without holding on to anyone or anything",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-movement-2",
+  "age_months": 18,
+  "domain": "movement",
+  "text": "Scribbles",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-movement-3",
+  "age_months": 18,
+  "domain": "movement",
+  "text": "Drinks from a cup without a lid and may spill sometimes",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-movement-4",
+  "age_months": 18,
+  "domain": "movement",
+  "text": "Feeds himself with his fingers",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-movement-5",
+  "age_months": 18,
+  "domain": "movement",
+  "text": "Tries to use a spoon",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "18m-movement-6",
+  "age_months": 18,
+  "domain": "movement",
+  "text": "Climbs on and off a couch or chair without help",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "24m-social-1",
+  "age_months": 24,
+  "domain": "social",
+  "text": "Notices when others are hurt or upset, like pausing or looking sad when someone is crying",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-social-2",
+  "age_months": 24,
+  "domain": "social",
+  "text": "Looks at your face to see how to react in a new situation",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-language-1",
+  "age_months": 24,
+  "domain": "language",
+  "text": "Points to things in a book when you ask, like “Where is the bear?”",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-language-2",
+  "age_months": 24,
+  "domain": "language",
+  "text": "Says at least two words together, like “More milk.”",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-language-3",
+  "age_months": 24,
+  "domain": "language",
+  "text": "Points to at least two body parts when you ask him to show you",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-language-4",
+  "age_months": 24,
+  "domain": "language",
+  "text": "Uses more gestures than just waving and pointing, like blowing a kiss or nodding yes",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-cognitive-1",
+  "age_months": 24,
+  "domain": "cognitive",
+  "text": "Holds something in one hand while using the other hand; for example, holding a container and taking the lid off",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-cognitive-2",
+  "age_months": 24,
+  "domain": "cognitive",
+  "text": "Tries to use switches, knobs, or buttons on a toy",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-cognitive-3",
+  "age_months": 24,
+  "domain": "cognitive",
+  "text": "Plays with more than one toy at the same time, like putting toy food on a toy plate",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-movement-1",
+  "age_months": 24,
+  "domain": "movement",
+  "text": "Kicks a ball",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-movement-2",
+  "age_months": 24,
+  "domain": "movement",
+  "text": "Runs",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-movement-3",
+  "age_months": 24,
+  "domain": "movement",
+  "text": "Walks (not climbs) up a few stairs with or without help",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "24m-movement-4",
+  "age_months": 24,
+  "domain": "movement",
+  "text": "Eats with a spoon",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "30m-social-1",
+  "age_months": 30,
+  "domain": "social",
+  "text": "Plays next to other children and sometimes plays with them",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-social-2",
+  "age_months": 30,
+  "domain": "social",
+  "text": "Shows you what she can do by saying, “Look at me!”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-social-3",
+  "age_months": 30,
+  "domain": "social",
+  "text": "Follows simple routines when told, like helping to pick up toys when you say, “It’s clean-up time.”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-language-1",
+  "age_months": 30,
+  "domain": "language",
+  "text": "Says about 50 words",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-language-2",
+  "age_months": 30,
+  "domain": "language",
+  "text": "Says two or more words together, with one action word, like “Doggie run”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-language-3",
+  "age_months": 30,
+  "domain": "language",
+  "text": "Names things in a book when you point and ask, “What is this?”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-language-4",
+  "age_months": 30,
+  "domain": "language",
+  "text": "Says words like “I,” “me,” or “we”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-cognitive-1",
+  "age_months": 30,
+  "domain": "cognitive",
+  "text": "Uses things to pretend, like feeding a block to a doll as if it were food",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-cognitive-2",
+  "age_months": 30,
+  "domain": "cognitive",
+  "text": "Shows simple problem-solving skills, like standing on a small stool to reach something",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-cognitive-3",
+  "age_months": 30,
+  "domain": "cognitive",
+  "text": "Follows two-step instructions like “Put the toy down and close the door.”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-cognitive-4",
+  "age_months": 30,
+  "domain": "cognitive",
+  "text": "Shows he knows at least one color, like pointing to a red crayon when you ask, “Which one is red?”",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-movement-1",
+  "age_months": 30,
+  "domain": "movement",
+  "text": "Uses hands to twist things, like turning doorknobs or unscrewing lids",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-movement-2",
+  "age_months": 30,
+  "domain": "movement",
+  "text": "Takes some clothes off by himself, like loose pants or an open jacket",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-movement-3",
+  "age_months": 30,
+  "domain": "movement",
+  "text": "Jumps off the ground with both feet",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "30m-movement-4",
+  "age_months": 30,
+  "domain": "movement",
+  "text": "Turns book pages, one at a time, when you read to her",
+  "source": {
+   "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/30-months.html"
+  }
+ },
+ {
+  "key": "36m-social-1",
+  "age_months": 36,
+  "domain": "social",
+  "text": "Calms down within 10 minutes after you leave her, like at a childcare drop off",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-social-2",
+  "age_months": 36,
+  "domain": "social",
+  "text": "Notices other children and joins them to play",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-language-1",
+  "age_months": 36,
+  "domain": "language",
+  "text": "Talks with you in conversation using at least two back-and-forth exchanges",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-language-2",
+  "age_months": 36,
+  "domain": "language",
+  "text": "Asks “who,” “what,” “where,” or “why” questions, like “Where is mommy/daddy?”",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-language-3",
+  "age_months": 36,
+  "domain": "language",
+  "text": "Says what action is happening in a picture or book when asked, like “running,” “eating,” or “playing”",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-language-4",
+  "age_months": 36,
+  "domain": "language",
+  "text": "Says first name, when asked",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-language-5",
+  "age_months": 36,
+  "domain": "language",
+  "text": "Talks well enough for others to understand, most of the time",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-cognitive-1",
+  "age_months": 36,
+  "domain": "cognitive",
+  "text": "Draws a circle, when you show him how",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-cognitive-2",
+  "age_months": 36,
+  "domain": "cognitive",
+  "text": "Avoids touching hot objects, like a stove, when you warn her",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-movement-1",
+  "age_months": 36,
+  "domain": "movement",
+  "text": "Strings items together, like large beads or macaroni",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-movement-2",
+  "age_months": 36,
+  "domain": "movement",
+  "text": "Puts on some clothes by himself, like loose pants or a jacket",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "36m-movement-3",
+  "age_months": 36,
+  "domain": "movement",
+  "text": "Uses a fork",
+  "source": {
+   "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/3-years.html"
+  }
+ },
+ {
+  "key": "48m-social-1",
+  "age_months": 48,
+  "domain": "social",
+  "text": "Pretends to be something else during play (teacher, superhero, dog)",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-social-2",
+  "age_months": 48,
+  "domain": "social",
+  "text": "Asks to go play with children if none are around, like “Can I play with Alex?”",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-social-3",
+  "age_months": 48,
+  "domain": "social",
+  "text": "Comforts others who are hurt or sad, like hugging a crying friend",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-social-4",
+  "age_months": 48,
+  "domain": "social",
+  "text": "Avoids danger, like not jumping from tall heights at the playground",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-social-5",
+  "age_months": 48,
+  "domain": "social",
+  "text": "Likes to be a “helper”",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-social-6",
+  "age_months": 48,
+  "domain": "social",
+  "text": "Changes behavior based on where she is (place of worship, library, playground)",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-language-1",
+  "age_months": 48,
+  "domain": "language",
+  "text": "Says sentences with four or more words",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-language-2",
+  "age_months": 48,
+  "domain": "language",
+  "text": "Says some words from a song, story, or nursery rhyme",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-language-3",
+  "age_months": 48,
+  "domain": "language",
+  "text": "Talks about at least one thing that happened during her day, like “I played soccer.”",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-language-4",
+  "age_months": 48,
+  "domain": "language",
+  "text": "Answers simple questions like “What is a coat for?” or “What is a crayon for?”",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-cognitive-1",
+  "age_months": 48,
+  "domain": "cognitive",
+  "text": "Names a few colors of items",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-cognitive-2",
+  "age_months": 48,
+  "domain": "cognitive",
+  "text": "Tells what comes next in a well-known story",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-cognitive-3",
+  "age_months": 48,
+  "domain": "cognitive",
+  "text": "Draws a person with three or more body parts",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-movement-1",
+  "age_months": 48,
+  "domain": "movement",
+  "text": "Catches a large ball most of the time",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-movement-2",
+  "age_months": 48,
+  "domain": "movement",
+  "text": "Serves herself food or pours water, with adult supervision",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-movement-3",
+  "age_months": 48,
+  "domain": "movement",
+  "text": "Unbuttons some buttons",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "48m-movement-4",
+  "age_months": 48,
+  "domain": "movement",
+  "text": "Holds crayon or pencil between fingers and thumb (not a fist)",
+  "source": {
+   "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/4-years.html"
+  }
+ },
+ {
+  "key": "60m-social-1",
+  "age_months": 60,
+  "domain": "social",
+  "text": "Follows rules or takes turns when playing games with other children",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-social-2",
+  "age_months": 60,
+  "domain": "social",
+  "text": "Sings, dances, or acts for you",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-social-3",
+  "age_months": 60,
+  "domain": "social",
+  "text": "Does simple chores at home, like matching socks or clearing the table after eating",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-language-1",
+  "age_months": 60,
+  "domain": "language",
+  "text": "Tells a story she heard or made up with at least two events. For example, a cat was stuck in a tree and a firefighter saved it",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-language-2",
+  "age_months": 60,
+  "domain": "language",
+  "text": "Answers simple questions about a book or story after you read or tell it to him",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-language-3",
+  "age_months": 60,
+  "domain": "language",
+  "text": "Keeps a conversation going with more than three back-and-forth exchanges",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-language-4",
+  "age_months": 60,
+  "domain": "language",
+  "text": "Uses or recognizes simple rhymes (bat-cat, ball-tall)",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-cognitive-1",
+  "age_months": 60,
+  "domain": "cognitive",
+  "text": "Counts to 10",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-cognitive-2",
+  "age_months": 60,
+  "domain": "cognitive",
+  "text": "Names some numbers between 1 and 5 when you point to them",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-cognitive-3",
+  "age_months": 60,
+  "domain": "cognitive",
+  "text": "Uses words about time, like “yesterday,” “tomorrow,” “morning,” or “night”",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-cognitive-4",
+  "age_months": 60,
+  "domain": "cognitive",
+  "text": "Pays attention for 5 to 10 minutes during activities. For example, during story time or making arts and crafts (screen time does not count)",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-cognitive-5",
+  "age_months": 60,
+  "domain": "cognitive",
+  "text": "Writes some letters in her name",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-cognitive-6",
+  "age_months": 60,
+  "domain": "cognitive",
+  "text": "Names some letters when you point to them",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-movement-1",
+  "age_months": 60,
+  "domain": "movement",
+  "text": "Buttons some buttons",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ },
+ {
+  "key": "60m-movement-2",
+  "age_months": 60,
+  "domain": "movement",
+  "text": "Hops on one foot",
+  "source": {
+   "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/5-years.html"
+  }
+ }
+]
