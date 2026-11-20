@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.1-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.0-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -26,6 +26,8 @@ Your data stays on your server.
   (bath, tummy time, indoor and outdoor play, story time, screen time, skin to skin, brushing teeth), time in a
   car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
+- Can serve more than one family from one server, invite only. Each family sees only its own data. An owner can
+  delete the family and all its data.
 - Has live timers for sleep, breastfeeding, pumping, activities and confined time. Activity timers can
   run side by side, one for each kind (for example indoor play and tummy time). A timer
   keeps running when you close the app.
@@ -233,8 +235,13 @@ BASE_URL=https://<your hostname>
 docker compose up -d
 ```
 
-Set `ALLOWED_EMAILS` first: the app is public when the tunnel runs. Cloudflare stops a request that sends no
-data for 125 seconds. On a slow computer the sleep plan and the support report can come near this limit.
+Set `OPERATOR_EMAILS` (or `ALLOWED_EMAILS`) first: the app is public when the tunnel runs. See
+[A server for more than one family](#a-server-for-more-than-one-family-invite-only). Also set
+`BEHIND_CLOUDFLARE=true`, so the rate limits see the address of each visitor.
+
+Cloudflare stops a request that sends no data for 125 seconds. The app allows for this: the sleep plan and the
+support report run as a job that the page asks about, the chat sends a heartbeat, and other requests that wait
+for the model get "The assistant is busy" after 60 seconds.
 
 **NVIDIA GPU**: to run the model server on the GPU, put `COMPOSE_FILE=compose.yaml:compose.gpu.yaml` in `.env`.
 You need the NVIDIA Container Toolkit with CDI. Tested on arm64.

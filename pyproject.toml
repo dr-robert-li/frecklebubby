@@ -1,6 +1,6 @@
 [project]
 name = "frecklebubby"
-version = "0.3.1"
+version = "0.4.0"
 description = "Self-hosted baby tracker with REST API and MCP server"
 readme = "README.md"
 license = { text = "MIT" }

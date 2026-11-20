@@ -56,7 +56,7 @@ test('a: a 4-month-old: waiting state, cited suggestions, a source, and the save
 	await expect(waiting).toBeHidden({ timeout: 300_000 });
 	console.log(`support report with the real model: ${Math.round((Date.now() - t0) / 1000)} s`);
 
-	await expect(card.getByText(/^Made \d+ \w+ · the last 7 days and today$/)).toBeVisible();
+	await expect(card.getByText(/^Made \d+ \w+ at .+ · the last 7 days and today$/)).toBeVisible();
 	await expect(card.getByText(NOTICE, { exact: true })).toHaveCount(0);
 	const area = (name: string) => card.getByRole('article', { name, exact: true });
 	for (const name of ['Sleep', 'Nappies', 'Play and tummy time', 'Time in a seat or pram'])

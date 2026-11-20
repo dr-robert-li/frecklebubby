@@ -6,6 +6,10 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-20
+
+An invite-only server for more than one family, with protection for a public address.
+
 ### Added
 
 - Invite only server: `OPERATOR_EMAILS` names the operators. **Settings > Server access** lets an operator invite

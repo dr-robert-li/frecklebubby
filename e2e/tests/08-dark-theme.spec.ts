@@ -7,7 +7,7 @@ test('night theme for feeds in the dark, on every screen', async ({ page, api, f
 	await api.post(`children/${family.childId}/timers/nursing/start`, { data: { side: 'right' } });
 
 	await page.goto('/settings/appearance');
-	await page.getByRole('button', { name: 'Night' }).click();
+	await page.getByRole('button', { name: 'Night', exact: true }).click();
 	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 	const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 	expect(bg).toBe('rgb(22, 20, 30)');
