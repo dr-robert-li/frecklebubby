@@ -427,7 +427,10 @@ pumping, growth, temperature, medicine, activities) from your Huckleberry accoun
 - Enter your Huckleberry email and password. The password is used only during the import. It is not stored or
   logged.
 - The import runs in the background and shows its progress. You can leave the page.
-- Each Huckleberry child becomes a new child in Frecklebubby, also when you already have a child with that name.
+- Select where the data goes. The default: each Huckleberry child becomes a new child in Frecklebubby, also when
+  you already have a child with that name. Or select a child you have now: then the data of the Huckleberry
+  child goes into that child, which keeps its name and birth date. This is only for a Huckleberry account with
+  one child.
 - You can run it again at any time. It does not make copies twice. A new run updates the rows that it imported
   before, so changes you made in Frecklebubby to imported rows are overwritten. Rows that you logged in
   Frecklebubby are not changed.

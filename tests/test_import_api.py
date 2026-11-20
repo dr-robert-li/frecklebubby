@@ -108,6 +108,39 @@ async def test_import_and_reimport(client, hb):
     assert "hb:activities:fake-leo-act0" in rows
 
 
+async def test_import_into_a_child_you_have(client, hb, monkeypatch):
+    h, own = await make_family(client)
+    body = {"email": "parent@example.com", "password": PASSWORD, "timezone": "Australia/Brisbane", "child_id": own}
+
+    async def go():
+        r = await client.post("/api/v1/import/huckleberry", headers=h, json=body)
+        assert r.status_code == 202, r.text
+        return await finish(client, h, r.json()["job_id"])
+
+    # The fake account has two children: nothing is imported.
+    job = await go()
+    assert job["status"] == "failed" and "has 2 children" in job["error"] and imported_entries() == []
+
+    # One Huckleberry child: its entries go to the child of the family, which keeps its name. No new child.
+    monkeypatch.setattr(fake, "USER", fake.USER.model_copy(update={"childList": fake.USER.childList[:1]}))
+    before = (await client.get("/api/v1/me", headers=h)).json()["children"]
+    job = await go()
+    assert job["status"] == "done" and job["progress"]["children"] == 1, job
+    assert (await client.get("/api/v1/me", headers=h)).json()["children"] == before
+    assert imported_entries() and {e.child_id for e in imported_entries()} == {own}
+    count = len(imported_entries())
+
+    # Again with no choice: the Huckleberry child is found by its link. No new child, no copies.
+    assert (await run_import(client, h))["status"] == "done"
+    assert len((await client.get("/api/v1/me", headers=h)).json()["children"]) == 1
+    assert len(imported_entries()) == count
+
+    # A child of another family is refused.
+    h2, _ = await make_family(client, email="other@example.com")
+    r = await client.post("/api/v1/import/huckleberry", headers=h2, json=body)
+    assert r.status_code == 404
+
+
 async def test_family_isolation(client, hb):
     ha, _ = await make_family(client, "a@example.com")
     hb_user, _ = await make_family(client, "b@example.com", child="Bo")

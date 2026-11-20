@@ -26,6 +26,7 @@ from ..db import SessionLocal, utcnow
 from ..models import Child, Entry, ImportJob
 from ..schemas import DATA_MODELS
 from ..services import Conflict, Ctx, Invalid, NotFound, ServiceError, zone
+from ..services.children import get_child as family_child
 from ..services.entries import validate
 
 log = logging.getLogger(__name__)
@@ -324,10 +325,14 @@ def _recover(s: Session) -> None:
     s.commit()
 
 
-def start_job(s: Session, ctx: Ctx, email: str, password: str, timezone: str) -> ImportJob:
-    """Make a job and start its task. Call from a running event loop."""
+def start_job(s: Session, ctx: Ctx, email: str, password: str, timezone: str,
+              into_child_id: int | None = None) -> ImportJob:
+    """Make a job and start its task. Call from a running event loop. `into_child_id`: put the data of the one
+    Huckleberry child into this child of the family; None = each Huckleberry child becomes a new child."""
     factory = _factory()
     zone(timezone)
+    if into_child_id is not None:
+        family_child(s, ctx, into_child_id)  # 404 for a child of another family
     _recover(s)
     if s.scalar(select(ImportJob.id).where(ImportJob.family_id == ctx.fam.id,
                                            ImportJob.status.in_(("pending", "running")))):
@@ -336,7 +341,8 @@ def start_job(s: Session, ctx: Ctx, email: str, password: str, timezone: str) ->
                     progress={"stage": "Waiting", "children": 0, "entries": {}, "skipped": 0, "skipped_reasons": []})
     s.add(job)
     s.commit()
-    _RUNNING[job.id] = asyncio.create_task(run(job.id, ctx.fam.id, ctx.user.id, email, password, timezone, factory))
+    _RUNNING[job.id] = asyncio.create_task(run(job.id, ctx.fam.id, ctx.user.id, email, password, timezone, factory,
+                                               into_child_id))
     return job
 
 
@@ -356,12 +362,25 @@ def _save(job_id: int, **fields: Any) -> None:
         s.commit()
 
 
-def _upsert_child(family_id: int, cid: str, fields: dict[str, Any]) -> int:
+def _upsert_child(family_id: int, cid: str, fields: dict[str, Any], into: int | None = None) -> int:
+    """The child for one Huckleberry child. `into`: link the Huckleberry child to this child and keep its profile."""
     ext = f"hb:child:{cid}"
     with SessionLocal() as s:
         child = s.scalar(select(Child).where(Child.external_id == ext))
         if child is not None and child.family_id != family_id:
             raise Stop("A child in this Huckleberry account is already in another family. Nothing more was imported.")
+        if into is not None:
+            if child is not None and child.id != into:
+                raise Stop(f"This Huckleberry child is already imported as the child {child.name}. Nothing was "
+                           "imported. Run the import for that child.")
+            if child is None:
+                child = s.get(Child, into)
+                if child.external_id:
+                    raise Stop(f"{child.name} already has the data of another Huckleberry child. Nothing was "
+                               "imported.")
+                child.external_id = ext
+                s.commit()
+            return child.id
         if child is None:
             child = Child(family_id=family_id, external_id=ext, birthdate=fields["birthdate"] or date.today())
             s.add(child)
@@ -403,7 +422,7 @@ def _skip(progress: dict, reason: str) -> None:
 
 
 async def run(job_id: int, family_id: int, user_id: int, email: str, password: str, timezone: str,
-              factory: Factory) -> None:
+              factory: Factory, into: int | None = None) -> None:
     progress = {"stage": "Signing in to Huckleberry", "children": 0, "entries": {}, "skipped": 0,
                 "skipped_reasons": []}
     try:
@@ -411,9 +430,13 @@ async def run(job_id: int, family_id: int, user_id: int, email: str, password: s
         tz, now = zone(timezone), utcnow()
         async with factory(email, password, timezone) as hb:
             user = await hb.get_user()
-            for ref in (user.childList if user else []):
+            refs = user.childList if user else []
+            if into is not None and len(refs) != 1:
+                raise Stop(f"This Huckleberry account has {len(refs)} children. The import can put only one "
+                           "Huckleberry child into a child you have. Nothing was imported. Import into new children.")
+            for ref in refs:
                 fields = map_child(await hb.get_child(ref.cid), ref.nickname, tz)
-                child_id = await asyncio.to_thread(_upsert_child, family_id, ref.cid, fields)
+                child_id = await asyncio.to_thread(_upsert_child, family_id, ref.cid, fields, into)
                 progress["children"] += 1
                 # A year before birth also finds pumping in pregnancy; no birthdate = 5 years back.
                 first = (datetime.combine(fields["birthdate"] - timedelta(days=365), time(), UTC)

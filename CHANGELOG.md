@@ -6,6 +6,11 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Huckleberry import: select where the data goes, a new child (as before) or a child you have now. The page says
+  where the data is when the import is done. API: the optional field `child_id` of `POST /import/huckleberry`.
+
 ## [0.4.1] - 2026-11-21
 
 ### Changed

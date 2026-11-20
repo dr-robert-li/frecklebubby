@@ -3,7 +3,7 @@
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy.orm import Session
 
 from ..auth import get_ctx, upload_limit
@@ -19,6 +19,9 @@ class ImportIn(BaseModel):
     email: Email
     password: Annotated[str, StringConstraints(min_length=1, max_length=500)]
     timezone: str
+    child_id: int | None = Field(None, description=(
+        "Put the data into this child of your family. Only for a Huckleberry account with one child. The child "
+        "keeps its name and birth date. Empty = each Huckleberry child becomes a new child."))
 
 
 class ImportStarted(BaseModel):
@@ -40,7 +43,8 @@ class JobOut(BaseModel):
     dependencies=[Depends(upload_limit)])
 async def start_import(body: ImportIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     # async route: the job task needs the running event loop.
-    return {"job_id": huckleberry.start_job(s, ctx, body.email, body.password, body.timezone).id}
+    return {"job_id": huckleberry.start_job(s, ctx, body.email, body.password, body.timezone,
+                                             body.child_id).id}
 
 
 @router.get("/import/jobs/{job_id}", response_model=JobOut, description=(

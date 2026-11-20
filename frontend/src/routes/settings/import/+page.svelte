@@ -10,6 +10,9 @@
 	let job = $state<Job | null>(null);
 	let error = $state('');
 	let busy = $state(false);
+	let into = $state<number | null>(null); // null = new children
+	const kids = $derived(app.me?.children ?? []);
+	let target = $state('');
 	const total = $derived(Object.values(job?.progress.entries ?? {}).reduce((a, b) => a + b, 0));
 
 	async function start(e: SubmitEvent) {
@@ -17,7 +20,8 @@
 		busy = true;
 		error = '';
 		try {
-			const { job_id } = await api<{ job_id: number }>('/import/huckleberry', { method: 'POST', body: { email, password, timezone } });
+			const { job_id } = await api<{ job_id: number }>('/import/huckleberry', { method: 'POST', body: { email, password, timezone, child_id: into } });
+			target = kids.find((c) => c.id === into)?.name ?? '';
 			password = '';
 			poll(job_id);
 		} catch (err) {
@@ -52,6 +56,16 @@
 	<label class="field"><span>Huckleberry email</span><input type="email" bind:value={email} required autocomplete="off" /></label>
 	<label class="field"><span>Huckleberry password</span><input type="password" bind:value={password} required autocomplete="off" /></label>
 	<label class="field"><span>Time zone of the data</span><input bind:value={timezone} required /></label>
+	{#if kids.length}
+		<fieldset class="field">
+			<legend>Where does the data go?</legend>
+			<label class="pick"><input type="radio" name="into" checked={into === null} onchange={() => (into = null)} /> A new child for each Huckleberry child</label>
+			{#each kids as c (c.id)}
+				<label class="pick"><input type="radio" name="into" checked={into === c.id} onchange={() => (into = c.id)} /> {c.name} (a child you have now)</label>
+			{/each}
+			<p class="muted small">Select a child you have now only when the Huckleberry account has one child. That child keeps its name and birth date.</p>
+		</fieldset>
+	{/if}
 	{#if error}<p class="notice" role="alert">{error}</p>{/if}
 	<button class="wide" type="submit" disabled={busy}>{busy ? 'Importing…' : 'Start import'}</button>
 </form>
@@ -61,6 +75,7 @@
 		<h2>{{ pending: 'Waiting to start', running: 'Importing…', done: 'Import complete', failed: 'Import failed' }[job.status]}</h2>
 		{#if job.progress.stage && job.status === 'running'}<p class="muted">Now: {job.progress.stage}</p>{/if}
 		{#if job.status !== 'failed'}<progress max="1" value={job.status === 'done' ? 1 : undefined} aria-label="Import progress"></progress>{/if}
+		{#if job.status === 'done'}<p>{target ? `The data is in the child ${target}.` : 'The data is in new children. Select the child name at the top of the page to change child.'}</p>{/if}
 		<p>{job.progress.children ?? 0} {job.progress.children === 1 ? 'child' : 'children'} · {total} entries{job.progress.skipped ? ` · ${job.progress.skipped} skipped` : ''}</p>
 		{#if Object.keys(job.progress.entries ?? {}).length}
 			<ul class="counts">
@@ -72,6 +87,22 @@
 {/if}
 
 <style>
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0;
+	}
+	legend {
+		font-weight: 700;
+		padding: 0;
+		margin-bottom: 4px;
+	}
+	.pick {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 44px;
+	}
 	progress {
 		width: 100%;
 		height: 12px;
