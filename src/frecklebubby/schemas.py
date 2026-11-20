@@ -9,9 +9,9 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 EntryType = Literal[
     "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry",
+    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry", "play", "confined",
 ]
-TimerType = Literal["sleep", "nursing", "pump", "activity"]
+TimerType = Literal["sleep", "nursing", "pump", "activity", "play", "confined"]
 TimerAction = Literal["start", "pause", "resume", "switch", "cancel", "complete"]
 
 SleepCondition = Literal["happy", "upset", "under_10_minutes", "10-20_minutes", "longTimeToFallAsleep", "wokeUpChild"]
@@ -30,6 +30,11 @@ MedicineUnit = Literal["ml", "oz", "tsp", "drops", "mg"]
 ActivityKind = Literal[
     "bath", "tummyTime", "storyTime", "screenTime", "skinToSkin", "outdoorPlay", "indoorPlay", "brushTeeth"
 ]
+PlayKind = Literal["indoor", "outdoor"]
+ConfinedDevice = Literal["car_seat", "bouncer", "swing", "pram", "carrier", "high_chair", "other"]
+RashSeverity = Literal["mild", "moderate", "severe"]
+PeeColor = Literal["pale", "yellow", "dark_yellow", "orange_pink", "red"]
+PeeLook = Literal["clear", "cloudy"]
 
 Text100 = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 HHMM = Annotated[str, StringConstraints(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")]
@@ -76,6 +81,19 @@ class NappyData(_Data):
     color: PooColor | None = None
     consistency: PooConsistency | None = None
     rash: bool = False
+    air_minutes: int | None = Field(None, ge=0, le=240, description="Time with the nappy off")
+    rash_severity: RashSeverity | None = None
+    pee_color: PeeColor | None = None
+    pee_look: PeeLook | None = None
+    pee_smell: bool | None = Field(None, description="Strong smell")
+
+    @model_validator(mode="after")
+    def _details(self):
+        if self.rash_severity:
+            self.rash = True
+        if self.mode not in ("pee", "both") and (self.pee_color or self.pee_look or self.pee_smell):
+            raise ValueError("pee_color, pee_look and pee_smell: only for a wet nappy (mode pee or both)")
+        return self
 
 
 class PottyData(NappyData):
@@ -135,14 +153,23 @@ class CryData(_Data):
     soothed_by: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)] | None = None
 
 
+class PlayData(_Data):
+    kind: PlayKind | None = None
+    tummy_seconds: float | None = Field(None, ge=0, le=86400)
+
+
+class ConfinedData(_Data):
+    device: ConfinedDevice
+
+
 DATA_MODELS: dict[str, type[_Data]] = {
     "sleep": SleepData, "nursing": NursingData, "bottle": BottleData, "solids": SolidsData,
     "nappy": NappyData, "potty": PottyData, "pump": PumpData, "growth": GrowthData,
     "temperature": TemperatureData, "medicine": MedicineData, "activity": ActivityData,
-    "milestone": MilestoneData, "note": _Data, "cry": CryData,
+    "milestone": MilestoneData, "note": _Data, "cry": CryData, "play": PlayData, "confined": ConfinedData,
 }
 END_REQUIRED = {"sleep"}
-END_OPTIONAL = {"nursing", "pump", "activity", "cry"}
+END_OPTIONAL = {"nursing", "pump", "activity", "cry", "play", "confined"}
 
 # --- users, families, children --------------------------------------------------------------------
 
@@ -311,6 +338,7 @@ class TimerBody(BaseModel):
     at: datetime | None = Field(None, description="start: start time; complete: end time. No offset = family time zone.")
     side: Side | None = None
     kind: ActivityKind | None = None
+    device: ConfinedDevice | None = Field(None, description="confined timer only (start)")
     data: dict[str, Any] | None = None
     notes: Annotated[str, StringConstraints(max_length=2000)] | None = None
 
@@ -382,6 +410,8 @@ class FeedDay(BaseModel):
 class NappyDay(BaseModel):
     wet: int = 0
     dirty: int = 0
+    air_minutes: int = 0
+    rash: int = Field(0, description="Nappies with a rash")
 
 
 class ActivityDay(BaseModel):
@@ -394,6 +424,18 @@ class CryDay(BaseModel):
     seconds: int = 0
 
 
+class PlayDay(BaseModel):
+    count: int = Field(0, description="play entries + activity entries of kind tummyTime, indoorPlay, outdoorPlay")
+    seconds: int = 0
+    tummy_seconds: int = Field(0, description="play tummy_seconds + duration of activity entries of kind tummyTime")
+
+
+class ConfinedDay(BaseModel):
+    count: int = 0
+    seconds: int = 0
+    longest_seconds: int = Field(0, description="Longest continuous period (gaps of 10 min or less joined)")
+
+
 class DayReport(BaseModel):
     date: date
     sleep: SleepDay = SleepDay()
@@ -403,12 +445,37 @@ class DayReport(BaseModel):
     medicine_count: int = 0
     activities: dict[str, ActivityDay] = {}
     crying: CryDay = CryDay()
+    play: PlayDay = PlayDay()
+    confined: ConfinedDay = ConfinedDay()
+
+
+class TummyRecommendation(BaseModel):
+    minutes: int
+    text: str
+    citation: Citation
 
 
 class DailyReport(BaseModel):
     timezone: str
     sleep_recommendations: list[SleepRecommendation]
+    tummy_recommendation: TummyRecommendation | None = Field(
+        None, description="Daily tummy time for babies under 12 months, with source; null from 12 months")
     days: list[DayReport]
+
+
+class ConfinedLevel(BaseModel):
+    after_seconds: int = Field(description="Show from this continuous time")
+    title: str
+    text: str
+    citations: list[dict[str, Any]]
+
+
+class ConfinedNow(BaseModel):
+    since: datetime = Field(description="Start of the continuous confined period")
+    device: str
+    seconds: int = Field(description="Continuous seconds at response time")
+    note: ConfinedLevel | None = Field(description="null when the child is 5 years or older")
+    warning: ConfinedLevel | None = Field(description="null when the child is 12 months or older")
 
 
 class Status(BaseModel):
@@ -418,6 +485,7 @@ class Status(BaseModel):
     today: DayReport
     prediction: Prediction | None
     unread_notifications: int
+    confined: ConfinedNow | None = Field(None, description="Set while a confined timer runs")
 
 
 # --- growth, milestones ---------------------------------------------------------------------------
@@ -474,7 +542,7 @@ class MilestonesOut(BaseModel):
 class ReminderIn(BaseModel):
     type: Literal[
         "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-        "growth", "temperature", "medicine", "activity", "milestone", "note", "sleep_alert",
+        "growth", "temperature", "medicine", "activity", "milestone", "note", "play", "confined", "sleep_alert",
     ]
     mode: Literal["in", "at"]
     interval_minutes: int | None = Field(None, ge=1, le=10080)

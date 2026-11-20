@@ -22,7 +22,7 @@ test('a nappy reminder set in the app fires and the parent reads it', async ({ p
 	// a nappy 10 minutes ago, so the reminder is due now
 	await page.getByRole('link', { name: 'Home' }).click();
 	const s = await openTile(page, 'Nappy');
-	await s.getByLabel('Time').fill(todayAgo(10));
+	await s.getByLabel('Time', { exact: true }).fill(todayAgo(10));
 	await s.getByRole('button', { name: 'Wet', exact: true }).click();
 	await s.getByRole('button', { name: 'Save' }).click();
 	await expect(s).toBeHidden();

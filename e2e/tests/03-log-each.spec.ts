@@ -21,6 +21,7 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	// nappy: poo with colour and texture
 	s = await openTile(page, 'Nappy');
 	await s.getByRole('button', { name: 'Dirty', exact: true }).click();
+	await s.getByText('More details').click(); // details are collapsed so that the quick log stays 2 taps (M9)
 	await s.getByRole('button', { name: 'Yellow' }).click();
 	await s.getByRole('button', { name: 'Runny' }).click();
 	await s.getByRole('button', { name: 'Big' }).click();

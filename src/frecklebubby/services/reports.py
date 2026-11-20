@@ -10,13 +10,28 @@ from ..models import Entry, Notification
 from ..schemas import ActivityDay, DayReport
 from . import Ctx, Invalid, day_bounds
 from .children import age_months, get_child, is_night
+from .confined import merge, now_info, under
 from .entries import last_entries
+from .library import source
 from .sleep import predict, recommendations
 from .timers import list_timers, timer_out
+
+PLAY_KINDS = ("tummyTime", "indoorPlay", "outdoorPlay")  # old activity kinds that count as play
+# WHO 2019 (who-under-5-activity-sleep.md): "For infants not yet mobile, this includes at least 30 minutes in prone
+# position (tummy time)"; checked in tests/test_m9.py.
+TUMMY = {"minutes": 30, "under_months": 12, "source": "who-under-5-activity-sleep",
+         "text": "WHO: at least 30 minutes of tummy time a day, spread through the day, for babies under 1 year "
+                 "who are not yet mobile."}
 
 
 def _seconds(a: datetime, b: datetime) -> int:
     return max(0, int((b - a).total_seconds()))
+
+
+def tummy_recommendation(child, day: date) -> dict | None:
+    if not under(child, day, TUMMY["under_months"]):
+        return None
+    return {"minutes": TUMMY["minutes"], "text": TUMMY["text"], "citation": source(TUMMY["source"])}
 
 
 def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: date | None = None,
@@ -33,6 +48,7 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
     bounds = [day_bounds(d, tz) for d in days]
     reports = [DayReport(date=d) for d in days]
     lo, hi = bounds[0][0], bounds[-1][1]
+    confined_spans: dict[date, list] = {}
 
     # Sleeps that start up to 2 days earlier can reach into the range.
     entries = s.scalars(select(Entry).where(Entry.child_id == child.id, Entry.started_at >= lo - timedelta(days=2),
@@ -70,6 +86,8 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
         elif e.type == "nappy":
             r.nappies.wet += d["mode"] in ("pee", "both")
             r.nappies.dirty += d["mode"] in ("poo", "both")
+            r.nappies.air_minutes += int(d.get("air_minutes", 0))
+            r.nappies.rash += bool(d.get("rash"))
         elif e.type == "pump":
             r.pump_ml += d.get("total_ml", 0)
         elif e.type == "medicine":
@@ -78,11 +96,27 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
             a = r.activities.setdefault(d["kind"], ActivityDay())
             a.count += 1
             a.seconds += duration
+            if d["kind"] in PLAY_KINDS:
+                r.play.count += 1
+                r.play.seconds += duration
+                r.play.tummy_seconds += duration if d["kind"] == "tummyTime" else 0
         elif e.type == "cry":
             r.crying.count += 1
             r.crying.seconds += duration
+        elif e.type == "play":
+            r.play.count += 1
+            r.play.seconds += duration
+            r.play.tummy_seconds += int(d.get("tummy_seconds", 0))
+        elif e.type == "confined":
+            r.confined.count += 1
+            r.confined.seconds += duration
+            if e.ended_at:
+                confined_spans.setdefault(r.date, []).append((e.started_at, e.ended_at))
+    for r in reports:
+        # Longest continuous period of the entries that start on this day.
+        r.confined.longest_seconds = max((_seconds(a, b) for a, b in merge(confined_spans.get(r.date, []))), default=0)
     return {"timezone": ctx.fam.timezone, "sleep_recommendations": recommendations(age_months(child, now)),
-            "days": reports}
+            "tummy_recommendation": tummy_recommendation(child, now.astimezone(tz).date()), "days": reports}
 
 
 def status(s: Session, ctx: Ctx, child_id: int, now: datetime | None = None) -> dict:
@@ -98,4 +132,5 @@ def status(s: Session, ctx: Ctx, child_id: int, now: datetime | None = None) -> 
         "today": daily(s, ctx, child.id, today, today, now)["days"][0],
         "prediction": predict(s, child, ctx.tz, now),
         "unread_notifications": unread,
+        "confined": now_info(s, child, ctx.tz, now),
     }

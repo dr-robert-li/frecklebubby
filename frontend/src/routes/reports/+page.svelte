@@ -2,7 +2,7 @@
 	import { api, apiRaw } from '#lib/api.ts';
 	import { child, units, wording } from '#lib/app.svelte.ts';
 	import BarChart from '#lib/BarChart.svelte';
-	import { addDays, fmtDay, localDay, round, toUnit, unitLabel, type UnitKind } from '#lib/format.svelte.ts';
+	import { addDays, fmtDay, fmtDur, localDay, round, toUnit, unitLabel, type UnitKind } from '#lib/format.svelte.ts';
 	import GrowthChart from '#lib/GrowthChart.svelte';
 	import Icon from '#lib/Icon.svelte';
 
@@ -92,6 +92,27 @@
 				{ label: 'Dirty', color: 'var(--s2)', values: days.map((d: any) => d.nappies.dirty) }
 			]} />
 	</section>
+	{#if days.some((d: any) => d.play?.count)}
+		{@const tr = report.tummy_recommendation}
+		<section class="card">
+			<BarChart title="Play per day (minutes)" {labels} fmt={(v) => `${Math.round(v)} min`}
+				line={tr ? { value: tr.minutes, label: `${tr.minutes} min tummy time` } : null}
+				series={[
+					{ label: 'Tummy time', color: 'var(--s1)', values: days.map((d: any) => Math.round(d.play.tummy_seconds / 60)) },
+					{ label: 'Other play', color: 'var(--s2)', values: days.map((d: any) => Math.round(Math.max(0, d.play.seconds - d.play.tummy_seconds) / 60)) }
+				]} />
+			<p class="small muted">Play and tummy time with an end time, also old "Tummy time", "Indoor play" and "Outdoor play" activities.
+				{#if tr}{tr.text} (<a href={tr.citation.url} target="_blank" rel="noopener">WHO {tr.citation.year ?? ''}</a>){/if}</p>
+		</section>
+	{/if}
+	{#if days.some((d: any) => d.confined?.count)}
+		<section class="card">
+			<BarChart title="Confined time per day (minutes)" {labels} fmt={(v) => `${Math.round(v)} min`}
+				series={[{ label: 'Confined', color: 'var(--s1)', values: days.map((d: any) => Math.round(d.confined.seconds / 60)) }]} />
+			<p class="small muted">Time in a car seat, pram, bouncer, swing, carrier or high chair. Longest without a break this week:
+				{fmtDur(Math.max(...days.map((d: any) => d.confined.longest_seconds)))}.</p>
+		</section>
+	{/if}
 	{#if days.some((d: any) => d.crying?.count)}
 		<section class="card">
 			<BarChart title="Crying per day (minutes)" {labels} fmt={(v) => `${Math.round(v)} min`}

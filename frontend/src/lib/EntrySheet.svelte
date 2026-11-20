@@ -2,10 +2,11 @@
 	// Log, edit or delete one entry of any type. Timer types also get a "Start timer" tab.
 	import { api } from './api';
 	import { app, refresh, toast, units, wording } from './app.svelte';
+	import Cites from './Cites.svelte';
 	import { fromUnit, round, toLocalInput, toUnit, unitLabel, type UnitKind } from './format.svelte';
 	import Icon from './Icon.svelte';
 	import Sheet from './Sheet.svelte';
-	import { ACTIVITIES, tracker, type Entry, type EntryType, type Field } from './trackers';
+	import { ACTIVITIES, DEVICES, tracker, type Entry, type EntryType, type Field } from './trackers';
 
 	let { type, entry = null, childId, onclose }: { type: EntryType; entry?: Entry | null; childId: number; onclose: () => void } =
 		$props();
@@ -14,6 +15,8 @@
 	const u = units();
 	const running = $derived(app.status?.timers.some((x) => x.type === type));
 	const POO_HEX: Record<string, string> = { yellow: '#E8C547', brown: '#8A5A2B', green: '#6E9B3A', black: '#222', red: '#C0392B', gray: '#9A9A9A' };
+	const PEE_HEX: Record<string, string> = { pale: '#F7F1C8', yellow: '#F2D74E', dark_yellow: '#C9971C', orange_pink: '#F2A07B', red: '#C0392B' };
+	const HEX: Record<string, Record<string, string>> = { color: POO_HEX, pee_color: PEE_HEX };
 
 	// form values in display units
 	function initial(): Record<string, any> {
@@ -39,7 +42,8 @@
 		notes: entry?.notes ?? '',
 		started: toLocalInput(entry?.started_at ?? (type === 'sleep' && !entry ? Date.now() - 3600_000 : undefined)),
 		ended: entry?.ended_at ? toLocalInput(entry.ended_at) : type === 'sleep' ? toLocalInput() : '',
-		tab: (t.timer && !entry && !running ? 'timer' : 'log') as 'timer' | 'log'
+		tab: (t.timer && !entry && !running ? 'timer' : 'log') as 'timer' | 'log',
+		more: !!entry && t.fields.some((f) => f.more && entry!.data[f.key] != null && entry!.data[f.key] !== false)
 	});
 	const s0 = start();
 	let vals = $state(initial());
@@ -50,6 +54,9 @@
 	let error = $state('');
 	let busy = $state(false);
 	let confirmDelete = $state(false);
+	// "More details" starts open when the entry being edited has one of them.
+	let moreOpen = $state(s0.more);
+	let advice = $state<{ title: string; body: string; citations: any[] } | null>(null);
 
 	const visible = (f: Field) => !f.show || f.show(vals);
 	const empty = (x: any) => x === '' || x == null || (Array.isArray(x) && !x.length);
@@ -71,7 +78,7 @@
 			if (f.kind === 'foods') x = x.filter((fd: any) => fd.name.trim()).map((fd: any) => (fd.amount.trim() ? { name: fd.name.trim(), amount: fd.amount.trim() } : { name: fd.name.trim() }));
 			if (f.kind === 'text' && typeof x === 'string') x = x.trim();
 			if (f.kind === 'bool') {
-				data[f.key] = !!x;
+				if (x || !f.more) data[f.key] = !!x; // optional details: leave out when not ticked
 				continue;
 			}
 			if (empty(x)) {
@@ -114,12 +121,24 @@
 			else await api(`/children/${childId}/entries`, { method: 'POST', body: { type, ...body } });
 			toast(entry ? 'Changes saved' : `${t.label} saved`);
 			refresh();
+			if (data.rash && (type === 'nappy' || type === 'potty') && (await showRashAdvice())) return;
 			onclose();
 		} catch (e) {
 			error = (e as Error).message;
 		} finally {
 			busy = false;
 		}
+	}
+
+	/** After a rash is logged: show the rash card from the insights (NHS advice with sources). */
+	async function showRashAdvice() {
+		try {
+			const cards = await api<any[]>(`/children/${childId}/insights`);
+			advice = cards.find((c) => c.kind === 'nappy_rash') ?? null;
+		} catch {
+			advice = null;
+		}
+		return !!advice;
 	}
 
 	async function remove() {
@@ -138,9 +157,11 @@
 
 	async function startTimer(extra: Record<string, string> = {}) {
 		if (type === 'activity' && !vals.kind) return void (error = 'Choose an activity.');
+		if (type === 'confined' && !vals.device) return void (error = 'Choose where.');
 		busy = true;
 		try {
-			await api(`/children/${childId}/timers/${type}/start`, { method: 'POST', body: type === 'activity' ? { kind: vals.kind } : extra });
+			const body = type === 'activity' ? { kind: vals.kind } : type === 'confined' ? { device: vals.device } : extra;
+			await api(`/children/${childId}/timers/${type}/start`, { method: 'POST', body });
 			toast(`${t.label} timer started`);
 			refresh();
 			onclose();
@@ -152,7 +173,58 @@
 	}
 </script>
 
-<Sheet title={entry ? `Edit ${t.label.toLowerCase()}` : t.label} {onclose}>
+{#snippet fieldView(f: Field)}
+			{#if f.kind === 'one' || f.kind === 'many'}
+				<fieldset>
+					<legend class="field-label">{f.label}</legend>
+					<div class="chips">
+						{#each f.options as [v, l] (v)}
+							<button type="button" class="chip" aria-pressed={f.kind === 'many' ? vals[f.key].includes(v) : vals[f.key] === v}
+								onclick={() => toggle(f, v)}>
+								{#if HEX[f.key]}<span class="dot" style="background:{HEX[f.key][v]}"></span>{/if}{l}
+							</button>
+						{/each}
+					</div>
+				</fieldset>
+			{:else if f.kind === 'num'}
+				<label class="field"><span>{f.label}{f.unit ? ` (${f.unit === 'min' ? 'min' : unitLabel(f.unit, u)})` : f.plain ? ` (${f.plain})` : ''}</span>
+					<input type="number" inputmode="decimal" step="any" min="0" max={f.max} bind:value={vals[f.key]} /></label>
+				{#if f.chips}
+					<div class="chips quick" role="group" aria-label="{f.label}: quick choice">
+						{#each f.chips as c (c)}
+							<button type="button" class="chip" aria-pressed={Number(vals[f.key]) === c} onclick={() => (vals[f.key] = Number(vals[f.key]) === c ? '' : c)}>{c} {f.plain ?? ''}</button>
+						{/each}
+					</div>
+				{/if}
+			{:else if f.kind === 'text'}
+				<label class="field"><span>{f.label}</span><input type="text" maxlength="100" bind:value={vals[f.key]} /></label>
+			{:else if f.kind === 'bool'}
+				<label class="check"><input type="checkbox" bind:checked={vals[f.key]} /> {f.label}</label>
+			{:else if f.kind === 'foods'}
+				<fieldset>
+					<legend class="field-label">{f.label}</legend>
+					{#each vals.foods as food, i (i)}
+						<div class="food">
+							<input aria-label="Food {i + 1}" placeholder="Food, e.g. pumpkin" bind:value={food.name} />
+							<input aria-label="Amount of food {i + 1}" placeholder="Amount" class="amt" bind:value={food.amount} />
+							{#if vals.foods.length > 1}
+								<button type="button" class="icon" aria-label="Remove food {i + 1}" onclick={() => vals.foods.splice(i, 1)}><Icon name="close" /></button>
+							{/if}
+						</div>
+					{/each}
+					<button type="button" class="plain" onclick={() => vals.foods.push({ name: '', amount: '' })}><Icon name="plus" /> Add food</button>
+				</fieldset>
+			{/if}
+{/snippet}
+
+<Sheet title={advice ? advice.title : entry ? `Edit ${t.label.toLowerCase()}` : t.label} {onclose}>
+	{#if advice}
+		<div class="stack advice" role="status">
+			<p>{advice.body}</p>
+			<Cites list={advice.citations} />
+			<button class="wide big" style="background: var({t.color})" onclick={onclose}><Icon name="check" /> Done</button>
+		</div>
+	{:else}
 	{#if t.timer && !entry}
 		<div class="seg" role="tablist" aria-label="How to log">
 			<button role="tab" aria-selected={tab === 'timer'} onclick={() => (tab = 'timer')}>Start timer</button>
@@ -177,6 +249,13 @@
 							<button class="chip" aria-pressed={vals.kind === v} onclick={() => (vals.kind = v)}>{l}</button>
 						{/each}
 					</div>
+				{:else if type === 'confined'}
+					<p class="muted">Where is {app.me?.children.find((c) => c.id === childId)?.name ?? 'your child'}?</p>
+					<div class="chips" role="group" aria-label="Where">
+						{#each DEVICES as [v, l] (v)}
+							<button class="chip" aria-pressed={vals.device === v} onclick={() => (vals.device = v)}>{l}</button>
+						{/each}
+					</div>
 				{/if}
 				<button class="big wide" style="background: var({t.color})" disabled={busy} onclick={() => startTimer()}>
 					<Icon name="play" /> Start {t.label.toLowerCase()} timer
@@ -195,44 +274,19 @@
 				{/if}
 			</div>
 
-			{#each t.fields as f (f.key)}
-				{#if visible(f)}
-					{#if f.kind === 'one' || f.kind === 'many'}
-						<fieldset>
-							<legend class="field-label">{f.label}</legend>
-							<div class="chips">
-								{#each f.options as [v, l] (v)}
-									<button type="button" class="chip" aria-pressed={f.kind === 'many' ? vals[f.key].includes(v) : vals[f.key] === v}
-										onclick={() => toggle(f, v)}>
-										{#if f.key === 'color'}<span class="dot" style="background:{POO_HEX[v]}"></span>{/if}{l}
-									</button>
-								{/each}
-							</div>
-						</fieldset>
-					{:else if f.kind === 'num'}
-						<label class="field"><span>{f.label}{f.unit ? ` (${f.unit === 'min' ? 'min' : unitLabel(f.unit, u)})` : ''}</span>
-							<input type="number" inputmode="decimal" step="any" min="0" bind:value={vals[f.key]} /></label>
-					{:else if f.kind === 'text'}
-						<label class="field"><span>{f.label}</span><input type="text" maxlength="100" bind:value={vals[f.key]} /></label>
-					{:else if f.kind === 'bool'}
-						<label class="check"><input type="checkbox" bind:checked={vals[f.key]} /> {f.label}</label>
-					{:else if f.kind === 'foods'}
-						<fieldset>
-							<legend class="field-label">{f.label}</legend>
-							{#each vals.foods as food, i (i)}
-								<div class="food">
-									<input aria-label="Food {i + 1}" placeholder="Food, e.g. pumpkin" bind:value={food.name} />
-									<input aria-label="Amount of food {i + 1}" placeholder="Amount" class="amt" bind:value={food.amount} />
-									{#if vals.foods.length > 1}
-										<button type="button" class="icon" aria-label="Remove food {i + 1}" onclick={() => vals.foods.splice(i, 1)}><Icon name="close" /></button>
-									{/if}
-								</div>
-							{/each}
-							<button type="button" class="plain" onclick={() => vals.foods.push({ name: '', amount: '' })}><Icon name="plus" /> Add food</button>
-						</fieldset>
-					{/if}
-				{/if}
+			{#each t.fields.filter((f) => !f.more) as f (f.key)}
+				{#if visible(f)}{@render fieldView(f)}{/if}
 			{/each}
+			{#if t.fields.some((f) => f.more && visible(f))}
+				<details class="more" bind:open={moreOpen}>
+					<summary>More details <Icon name="down" /></summary>
+					<div class="stack">
+						{#each t.fields.filter((f) => f.more) as f (f.key)}
+							{#if visible(f)}{@render fieldView(f)}{/if}
+						{/each}
+					</div>
+				</details>
+			{/if}
 
 			<label class="field"><span>{type === 'note' ? 'Note' : 'Notes (optional)'}</span>
 				<textarea bind:value={notes} maxlength="2000"></textarea></label>
@@ -251,6 +305,7 @@
 				{/if}
 			{/if}
 		</form>
+	{/if}
 	{/if}
 </Sheet>
 
@@ -297,6 +352,32 @@
 	.food .amt {
 		width: 34%;
 		flex: none;
+	}
+	.more {
+		border: 1.5px solid var(--line);
+		border-radius: var(--radius-s);
+		padding: 0 14px;
+	}
+	.more summary {
+		min-height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		list-style: none;
+		font-weight: 700;
+		cursor: pointer;
+	}
+	.more summary::-webkit-details-marker {
+		display: none;
+	}
+	.more[open] summary :global(svg) {
+		transform: rotate(180deg);
+	}
+	.more[open] {
+		padding-bottom: 14px;
+	}
+	.advice p {
+		margin: 0;
 	}
 	.dot {
 		width: 14px;

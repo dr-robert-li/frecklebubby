@@ -57,7 +57,7 @@ async def test_sleep_activity_pump(client):
     act(s, ctx, cid, "sleep", "start", TimerBody(at=at(0)), now=at(1))
     with pytest.raises(Invalid, match="use them only with complete"):
         act(s, ctx, cid, "sleep", "pause", TimerBody(data={}), now=at(2))
-    with pytest.raises(Invalid, match="nursing or activity"):
+    with pytest.raises(Invalid, match="nursing, activity or play"):
         act(s, ctx, cid, "sleep", "switch", TimerBody(), now=at(2))
     _, e = act(s, ctx, cid, "sleep", "complete",
                TimerBody(at=at(90), data={"locations": ["car"]}), now=at(95))

@@ -3,7 +3,7 @@ import { fmtDur, fmtUnit, type UnitKind, type Units } from './format.svelte';
 
 export type EntryType =
 	| 'sleep' | 'nursing' | 'bottle' | 'solids' | 'nappy' | 'potty' | 'pump'
-	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry';
+	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry' | 'play' | 'confined';
 
 export type Entry = {
 	id: number;
@@ -20,15 +20,18 @@ export type Entry = {
 export type Wording = 'nappy' | 'diaper';
 
 type Opt = [value: string, label: string];
+// more: shown under the collapsed "More details" part of the sheet.
+type Common = { key: string; label: string; required?: boolean; show?: (v: any) => boolean; more?: boolean };
 export type Field =
-	| { key: string; label: string; kind: 'one' | 'many'; options: Opt[]; required?: boolean; show?: (v: any) => boolean }
-	| { key: string; label: string; kind: 'num'; unit?: UnitKind | 'min'; plain?: string; max?: number; required?: boolean; show?: (v: any) => boolean }
-	| { key: string; label: string; kind: 'text' | 'bool' | 'foods'; required?: boolean; show?: (v: any) => boolean };
+	| (Common & { kind: 'one' | 'many'; options: Opt[] })
+	| (Common & { kind: 'num'; unit?: UnitKind | 'min'; plain?: string; max?: number; chips?: number[] })
+	| (Common & { kind: 'text' | 'bool' | 'foods' });
 
 export type Tracker = {
 	type: EntryType;
 	label: string;
 	color: string; // CSS variable of the tracker pastel
+	icon?: string; // Icon name when it is not the type
 	end?: 'required' | 'optional';
 	timer?: boolean;
 	fields: Field[];
@@ -61,6 +64,16 @@ export const ACTIVITIES: Opt[] = [
 	['bath', 'Bath'], ['tummyTime', 'Tummy time'], ['storyTime', 'Story time'], ['screenTime', 'Screen time'],
 	['skinToSkin', 'Skin to skin'], ['outdoorPlay', 'Outdoor play'], ['indoorPlay', 'Indoor play'], ['brushTeeth', 'Brush teeth']
 ];
+export const PLAY_KINDS: Opt[] = [['indoor', 'Indoor'], ['outdoor', 'Outdoor']];
+export const DEVICES: Opt[] = [
+	['car_seat', 'Car seat'], ['pram', 'Pram'], ['bouncer', 'Bouncer'], ['swing', 'Swing'], ['carrier', 'Carrier'],
+	['high_chair', 'High chair'], ['other', 'Other']
+];
+export const PEE_COLOURS: Opt[] = [
+	['pale', 'Pale'], ['yellow', 'Yellow'], ['dark_yellow', 'Dark yellow'], ['orange_pink', 'Orange or pink'], ['red', 'Red']
+];
+const PEE_LOOK: Opt[] = [['clear', 'Clear'], ['cloudy', 'Cloudy']];
+const RASH: Opt[] = [['mild', 'Mild'], ['moderate', 'Moderate'], ['severe', 'Severe']];
 const MED_UNITS: Opt[] = [['ml', 'ml'], ['oz', 'oz'], ['tsp', 'tsp'], ['drops', 'drops'], ['mg', 'mg']];
 const SIDES: Opt[] = [['left', 'Left'], ['right', 'Right']];
 
@@ -68,11 +81,16 @@ const pee = (v: any) => v.mode === 'pee' || v.mode === 'both';
 const poo = (v: any) => v.mode === 'poo' || v.mode === 'both';
 const nappyFields = (word: string): Field[] => [
 	{ key: 'mode', label: 'Type', kind: 'one', required: true, options: [['pee', 'Wet'], ['poo', 'Dirty'], ['both', 'Wet and dirty'], ['dry', 'Dry']] },
-	{ key: 'pee_amount', label: 'Wee amount', kind: 'one', options: AMOUNTS, show: pee },
-	{ key: 'poo_amount', label: 'Poo amount', kind: 'one', options: AMOUNTS, show: poo },
-	{ key: 'color', label: 'Poo colour', kind: 'one', options: POO_COLOURS, show: poo },
-	{ key: 'consistency', label: 'Poo texture', kind: 'one', options: CONSISTENCY, show: poo },
-	{ key: 'rash', label: `${word} rash`, kind: 'bool' }
+	{ key: 'pee_amount', label: 'Wee amount', kind: 'one', options: AMOUNTS, show: pee, more: true },
+	{ key: 'pee_color', label: 'Wee colour', kind: 'one', options: PEE_COLOURS, show: pee, more: true },
+	{ key: 'pee_look', label: 'Wee looks', kind: 'one', options: PEE_LOOK, show: pee, more: true },
+	{ key: 'pee_smell', label: 'Strong smell', kind: 'bool', show: pee, more: true },
+	{ key: 'poo_amount', label: 'Poo amount', kind: 'one', options: AMOUNTS, show: poo, more: true },
+	{ key: 'color', label: 'Poo colour', kind: 'one', options: POO_COLOURS, show: poo, more: true },
+	{ key: 'consistency', label: 'Poo texture', kind: 'one', options: CONSISTENCY, show: poo, more: true },
+	{ key: 'rash', label: `${word} rash`, kind: 'bool', more: true },
+	{ key: 'rash_severity', label: 'How bad is the rash', kind: 'one', options: RASH, show: (v) => !!v.rash, more: true },
+	{ key: 'air_minutes', label: `Air time (${word.toLowerCase()} off)`, kind: 'num', plain: 'min', max: 240, chips: [5, 10, 15, 30], more: true }
 ];
 
 export function trackers(wording: Wording): Tracker[] {
@@ -128,6 +146,13 @@ export function trackers(wording: Wording): Tracker[] {
 		{ type: 'note', label: 'Note', color: '--cloud', fields: [] },
 		{ type: 'cry', label: 'Crying', color: '--coral', end: 'optional', fields: [
 			{ key: 'soothed_by', label: 'What helped', kind: 'text' }
+		] },
+		{ type: 'play', label: 'Play', color: '--butter', icon: 'toy', end: 'optional', timer: true, fields: [
+			{ key: 'kind', label: 'Where', kind: 'one', options: PLAY_KINDS },
+			{ key: 'tummy_seconds', label: 'Tummy time', kind: 'num', unit: 'min', max: 1440 }
+		] },
+		{ type: 'confined', label: 'Confined', color: '--peach', end: 'optional', timer: true, fields: [
+			{ key: 'device', label: 'Where', kind: 'one', required: true, options: DEVICES }
 		] }
 	];
 }
@@ -171,8 +196,18 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 				{ pee: 'Wet', poo: 'Dirty', both: 'Wet and dirty', dry: 'Dry' }[d.mode as string],
 				d.color && label(POO_COLOURS, d.color),
 				d.consistency && label(CONSISTENCY, d.consistency),
-				d.rash && 'Rash'
+				d.pee_color && `Wee ${label(PEE_COLOURS, d.pee_color).toLowerCase()}`,
+				d.pee_look === 'cloudy' && 'Cloudy',
+				d.pee_smell && 'Strong smell',
+				d.rash && (d.rash_severity ? `Rash (${d.rash_severity})` : 'Rash'),
+				d.air_minutes && `Air time ${d.air_minutes} min`
 			);
+			break;
+		case 'play':
+			parts.push(d.kind && label(PLAY_KINDS, d.kind), dur, d.tummy_seconds && `Tummy time ${fmtDur(d.tummy_seconds)}`);
+			break;
+		case 'confined':
+			parts.push(label(DEVICES, d.device), dur);
 			break;
 		case 'pump':
 			parts.push(d.total_ml != null && fmtUnit('volume', d.total_ml, u),
@@ -220,6 +255,8 @@ export function needLabel(need: string, wording: Wording): string {
 	};
 	return labels[need] ?? need;
 }
+
+export const deviceLabel = (v: string) => label(DEVICES, v);
 
 export function activityLabel(kind: string) {
 	return label(ACTIVITIES, kind);

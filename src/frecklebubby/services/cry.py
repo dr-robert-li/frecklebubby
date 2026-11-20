@@ -16,21 +16,20 @@ import shutil
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
-from functools import lru_cache
 from pathlib import Path
 from statistics import median
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..config import PACKAGE_DATA, get_settings
+from ..config import get_settings
 from ..db import utcnow
-from ..knowledge.ingest import front_matter
 from ..models import Child, Entry, Timer
 from . import Ctx, Invalid, ServiceError
 from .children import get_child
 from .families import wording
 from .insights import red_flags
+from .library import cite, library  # noqa: F401  (library: used by tests)
 from .sleep import predict
 
 log = logging.getLogger(__name__)
@@ -50,25 +49,6 @@ FEED_TYPES = ("nursing", "bottle")
 
 class NotInstalled(ServiceError):
     status = 501
-
-
-# --- library citations ---------------------------------------------------------------------------------------------
-
-
-@lru_cache
-def library(name: str) -> tuple[dict, str]:
-    """(front matter, body) of data/library/<name>.md."""
-    return front_matter((PACKAGE_DATA / "library" / f"{name}.md").read_text())
-
-
-def cite(*names: str) -> list[dict]:
-    """Citations in the API shape, numbered from 1."""
-    out = []
-    for i, name in enumerate(names, 1):
-        m = library(name)[0]
-        out.append({"n": i, "kind": "bundled", **{k: m[k] for k in ("title", "publisher", "url", "year", "licence")
-                                                  if m.get(k) is not None}})
-    return out
 
 
 # Each rule's supporting phrase, copied from the cited file (checked by a test).

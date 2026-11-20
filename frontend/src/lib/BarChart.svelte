@@ -7,12 +7,16 @@
 		series,
 		fmt = (v: number) => String(v),
 		band = null,
+		line = null,
 		counts = false
-	}: { title: string; labels: string[]; series: Series[]; fmt?: (v: number) => string; band?: [number, number] | null; counts?: boolean } = $props();
+	}: {
+		title: string; labels: string[]; series: Series[]; fmt?: (v: number) => string; band?: [number, number] | null;
+		line?: { value: number; label: string } | null; counts?: boolean;
+	} = $props();
 
 	const W = 340, H = 170, L = 34, B = 22, T = 8;
 	const totals = $derived(labels.map((_, i) => series.reduce((a, s) => a + (s.values[i] || 0), 0)));
-	const max = $derived(niceMax(Math.max(1, ...totals, band?.[1] ?? 0)));
+	const max = $derived(niceMax(Math.max(1, ...totals, band?.[1] ?? 0, line?.value ?? 0)));
 	const y = (v: number) => H - B - (v / max) * (H - B - T);
 	const step = $derived((W - L) / labels.length);
 	const bw = $derived(Math.min(28, step * 0.55));
@@ -36,9 +40,10 @@
 <figure>
 	<figcaption class="spread">
 		<h3>{title}</h3>
-		{#if series.length > 1}
+		{#if series.length > 1 || line}
 			<span class="legend">
 				{#each series as s (s.label)}<span><i style="background:{s.color}"></i>{s.label}</span>{/each}
+				{#if line}<span><i class="dash"></i>{line.label}</span>{/if}
 			</span>
 		{/if}
 	</figcaption>
@@ -46,6 +51,9 @@
 		{#if band}
 			<rect x={L} width={W - L} y={y(band[1])} height={y(band[0]) - y(band[1])} class="band" />
 			<text x={W - 4} y={y(band[1]) - 3} class="tick" text-anchor="end">Common range</text>
+		{/if}
+		{#if line}
+			<line x1={L} x2={W} y1={y(line.value)} y2={y(line.value)} class="target" />
 		{/if}
 		{#each [0, 0.5, 1] as f (f)}
 			<line x1={L} x2={W} y1={y(max * f)} y2={y(max * f)} class="grid" />
@@ -97,6 +105,11 @@
 		stroke: var(--line);
 		stroke-width: 1;
 	}
+	.target {
+		stroke: var(--ink);
+		stroke-width: 1.5;
+		stroke-dasharray: 5 4;
+	}
 	.band {
 		fill: var(--mint);
 		opacity: 0.45;
@@ -106,8 +119,14 @@
 		fill: var(--muted);
 		font-weight: 600;
 	}
+	.legend .dash {
+		height: 0;
+		border-radius: 0;
+		border-top: 2px dashed var(--ink);
+	}
 	.legend {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 12px;
 		font-size: 0.85rem;
 		font-weight: 700;

@@ -112,7 +112,8 @@
       "title": "Black poo",
       "body": "A black poo was logged at {time}. After the first meconium poos, black poo can be a sign of blood. Talk to your doctor about it soon.",
       "citations": [
-        {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"}
+        {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"},
+        {"title": "Bleeding from the bottom (rectal bleeding): blood in poo", "publisher": "NHS", "url": "https://www.nhs.uk/symptoms/bleeding-from-the-bottom-rectal-bleeding/"}
       ]
     },
     {
@@ -124,7 +125,8 @@
       "body": "A red poo was logged at {time}. Any amount of blood in poo should be checked by a doctor. Contact a doctor soon (the NHS says to ask for an urgent GP appointment).",
       "citations": [
         {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"},
-        {"title": "Reflux in babies", "publisher": "NHS", "url": "https://www.nhs.uk/conditions/reflux-in-babies/"}
+        {"title": "Reflux in babies", "publisher": "NHS", "url": "https://www.nhs.uk/conditions/reflux-in-babies/"},
+        {"title": "Bleeding from the bottom (rectal bleeding): blood in poo", "publisher": "NHS", "url": "https://www.nhs.uk/symptoms/bleeding-from-the-bottom-rectal-bleeding/"}
       ]
     },
     {
@@ -137,6 +139,31 @@
       "citations": [
         {"title": "The Many Colors of Baby Poop", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/The-Many-Colors-of-Poop.aspx"},
         {"title": "How to change your baby's nappy", "publisher": "NHS", "url": "https://www.nhs.uk/baby/caring-for-a-newborn/how-to-change-your-babys-nappy/"}
+      ]
+    },
+    {
+      "id": "pee_red",
+      "severity": "urgent",
+      "colors": ["red", "orange_pink"],
+      "window_hours": 72,
+      "title": "Pink or red pee",
+      "body": "A {color} pee was logged at {time}. The NHS says blood in pee may be bright pink, red or dark brown, and to get it checked even if there is only a small amount or you are not sure it is blood. Contact a doctor soon (the NHS says to ask for an urgent GP appointment). This NHS page is written for adults.",
+      "citations": [
+        {"title": "Blood in urine (pee)", "publisher": "NHS", "url": "https://www.nhs.uk/conditions/blood-in-urine/"}
+      ]
+    },
+    {
+      "id": "dark_pee_newborn",
+      "severity": "urgent",
+      "colors": ["dark_yellow"],
+      "min_age_days": 1,
+      "max_age_days": 28,
+      "_app_choice": "max_age_days 28 (newborn) is the app's choice; the NHS jaundice page gives no upper age.",
+      "window_hours": 72,
+      "title": "Dark yellow pee in a newborn",
+      "body": "A dark yellow pee was logged at {time}. The NHS lists this under jaundice in babies: for a baby over 24 hours old whose pee is dark yellow or brown or whose poo is a pale creamy colour, ask for an urgent GP or midwife appointment. Contact a doctor or midwife soon.",
+      "citations": [
+        {"title": "Jaundice in babies", "publisher": "NHS", "url": "https://www.nhs.uk/conditions/jaundice-newborn/"}
       ]
     },
     {

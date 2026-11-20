@@ -72,6 +72,10 @@ def child_context(s: Session, ctx: Ctx, child: Child, now: datetime) -> str:
     if p:
         lines.append(f"Next sleep ({p['kind']}) predicted {p['start'].astimezone(ctx.tz):%H:%M}-"
                      f"{p['end'].astimezone(ctx.tz):%H:%M} ({p['note']})")
+    rash = [d.date for d in rep + [t] if d.nappies.rash]
+    if rash:
+        lines.append(f"{wording(ctx.fam).capitalize()} rash logged on {len(rash)} of the last 8 days, last on "
+                     f"{rash[-1]:%a %d %b}.")
     g = [x for x in growth(s, ctx, child.id)["points"] if x.get("weight_percentile") is not None]
     if g:
         lines.append(f"Latest weight {g[-1]['weight_kg']:g} kg, WHO percentile {g[-1]['weight_percentile']:.0f}.")

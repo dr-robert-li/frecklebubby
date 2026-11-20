@@ -21,6 +21,7 @@ export type Timer = {
 	data: Record<string, any>;
 };
 export type Prediction = { start: string; end: string; kind: 'nap' | 'bedtime'; basis: string; note: string };
+export type ConfinedLevel = { after_seconds: number; title: string; text: string; citations: any[] };
 export type Status = {
 	now: string;
 	timers: Timer[];
@@ -28,6 +29,8 @@ export type Status = {
 	today: any;
 	prediction: Prediction | null;
 	unread_notifications: number;
+	/** Set while a confined timer runs: the continuous period and the texts for this child's age. */
+	confined: { since: string; device: string; seconds: number; note: ConfinedLevel | null; warning: ConfinedLevel | null } | null;
 };
 export type Settings = {
 	units: Units;
@@ -114,6 +117,12 @@ export function toast(msg: string) {
 export function elapsed(t: Timer): number {
 	const end = t.paused_at ? Date.parse(t.paused_at) : serverNow();
 	return (end - Date.parse(t.started_at)) / 1000 - t.paused_seconds;
+}
+
+/** Tummy time seconds of a play timer, live. */
+export function tummySeconds(t: Timer): number {
+	const d = t.data;
+	return (d.tummy_seconds ?? 0) + (d.tummy_started_at ? (serverNow() - Date.parse(d.tummy_started_at)) / 1000 : 0);
 }
 
 /** Seconds on each nursing side, live. */

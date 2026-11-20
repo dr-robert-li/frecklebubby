@@ -1,15 +1,26 @@
 <script lang="ts">
 	// One running timer. Time comes from server state, so it is right after reload and for every carer.
 	import { api } from './api';
-	import { elapsed, refresh, sideSeconds, toast, wording, type Timer } from './app.svelte';
+	import { app, elapsed, refresh, serverNow, sideSeconds, toast, tummySeconds, wording, type Timer } from './app.svelte';
+	import Cites from './Cites.svelte';
 	import { fmtClock, fmtTime, toLocalInput } from './format.svelte';
 	import Icon from './Icon.svelte';
-	import { activityLabel, tracker } from './trackers';
+	import { activityLabel, deviceLabel, tracker } from './trackers';
 
 	let { timer, childId }: { timer: Timer; childId: number } = $props();
 	const t = $derived(tracker(timer.type, wording()));
 	const paused = $derived(!!timer.paused_at);
-	const title = $derived(timer.type === 'activity' ? activityLabel(timer.data.kind) : t.label);
+	const title = $derived(
+		timer.type === 'activity' ? activityLabel(timer.data.kind) : timer.type === 'confined' ? deviceLabel(timer.data.device) : t.label
+	);
+	// Confined: the continuous time (with short stops before this timer) and the note or warning for the child's age.
+	const conf = $derived(timer.type === 'confined' ? app.status?.confined : null);
+	const confSecs = $derived(conf ? ((timer.paused_at ? Date.parse(timer.paused_at) : serverNow()) - Date.parse(conf.since)) / 1000 : 0);
+	const level = $derived(
+		conf?.warning && confSecs >= conf.warning.after_seconds ? { ...conf.warning, urgent: true }
+		: conf?.note && confSecs >= conf.note.after_seconds ? { ...conf.note, urgent: false } : null
+	);
+	const tummyOn = $derived(timer.type === 'play' && !!timer.data.tummy_started_at);
 	let busy = $state(false);
 	let error = $state('');
 	let editStart = $state(false);
@@ -53,6 +64,26 @@
 				</div>
 			{/each}
 		</div>
+	{/if}
+
+	{#if timer.type === 'play'}
+		<button class="tummy" aria-pressed={tummyOn} disabled={busy || paused}
+			onclick={() => act('switch', {}, tummyOn ? 'Tummy time stopped' : 'Tummy time started')}>
+			<span>Tummy time{tummyOn ? ' (now)' : ''}<small>{paused ? 'Resume to use' : tummyOn ? 'Tap to stop' : 'Tap to start'}</small></span>
+			<strong role="timer" aria-label="Tummy time">{fmtClock(tummySeconds(timer))}</strong>
+		</button>
+	{/if}
+
+	{#if conf && conf.since !== timer.started_at}
+		<p class="small cont">In a seat since {fmtTime(conf.since)} with short stops: {fmtClock(confSecs)}</p>
+	{/if}
+	{#if level}
+		<article class="card level" class:urgent={level.urgent} role="status">
+			<p class="sev">{level.urgent ? 'Time for a break' : 'Good to know'}</p>
+			<h3>{level.title}</h3>
+			<p>{level.text}</p>
+			<Cites list={level.citations} />
+		</article>
 	{/if}
 
 	{#if editStart}
@@ -150,6 +181,63 @@
 	.discard {
 		margin-top: 4px;
 		font-weight: 600;
+	}
+	.tummy {
+		width: 100%;
+		margin-top: 12px;
+		min-height: 72px;
+		justify-content: space-between;
+		border-radius: 20px;
+		padding: 10px 16px;
+		background: color-mix(in srgb, var(--surface) 55%, transparent);
+		color: var(--ink-strong);
+		border: 2px solid transparent;
+		text-align: left;
+	}
+	.tummy span {
+		display: flex;
+		flex-direction: column;
+		font-size: 1.1rem;
+	}
+	.tummy small {
+		font-weight: 600;
+		font-size: 0.8rem;
+	}
+	.tummy strong {
+		font-size: 1.8rem;
+		font-variant-numeric: tabular-nums;
+	}
+	.tummy[aria-pressed='true'] {
+		background: var(--mint);
+		border-color: var(--ink-strong);
+	}
+	.cont {
+		margin: 8px 0 0;
+	}
+	.level {
+		margin: 12px 0 0;
+		padding: 14px;
+		border-left: 8px solid #e2a53a;
+		background: var(--surface);
+		color: var(--ink);
+	}
+	.level.urgent {
+		border: 3px solid #c2334f;
+		border-left-width: 8px;
+		background: var(--danger-bg);
+		color: var(--danger);
+	}
+	.level h3 {
+		margin: 2px 0 4px;
+	}
+	.level p {
+		margin: 0;
+	}
+	.sev {
+		font-size: 0.8rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
 	}
 	.edit {
 		margin-top: 10px;

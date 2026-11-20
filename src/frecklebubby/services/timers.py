@@ -1,4 +1,4 @@
-"""Live timers for sleep, nursing, pump and activity. complete() turns a timer into an entry."""
+"""Live timers for sleep, nursing, pump, activity, play and confined time. complete() turns a timer into an entry."""
 
 from datetime import datetime
 
@@ -12,7 +12,7 @@ from . import Conflict, Ctx, Invalid, NotFound, to_utc
 from .children import get_child
 from .entries import FUTURE_LIMIT, validate
 
-TIMER_TYPES = ("sleep", "nursing", "pump", "activity")
+TIMER_TYPES = ("sleep", "nursing", "pump", "activity", "play", "confined")
 
 
 def elapsed(t: Timer, now: datetime) -> int:
@@ -40,10 +40,20 @@ def _close_side(data: dict, until: datetime) -> dict:
     return data
 
 
+def _close_tummy(data: dict, until: datetime) -> dict:
+    """Play: add the tummy time since tummy_started_at to tummy_seconds (same mechanics as the nursing sides)."""
+    data = dict(data)
+    if data.get("tummy_started_at"):
+        since = datetime.fromisoformat(data["tummy_started_at"])
+        data["tummy_seconds"] = data.get("tummy_seconds", 0) + max(0, int((until - since).total_seconds()))
+    data["tummy_started_at"] = None
+    return data
+
+
 def act(s: Session, ctx: Ctx, child_id: int, type_: str, action: str, body: TimerBody,
         now: datetime | None = None) -> tuple[Timer | None, Entry | None]:
     if type_ not in TIMER_TYPES:
-        raise NotFound(f"No timer type {type_!r}. Use sleep, nursing, pump or activity.")
+        raise NotFound(f"No timer type {type_!r}. Use sleep, nursing, pump, activity, play or confined.")
     now = now or utcnow()
     child = get_child(s, ctx, child_id)
     at = to_utc(body.at, ctx.tz) if body.at else None
@@ -53,6 +63,8 @@ def act(s: Session, ctx: Ctx, child_id: int, type_: str, action: str, body: Time
         raise Invalid("side: use it only with a nursing timer")
     if body.kind and not (type_ == "activity" and action in ("start", "switch")):
         raise Invalid("kind: use it only with an activity timer")
+    if body.device and not (type_ == "confined" and action == "start"):
+        raise Invalid("device: use it only to start a confined timer")
     if (body.data is not None or body.notes is not None) and action != "complete":
         raise Invalid("data and notes: use them only with complete")
 
@@ -73,6 +85,12 @@ def act(s: Session, ctx: Ctx, child_id: int, type_: str, action: str, body: Time
                 if not body.kind:
                     raise Invalid("kind: required to start an activity timer")
                 data = {"kind": body.kind}
+            elif type_ == "play":
+                data = {"tummy_seconds": 0, "tummy_started_at": None}
+            elif type_ == "confined":
+                if not body.device:
+                    raise Invalid("device: required to start a confined timer")
+                data = {"device": body.device}
             t = Timer(child_id=child.id, type=type_, started_at=start, paused_seconds=0, data=data,
                       started_by=ctx.user.id)
             s.add(t)
@@ -89,12 +107,19 @@ def act(s: Session, ctx: Ctx, child_id: int, type_: str, action: str, body: Time
                 data = _close_side(data, now) | {"side": body.side, "side_since": None if t.paused_at else now.isoformat()}
             if type_ == "activity" and body.kind:
                 data["kind"] = body.kind
+            if type_ == "play" and data.get("tummy_started_at"):
+                data["tummy_started_at"] = min(max(datetime.fromisoformat(data["tummy_started_at"]), start),
+                                               now).isoformat()
+            if type_ == "confined" and body.device:
+                data["device"] = body.device
             t.started_at, t.data = start, data
     elif action == "pause":
         if t.paused_at:
             raise Conflict("The timer is already paused.")
         if type_ == "nursing":
             t.data = _close_side(t.data, now)
+        elif type_ == "play":
+            t.data = _close_tummy(t.data, now)
         t.paused_at = now
     elif action == "resume":
         if not t.paused_at:
@@ -113,8 +138,14 @@ def act(s: Session, ctx: Ctx, child_id: int, type_: str, action: str, body: Time
             if not body.kind:
                 raise Invalid("kind: required to switch an activity timer")
             t.data = {**t.data, "kind": body.kind}
+        elif type_ == "play":
+            # Tummy time on or off.
+            if t.paused_at:
+                raise Conflict("The timer is paused. Resume it first.")
+            t.data = (_close_tummy(t.data, now) if t.data.get("tummy_started_at")
+                      else {**t.data, "tummy_started_at": now.isoformat()})
         else:
-            raise Invalid("switch: use it only with a nursing or activity timer")
+            raise Invalid("switch: use it only with a nursing, activity or play timer")
     elif action == "cancel":
         s.delete(t)
         s.commit()
@@ -130,6 +161,11 @@ def act(s: Session, ctx: Ctx, child_id: int, type_: str, action: str, body: Time
                     "last_side": nd["side"]} | data
         elif type_ == "activity":
             data = {"kind": t.data["kind"]} | data
+        elif type_ == "play":
+            pd = _close_tummy(t.data, min(end, now))
+            data = {"tummy_seconds": pd.get("tummy_seconds", 0)} | data
+        elif type_ == "confined":
+            data = {"device": t.data["device"]} | data
         # shortcut: the entry spans start to end and paused time is not removed (except nursing side seconds);
         # store paused_seconds in the entry if users need net durations.
         data = validate(type_, t.started_at, end, data, body.notes, now)

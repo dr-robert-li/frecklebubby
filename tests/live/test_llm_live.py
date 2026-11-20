@@ -65,6 +65,11 @@ CASES = [
     ("she rolled over for the first time this morning", False, [("milestone", None, None, {"title": "roll"})]),
     ("started feeding her on the right side", False, [("timer:nursing:start", None, None, {"side": "right"})]),
     ("6oz formula at 2am", False, [("bottle", "D02:00", None, {"amount_ml": 177.4, "milk_type": "Formula"})]),
+    # M9
+    ("20 minutes of play with 5 of tummy time", False, [("play", "D14:15", "D14:35", {"tummy_seconds": 300})]),
+    ("in the car seat since 9", False, [("timer:confined:start", None, None, {"device": "car_seat"})]),
+    ("nappy with a rash, left it off for 10 minutes", False, [("nappy", None, None, {"rash": True, "air_minutes": 10})]),
+    ("dark pee", False, [("nappy", None, None, {"mode": "pee", "pee_color": "dark_yellow"})]),
 ]
 
 

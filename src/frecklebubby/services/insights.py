@@ -12,10 +12,12 @@ from sqlalchemy.orm import Session
 from ..config import PACKAGE_DATA
 from ..db import utcnow
 from ..models import Child, Entry
-from . import Ctx, sleep
+from . import Ctx, day_bounds, sleep
 from .children import age_months, get_child
+from .confined import merge, under
 from .families import wording
 from .growth import growth
+from .library import cite, source
 from .milestones import catalog
 from .reports import daily
 
@@ -119,6 +121,17 @@ def red_flags(s: Session, child: Child, tz, now: datetime, word: str = "nappy") 
             out.append(card(rid, rule["severity"], rule["title"], rule["body"], rule["citations"],
                             time=local(hits[-1].started_at)))
 
+    # Pee colour (M9). Rules only where a library file supports them (SUPPORT in tests/test_m9.py).
+    for rid in ("pee_red", "dark_pee_newborn"):
+        rule = r[rid]
+        hits = [e for e in recent if e.type in ("nappy", "potty") and e.data.get("pee_color") in rule["colors"]
+                and e.started_at >= now - timedelta(hours=rule["window_hours"])
+                and rule.get("min_age_days", 0) <= (e.started_at.date() - child.birthdate).days
+                < rule.get("max_age_days", 100_000)]
+        if hits:
+            out.append(card(rid, rule["severity"], rule["title"], rule["body"], rule["citations"],
+                            time=local(hits[-1].started_at), color=PEE_WORDS[hits[-1].data["pee_color"]]))
+
     rule = r["allergic_reaction"]
     hits = [e for e in recent if e.type == "solids" and e.data.get("reaction") == "ALLERGIC"
             and e.started_at >= now - timedelta(hours=rule["window_hours"])]
@@ -128,6 +141,9 @@ def red_flags(s: Session, child: Child, tz, now: datetime, word: str = "nappy") 
                         time=local(hits[-1].started_at), foods=foods))
     return out
 
+
+PEE_WORDS = {"pale": "pale", "yellow": "yellow", "dark_yellow": "dark yellow", "orange_pink": "orange or pink",
+             "red": "red"}
 
 TEMP_RE = re.compile(r"(\d{2,3}(?:[.,]\d{1,2})?)\s*(°\s*[cf]\b|°|degrees?(?:\s*[cf]\b)?|[cf]\b)?", re.I)
 
@@ -300,9 +316,84 @@ def _wet_nappy_card(s: Session, ctx: Ctx, child: Child, now: datetime, w: dict) 
     if avg >= base["per_day"]:
         return []
     body = (f"Average logged: {avg:.1f} wet {w['nappies']} a day over the last {len(days)} days. "
-            + base["text"].format(**w) + " Fewer wet " + w["nappies"] + " than usual can be a sign of dehydration. "
-            "If you are worried, contact a doctor.")
-    return [card("wet_nappies", "info", "Wet {nappies}", body, base["citations"], **w)]
+            + base["text"].format(**w) + " Fewer wet " + w["nappies"] + " than usual can be a sign of dehydration. ")
+    cites_ = list(base["citations"])
+    # Dark pee (M9): "dark yellow, strong-smelling pee" and "fewer wet nappies than usual" (nhs-dehydration).
+    lo = day_bounds(today - timedelta(days=base["days"]), ctx.tz)[0]
+    dark = s.scalars(select(Entry).where(Entry.child_id == child.id, Entry.type.in_(("nappy", "potty")),
+                                         Entry.started_at >= lo, Entry.started_at <= now))
+    dark = [e for e in dark if e.data.get("pee_color") == "dark_yellow"]
+    if dark:
+        body += (f"Dark yellow pee was also logged {len(dark)} {'time' if len(dark) == 1 else 'times'}. The NHS lists "
+                 f"dark yellow, strong-smelling pee and fewer wet {w['nappies']} than usual as signs of dehydration. ")
+        cites_.append(source("nhs-dehydration"))
+    body += "If you are worried, contact a doctor."
+    return [card("wet_nappies", "attention" if dark else "info", "Wet {nappies}", body, cites_, **w)]
+
+
+def _bundled(kind: str, severity: str, title: str, body: str, *names: str) -> dict:
+    """An insight card cited from library files."""
+    return {"kind": kind, "severity": severity, "title": title, "body": body, "citations": cite(*names)}
+
+
+def _rash_card(s: Session, ctx: Ctx, child: Child, now: datetime, w: dict) -> list[dict]:
+    """Rash in the last 24 h: NHS care advice and an app tip. Rash on 3 or more of the last 7 days: when to get help."""
+    today = now.astimezone(ctx.tz).date()
+    rows = list(s.scalars(select(Entry).where(
+        Entry.child_id == child.id, Entry.type.in_(("nappy", "potty")),
+        Entry.started_at >= day_bounds(today - timedelta(days=6), ctx.tz)[0], Entry.started_at <= now)
+        .order_by(Entry.started_at)))
+    rash = [e for e in rows if e.data.get("rash")]
+    days = {e.started_at.astimezone(ctx.tz).date() for e in rash}
+    recent = rash and rash[-1].started_at >= now - timedelta(hours=24)
+    if not recent and len(days) < 3:
+        return []
+    n, ns, name = w["nappy"], w["nappies"], child.name
+    names = ["nhs-nappy-rash"]
+    body = ""
+    if recent:
+        body = (f"A {n} rash was logged at {rash[-1].started_at.astimezone(ctx.tz):%a %H:%M}. The NHS says to leave "
+                f"{ns} off when possible, and to change wet or dirty {ns} as soon as possible. A {n} change is a good "
+                f"time for this if {name} is calm.")
+        if under(child, today, 12):
+            body += " It is also a good time for a little tummy time."
+            names.append("who-under-5-activity-sleep")
+        body += " "
+    air = sum(e.data.get("air_minutes", 0) for e in rows)
+    if air:
+        body += f"Time with the {n} off logged this week: {air} min. "
+    if len(days) >= 3:
+        body += (f"A {n} rash was logged on {len(days)} of the last 7 days. The NHS says to see a health visitor or "
+                 "GP if the rash does not go away, gets worse or spreads, if your baby has a high temperature, or if "
+                 "your baby seems very uncomfortable.")
+    return [_bundled("nappy_rash", "attention" if len(days) >= 3 else "info", f"{n.capitalize()} rash",
+                     body.strip(), *names)]
+
+
+def _confined_card(s: Session, ctx: Ctx, child: Child, now: datetime) -> list[dict]:
+    """A continuous confined period over the limit for the age in the last 7 days."""
+    today = now.astimezone(ctx.tz).date()
+    if not under(child, today, 60):
+        return []
+    rows = s.execute(select(Entry.started_at, Entry.ended_at).where(
+        Entry.child_id == child.id, Entry.type == "confined", Entry.ended_at.is_not(None),
+        Entry.started_at >= now - timedelta(days=7), Entry.started_at <= now)).all()
+    over = [(a, b) for a, b in merge([(a, b) for a, b in rows]) if b - a > timedelta(hours=1)]
+    if not over:
+        return []
+    longest = max(b - a for a, b in over)
+    warn = under(child, today, 12) and longest > timedelta(hours=2)
+    m = int(longest.total_seconds() // 60)
+    days = len({a.astimezone(ctx.tz).date() for a, _ in over})
+    body = (f"On {days} of the last 7 days, {child.name} was in a car seat, pram or other seat for more than 1 hour "
+            f"without a break (longest: {m // 60} h {m % 60} min). WHO advises that children under 5 are not "
+            "restrained for more than 1 hour at a time.")
+    names = ["who-under-5-activity-sleep"]
+    if warn:
+        body += (" For a car seat, HealthyChildren.org (AAP) says to take a break every 2 to 3 hours on a day "
+                 "trip.")
+        names.append("car-seat-time")
+    return [_bundled("confined", "attention" if warn else "info", "Time in a seat or pram", body, *names)]
 
 
 def insights(s: Session, ctx: Ctx, child_id: int, now: datetime | None = None) -> list[dict]:
@@ -311,6 +402,7 @@ def insights(s: Session, ctx: Ctx, child_id: int, now: datetime | None = None) -
     word = wording(ctx.fam)
     w = {"nappy": word, "nappies": "nappies" if word == "nappy" else "diapers"}
     cards = (red_flags(s, child, ctx.tz, now, word) + _wet_nappy_card(s, ctx, child, now, w)
+             + _rash_card(s, ctx, child, now, w) + _confined_card(s, ctx, child, now)
              + _sleep_card(s, ctx, child, now) + sleep_model_cards(s, ctx, child, now) + _growth_card(s, ctx, child) + _milestone_cards(s, ctx, child, now))
     order = {"urgent": 0, "attention": 1, "info": 2}
     return sorted(cards, key=lambda c: order[c["severity"]])

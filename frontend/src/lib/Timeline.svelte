@@ -14,7 +14,7 @@
 			<li>
 				<button class="item" onclick={() => onpick(e)} aria-label="Edit {t.label} at {fmtTime(e.started_at)}">
 					<span class="time">{fmtTime(e.started_at)}{#if e.ended_at}<br /><span class="muted">{fmtTime(e.ended_at)}</span>{/if}</span>
-					<span class="bubble" style="background: var({t.color})"><Icon name={e.type} size={20} /></span>
+					<span class="bubble" style="background: var({t.color})"><Icon name={t.icon ?? e.type} size={20} /></span>
 					<span class="text">
 						<strong>{t.label}</strong>
 						<span class="detail">{entryDetail(e, units(), wording())}</span>

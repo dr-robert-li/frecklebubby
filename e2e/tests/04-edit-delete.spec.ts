@@ -12,7 +12,7 @@ test('a parent fixes the time of an entry and deletes another', async ({ page, a
 	const sheet = page.getByRole('dialog');
 	await expect(sheet.getByRole('heading', { name: 'Edit bottle' })).toBeVisible();
 	const newTime = todayAgo(10);
-	await sheet.getByLabel('Time').fill(newTime);
+	await sheet.getByLabel('Time', { exact: true }).fill(newTime);
 	await sheet.getByLabel('Amount (ml)').fill('100');
 	await shot(page, '05-edit-sheet');
 	await sheet.getByRole('button', { name: 'Save' }).click();

@@ -53,7 +53,7 @@ async def test_daily_report_brisbane(client):
     assert d1["sleep"] == {"total_seconds": 21600 + 5400, "night_seconds": 21600, "nap_seconds": 5400, "count": 1,
                            "nap_count": 1}
     assert d1["feeds"] == {"count": 2, "bottle_ml": 120, "nursing_seconds": 500, "solids_count": 0}
-    assert d1["nappies"] == {"wet": 2, "dirty": 1}
+    assert d1["nappies"] == {"wet": 2, "dirty": 1, "air_minutes": 0, "rash": 0}
     assert d1["activities"] == {"bath": {"count": 1, "seconds": 900}}
     assert d1["pump_ml"] == 80 and d1["medicine_count"] == 1
 

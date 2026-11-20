@@ -27,6 +27,7 @@ from .models import Child, User
 from .schemas import (
     ActivityKind,
     Amount,
+    ConfinedDevice,
     EntryIn,
     EntryOut,
     EntryPatch,
@@ -36,10 +37,14 @@ from .schemas import (
     MilestonesOut,
     MilkType,
     NappyMode,
+    PeeColor,
+    PeeLook,
+    PlayKind,
     PooColor,
     PooConsistency,
     PottyResult,
     Prediction,
+    RashSeverity,
     Reaction,
     Side,
     SleepCondition,
@@ -70,6 +75,11 @@ Notes = Annotated[str | None, Field(description="Optional note.")]
 Volume = Annotated[Literal["ml", "oz"], Field(description="Volume unit.")]
 Conditions = Annotated[list[SleepCondition] | None, Field(description="How the child fell asleep or woke.")]
 Locations = Annotated[list[SleepLocation] | None, Field(description="Where the child slept.")]
+AirMinutes = Annotated[int | None, Field(description="Minutes with the nappy off (air time).", ge=0, le=240)]
+RashLevel = Annotated[RashSeverity | None, Field(description="How bad the nappy rash is. Setting it means a rash.")]
+PeeColour = Annotated[PeeColor | None, Field(description="Pee colour (wet nappy only).")]
+PeeLooks = Annotated[PeeLook | None, Field(description="Pee looks clear or cloudy (wet nappy only).")]
+PeeSmell = Annotated[bool | None, Field(description="Pee has a strong smell (wet nappy only).")]
 
 READ = {"readOnlyHint": True}
 DESTRUCTIVE = {"destructiveHint": True}
@@ -160,7 +170,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         "Frecklebubby",
         instructions=(
             "Logs and reads baby-care data in Frecklebubby. Times are ISO 8601; a time without an offset is in the "
-            "family time zone; an omitted time means now. Timers (sleep, nursing, pump, activity) are live; log_* "
+            "family time zone; an omitted time means now. Timers (sleep, nursing, pump, activity, play, confined) are "
+            "live; log_* "
             "tools save events that are over. To fix or remove an entry: call list_entries, confirm the entry with "
             "the user, then call update_entry or delete_entry with its id. get_status shows running timers, the "
             "last entry of each type, today's totals and the next sleep window."
@@ -340,6 +351,64 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         """Save an activity that is over."""
         return log_entry(child, "activity", start_time, {"kind": kind}, notes, end_time)
 
+    @mcp.tool(annotations=DESTRUCTIVE)
+    def play_timer(
+        action: Annotated[Literal["start", "pause", "resume", "switch", "cancel", "complete"], Field(
+            description="start (or move the start of a running timer), pause, resume, switch (tummy time on or "
+                        "off), cancel (discard), complete (stop and save).")],
+        kind: Annotated[PlayKind | None, Field(description="complete only: indoor or outdoor play.")] = None,
+        start_time: Annotated[str | None, Field(description="start only: when play started. Omit = now.")] = None,
+        end_time: Annotated[str | None, Field(description="complete only: when play ended. Omit = now.")] = None,
+        notes: Notes = None,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Control the live play timer. During play, switch starts and stops the tummy time part."""
+        if kind and action != "complete":
+            raise ToolError("kind: use it only with complete")
+        return timer(child, "play", action, start_time, end_time, data={"kind": kind} if kind else None, notes=notes)
+
+    @mcp.tool
+    def log_play(
+        start_time: Time = None,
+        end_time: Annotated[str | None, Field(description="When play ended, ISO 8601. Optional.")] = None,
+        kind: Annotated[PlayKind | None, Field(description="Indoor or outdoor play.")] = None,
+        tummy_minutes: Annotated[float | None, Field(description="Minutes of tummy time in this play.", ge=0,
+                                                     le=1440)] = None,
+        notes: Notes = None,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Save play time that is over, with the minutes of tummy time in it."""
+        return log_entry(child, "play", start_time, {"kind": kind, "tummy_seconds": round(tummy_minutes * 60)
+                                                      if tummy_minutes is not None else None}, notes, end_time)
+
+    @mcp.tool(annotations=DESTRUCTIVE)
+    def confined_timer(
+        action: Annotated[Literal["start", "pause", "resume", "cancel", "complete"], Field(
+            description="start (or move the start of a running timer), pause, resume, cancel (discard), "
+                        "complete (stop and save).")],
+        device: Annotated[ConfinedDevice | None, Field(
+            description="start only (required for a new timer): car_seat, bouncer, swing, pram, carrier, "
+                        "high_chair or other.")] = None,
+        start_time: Annotated[str | None, Field(description="start only: when it started. Omit = now.")] = None,
+        end_time: Annotated[str | None, Field(description="complete only: when it ended. Omit = now.")] = None,
+        notes: Notes = None,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Control the live confined-time timer (car seat, pram, bouncer and so on). The app sends a note at 1 hour
+        (under 5 years) and a warning at 2 hours (under 1 year)."""
+        return timer(child, "confined", action, start_time, end_time, device=device, notes=notes)
+
+    @mcp.tool
+    def log_confined(
+        device: Annotated[ConfinedDevice, Field(description="Where the child was strapped in or held.")],
+        start_time: Time = None,
+        end_time: Annotated[str | None, Field(description="When it ended, ISO 8601. Optional.")] = None,
+        notes: Notes = None,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Save confined time that is over (car seat, bouncer, swing, pram, carrier, high chair)."""
+        return log_entry(child, "confined", start_time, {"device": device}, notes, end_time)
+
     # --- nappy and potty --------------------------------------------------------------------------
 
     @mcp.tool
@@ -350,13 +419,21 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         color: Annotated[PooColor | None, Field(description="Poo colour.")] = None,
         consistency: Annotated[PooConsistency | None, Field(description="Poo consistency.")] = None,
         rash: Annotated[bool, Field(description="Nappy rash.")] = False,
+        rash_severity: RashLevel = None,
+        air_minutes: AirMinutes = None,
+        pee_color: PeeColour = None,
+        pee_look: PeeLooks = None,
+        pee_smell: PeeSmell = None,
         start_time: Time = None,
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
         """Log a nappy (diaper) change."""
         return log_entry(child, "nappy", start_time, {"mode": mode, "pee_amount": pee_amount, "poo_amount": poo_amount,
-                                                       "color": color, "consistency": consistency, "rash": rash}, notes)
+                                                       "color": color, "consistency": consistency, "rash": rash,
+                                                       "rash_severity": rash_severity, "air_minutes": air_minutes,
+                                                       "pee_color": pee_color, "pee_look": pee_look,
+                                                       "pee_smell": pee_smell}, notes)
 
     @mcp.tool
     def log_potty(
@@ -366,6 +443,11 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         poo_amount: Annotated[Amount | None, Field(description="How much poo.")] = None,
         color: Annotated[PooColor | None, Field(description="Poo colour.")] = None,
         consistency: Annotated[PooConsistency | None, Field(description="Poo consistency.")] = None,
+        rash_severity: RashLevel = None,
+        air_minutes: AirMinutes = None,
+        pee_color: PeeColour = None,
+        pee_look: PeeLooks = None,
+        pee_smell: PeeSmell = None,
         start_time: Time = None,
         notes: Notes = None,
         child: ChildArg = None,
@@ -373,7 +455,9 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         """Log a potty-training attempt (potty or toilet, not a nappy change)."""
         return log_entry(child, "potty", start_time, {"mode": mode, "result": result, "pee_amount": pee_amount,
                                                        "poo_amount": poo_amount, "color": color,
-                                                       "consistency": consistency}, notes)
+                                                       "consistency": consistency, "rash_severity": rash_severity,
+                                                       "air_minutes": air_minutes, "pee_color": pee_color,
+                                                       "pee_look": pee_look, "pee_smell": pee_smell}, notes)
 
     # --- health -----------------------------------------------------------------------------------
 
@@ -516,7 +600,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         child: ChildArg = None,
     ) -> dict[str, Any]:
         """Totals per day in the family time zone: sleep (total, night, naps), feeds, nappies, pump, medicine,
-        activities, plus the recommended total sleep for the age with its source."""
+        activities, crying, play and tummy time, confined time, plus the recommended total sleep and tummy time for
+        the age with their sources."""
         try:
             start = date.fromisoformat(from_date) if from_date else None
             end = date.fromisoformat(to_date) if to_date else None

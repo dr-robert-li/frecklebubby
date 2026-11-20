@@ -48,7 +48,7 @@
 	<div class="tiles big">
 		{#each list.slice(0, 4) as t (t.type)}
 			<button class="tile" style="--c: var({t.color})" onclick={() => (sheet = { type: t.type })}>
-				<Icon name={t.type} size={30} />
+				<Icon name={t.icon ?? t.type} size={30} />
 				<strong>{t.label}</strong>
 				<span>{lastText(t.type)}</span>
 			</button>
@@ -61,7 +61,7 @@
 	<div class="tiles">
 		{#each list.slice(4) as t (t.type)}
 			<button class="tile" style="--c: var({t.color})" onclick={() => (sheet = { type: t.type })}>
-				<Icon name={t.type} />
+				<Icon name={t.icon ?? t.type} />
 				<strong>{t.label}</strong>
 			</button>
 		{/each}

@@ -31,7 +31,7 @@ const llmServer = [
 // Chromium plays is made here, in a temp folder, each run.
 const CRY_PORT = Number(process.env.E2E_CRY_PORT ?? 8013);
 const cryURL = `http://127.0.0.1:${CRY_PORT}`;
-export const CRY_MODEL_DIR = process.env.CRY_MODEL_DIR ?? join(__dirname, '../src/frecklebubby/data/models/cry');
+export const CRY_MODEL_DIR = process.env.CRY_MODEL_DIR ?? new URL('../src/frecklebubby/data/models/cry', import.meta.url).pathname;
 function cryClip(): string {
 	const dir = join(homedir(), 'Desktop/projects/DeepInfant/Data/v2/hungry');
 	const src = process.env.CRY_E2E_CLIP ?? (existsSync(dir) ? join(dir, readdirSync(dir).filter((f) => f.endsWith('.wav')).sort()[0] ?? '') : '');
@@ -68,10 +68,12 @@ export default defineConfig({
 		screenshot: 'on'
 	},
 	projects: [
-		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8)\.spec\.ts$/ },
+		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9)\.spec\.ts$/ },
 		{ name: 'llm', ...slow, testMatch: /\.llm\.spec\.ts$/, outputDir: './recordings/m3/results' },
 		{ name: 'm4', ...slow, testMatch: /\.m4\.spec\.ts$/, outputDir: './recordings/m4/results' },
 		{ name: 'm5', ...slow, testMatch: /\.m5\.spec\.ts$/, outputDir: './recordings/m5/results' },
+		// M9 new logging: the main server (no model); the confined notification waits for the 60 s server tick.
+		{ name: 'm9', use: phone, testMatch: /\.m9\.spec\.ts$/, outputDir: './recordings/m9/results', timeout: 240_000 },
 		{
 			name: 'm8',
 			testMatch: /\.m8\.spec\.ts$/,
