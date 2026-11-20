@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.2.2-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.1-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -22,11 +22,11 @@ Your data stays on your server.
 
 ## What it does
 
-- Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
+- Tracks sleep, breastfeeding, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
   (bath, tummy time, indoor and outdoor play, story time, screen time, skin to skin, brushing teeth), time in a
   car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
-- Has live timers for sleep, nursing, pumping, activities and confined time. Activity timers can
+- Has live timers for sleep, breastfeeding, pumping, activities and confined time. Activity timers can
   run side by side, one for each kind (for example indoor play and tummy time). A timer
   keeps running when you close the app.
 - Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a
@@ -179,7 +179,8 @@ Optional: put a comma list of emails in `ALLOWED_EMAILS`. Then other emails cann
 
 The server does not start in Clerk mode if a value is missing. The log names the missing value.
 
-> Not yet tested with a real Clerk account. The sign-in code is tested with test tokens only.
+> Tested with a real Clerk development instance (0.3.1): sign-in and the email claim. A carer invite and a
+> refused email are not yet tested with a real account.
 
 ### A server for more than one family (invite only)
 
@@ -216,6 +217,27 @@ tailscale funnel --bg 8000      # https://<machine>.<tailnet>.ts.net -> 127.0.0.
 
 Funnel must be on for your tailnet. The first `tailscale funnel` run prints a link to turn it on. Put the
 `https://<machine>.<tailnet>.ts.net` address in `BASE_URL` and restart: `docker compose up -d`.
+
+**Cloudflare Tunnel** gives your own domain (at Cloudflare) a public HTTPS address with no open port. In the
+Cloudflare dashboard go to **Zero Trust > Networks > Tunnels**, make a tunnel, and add a public hostname with
+the service `http://app:8000`. Put the tunnel token and the profile in `.env`, then start:
+
+```bash
+# .env
+COMPOSE_PROFILES=tunnel
+CLOUDFLARE_TUNNEL_TOKEN=<the token>
+BASE_URL=https://<your hostname>
+```
+
+```bash
+docker compose up -d
+```
+
+Set `ALLOWED_EMAILS` first: the app is public when the tunnel runs. Cloudflare stops a request that sends no
+data for 125 seconds. On a slow computer the sleep plan and the support report can come near this limit.
+
+**NVIDIA GPU**: to run the model server on the GPU, put `COMPOSE_FILE=compose.yaml:compose.gpu.yaml` in `.env`.
+You need the NVIDIA Container Toolkit with CDI. Tested on arm64.
 
 **A reverse proxy** (Caddy, nginx, Traefik) with your own domain also works. Send all paths to port 8000. Do not
 buffer responses: the assistant streams its answers (Server-Sent Events). Set `BASE_URL` to the public address.
@@ -257,7 +279,7 @@ uv run frecklebubby-mcp --stdio --user you@example.com
 
 `--user` can be left out when the database has only one user.
 
-> The Claude connector is not yet tested with a real Clerk account.
+> Tested with a real Clerk development instance through a Cloudflare Tunnel (0.3.1).
 
 ## REST API
 
@@ -450,8 +472,7 @@ The e2e tests act as a parent on a phone screen. They start the real backend wit
 Huckleberry account. Videos, traces and screenshots go to `e2e/recordings/<milestone>/` (not in git).
 Open a trace with `npx playwright show-trace <file>/trace.zip`.
 
-What the tests do not prove yet: sign-in with a real Clerk account, the Claude connector with a real Clerk account,
-push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
+What the tests do not prove yet: a carer invite and a refused email with a real Clerk account, push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
 account.
 
 ## Troubleshooting

@@ -13,6 +13,8 @@
 	--rose: #f8c8dc;
 	--cloud: #ebe7f1;
 	--coral: #ffc6c2;
+	--sage: #d6e6b4;
+	--sand: #e6d9c3;
 	--accent: #6d55c4; /* focus ring and links: AA on cream */
 	--s1: #7562c9; /* chart series, validated for CVD and contrast */
 	--s2: #2e9a72;
@@ -41,6 +43,8 @@
 		--rose: #5a3245;
 		--cloud: #302b3f;
 		--coral: #5e3433;
+		--sage: #414d28;
+		--sand: #4d4433;
 		--accent: #c5b6ff;
 		--s1: #8e7cdb;
 		--s2: #3faa82;
@@ -66,6 +70,8 @@
 	--rose: #5a3245;
 	--cloud: #302b3f;
 	--coral: #5e3433;
+	--sage: #414d28;
+	--sand: #4d4433;
 	--accent: #c5b6ff;
 	--s1: #8e7cdb;
 	--s2: #3faa82;

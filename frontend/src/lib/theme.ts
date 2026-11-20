@@ -8,8 +8,8 @@ export function getTheme(): Theme {
 	}
 }
 
-/** Set the theme on <html>; "auto" follows the device. */
-export function applyTheme(theme: Theme = getTheme()) {
+/** Set the theme on <html>; "auto" follows the device. Returns true when the result is dark. */
+export function applyTheme(theme: Theme = getTheme()): boolean {
 	try {
 		localStorage.setItem('fb.theme', theme);
 	} catch {
@@ -20,4 +20,5 @@ export function applyTheme(theme: Theme = getTheme()) {
 	else root.dataset.theme = theme;
 	const dark = theme === 'dark' || (theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
 	document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#16141e' : '#fff9f3');
+	return dark;
 }

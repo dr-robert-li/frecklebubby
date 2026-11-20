@@ -149,7 +149,7 @@ def feeds_block(p: Period) -> dict:
         if any(d.feeds.bottle_ml for d in logged):
             numbers.append(num("Bottle a day", _avg(logged, lambda d: d.feeds.bottle_ml), "ml"))
         if any(d.feeds.nursing_seconds for d in logged):
-            numbers.append(num("Nursing a day", _avg(logged, lambda d: d.feeds.nursing_seconds) / 60, "min"))
+            numbers.append(num("Breastfeeding a day", _avg(logged, lambda d: d.feeds.nursing_seconds) / 60, "min"))
         if any(d.feeds.solids_count for d in logged):
             numbers.append(num("Solid meals a day", _avg(logged, lambda d: d.feeds.solids_count)))
         numbers.append(num("Feeds today so far", p.now_day.feeds.count))

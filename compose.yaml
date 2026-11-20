@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-    image: frecklebubby:0.2.2
+    image: frecklebubby:0.3.1
     restart: unless-stopped
     ports:
       - "${FRECKLEBUBBY_PORT:-8000}:8000"
@@ -64,6 +64,21 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30m
+
+  # Optional: a Cloudflare Tunnel gives a public HTTPS address with no open port (README "HTTPS").
+  # It starts only with the profile "tunnel": put COMPOSE_PROFILES=tunnel in .env.
+  # A tunnel made with the cloudflared command line sends all requests to TUNNEL_URL.
+  # A tunnel made in the Cloudflare dashboard uses the dashboard route: set it to http://app:8000.
+  cloudflared:
+    image: cloudflare/cloudflared:2026.11.1
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      TUNNEL_URL: http://app:8000
+    depends_on:
+      - app
 
 volumes:
   data:

@@ -1,0 +1,15 @@
+# Run the model server on an NVIDIA GPU (x86_64 or arm64). Needs the NVIDIA Container Toolkit with CDI:
+# "docker info" must show the device nvidia.com/gpu=all.
+# Use: put COMPOSE_FILE=compose.yaml:compose.gpu.yaml in .env, then docker compose up -d.
+
+services:
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: cdi
+              device_ids:
+                - nvidia.com/gpu=all
+              capabilities: [gpu]

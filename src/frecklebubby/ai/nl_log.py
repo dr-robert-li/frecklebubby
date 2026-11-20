@@ -69,7 +69,9 @@ EVENTS = [
                   "consistency": _enum("solid", "loose", "runny", "mucousy", "hard", "pebbles", "diarrhea"),
                   "rash": {"type": "boolean"}, "air_minutes": _NUM,
                   "pee_color": _enum("pale", "yellow", "dark_yellow", "orange_pink", "red"),
-                  "pee_look": _enum("clear", "cloudy"), "pee_smell": {"type": "boolean"}}, ["at", "mode"]),
+                  "pee_look": _enum("clear", "cloudy"), "pee_smell": {"type": "boolean"},
+                  "pee_amount": _enum("little", "medium", "big"), "poo_amount": _enum("little", "medium", "big")},
+        ["at", "mode"]),
     _ev("potty", {"at": TIME, "mode": _enum("pee", "poo", "both", "dry"),
                   "result": _enum("satButDry", "wentPotty", "accident")}, ["at", "mode", "result"]),
     _ev("pump", {"at": TIME, "left_amount": _NUM, "right_amount": _NUM, "total_amount": _NUM,
@@ -104,7 +106,8 @@ Rules:
 - Use a "timer" event only for something that goes on now: "fell asleep", "went down", "is asleep" with no end → timer sleep start. "woke up", "is awake", "she's up" with no start, while a sleep timer runs → timer sleep complete. "started feeding on the left" → timer nursing start, side left. "started tummy time" → timer activity start, kind tummyTime; "stop tummy time" → timer activity complete, kind tummyTime. Same for pumping, the other activities and confined time. Several activity timers can run at once: always give the kind of an activity timer.
 
 Words:
-- wet, wee, pee = "pee". dirty, pooey, poo, poop, soiled, number two = "poo" (only "wet and dirty" is "both"). dry = "dry".
+- wet, wee, pee = "pee". dirty, pooey, poo, poop, soiled, number two = "poo". Pee AND poo in the same nappy ("wet and dirty", "poo and pee") = "both". dry = "dry".
+- ONE nappy change is ONE "nappy" event, also when it had pee and poo, details and air time. Never repeat an event.
 - breastfed, nursed, fed on the left or right side, on the boob = "nursing" (never a bottle). Minutes on each side go to left_minutes and right_minutes; last_side is the side fed last.
 - formula in a bottle = bottle "Formula". expressed milk, EBM, breast milk in a bottle = bottle "Breast Milk".
 - pumped or expressed (the parent) = ONE "pump" event; amounts from each side go to left_amount and right_amount.
@@ -116,6 +119,8 @@ Words:
 - play, playing, floor play = "activity" kind "indoorPlay". playing outside, in the garden, at the park = "outdoorPlay". Play with some tummy time is two events: the play and the tummy time.
 - in the car seat, pram, stroller, buggy, bouncer, swing, carrier, high chair = "confined" with that device (stroller and buggy = "pram").
 - nappy details: rash = rash true. Nappy off, air time, left it off for N minutes = air_minutes. dark pee, dark wee = pee "dark_yellow"; pale, yellow, orange or pink, red pee = pee_color; cloudy pee = pee_look "cloudy"; smelly or strong-smelling pee = pee_smell true.
+- nappy amounts: "big wee", "small poo", "medium poo" give pee_amount and poo_amount. small, little, tiny, a bit = "little". medium, normal = "medium". big, large, huge, a lot, full = "big".
+- "color" and "consistency" describe the poo. A yellow, green or brown poo is "color", not pee_color.
 - cried, was crying, screamed, was unsettled for a time = "cry"; what calmed the baby goes to soothed_by.
 - the first time the baby did something new (smiled, sat up, crawled, first tooth, first word, first steps) = "milestone".
 - Anything else the parent wants to record about the baby = "note". Chat, the weather or words that make no sense give {"events": []}.
@@ -127,6 +132,9 @@ Example. Note: "3oz formula at 6:20 this morning then she napped from 7 for 40 m
 
 Example. Note: "20 minutes of play, 5 of them tummy time. in the car seat since 9"
 {"events":[{"type":"activity","kind":"indoorPlay","end":"now","duration":"20 minutes"},{"type":"activity","kind":"tummyTime","end":"now","duration":"5 minutes"},{"type":"confined","start":"9","device":"car_seat"}]}
+
+Example. Note: "changed nappy, big wee and a small poo, the poo was green and runny. left the nappy off for 5 minutes"
+{"events":[{"type":"nappy","at":"now","mode":"both","pee_amount":"big","poo_amount":"little","color":"green","consistency":"runny","air_minutes":5}]}
 
 Example (a sleep timer runs). Note: "she's awake now, fed her on the right for 12 minutes"
 {"events":[{"type":"timer","timer":"sleep","action":"complete"},{"type":"nursing","start":"now","right_minutes":12,"last_side":"right"}]}"""
@@ -342,7 +350,10 @@ def to_proposal(ev: dict, now: datetime) -> dict:
     elif kind == "solids":
         data = {"foods": [{"name": f} for f in ev["foods"]], "reaction": ev.get("reaction")}
     elif kind == "nappy":
+        mode = ev["mode"]
         data = {k: ev.get(k) for k in ("mode", "color", "consistency", "pee_color", "pee_look")} | {
+            "pee_amount": ev.get("pee_amount") if mode in ("pee", "both") else None,
+            "poo_amount": ev.get("poo_amount") if mode in ("poo", "both") else None,
             "rash": bool(ev.get("rash")), "air_minutes": round(ev["air_minutes"]) if ev.get("air_minutes") else None,
             "pee_smell": True if ev.get("pee_smell") else None}
     elif kind == "potty":
@@ -407,6 +418,8 @@ def summary(p: dict, ctx: Ctx) -> str:
     elif t in ("nappy", "potty"):
         detail = NAPPY_WORDS[d["mode"]] + (f", {d['color']}" if d.get("color") else "") + (
             f", {d['consistency']}" if d.get("consistency") else "") + (", rash" if d.get("rash") else "") + (
+            f", {d['pee_amount']} pee" if d.get("pee_amount") else "") + (
+            f", {d['poo_amount']} poo" if d.get("poo_amount") else "") + (
             f", pee {d['pee_color'].replace('_', ' ')}" if d.get("pee_color") else "") + (
             ", cloudy" if d.get("pee_look") == "cloudy" else "") + (", strong smell" if d.get("pee_smell") else "") + (
             f", air time {d['air_minutes']} min" if d.get("air_minutes") else "")
@@ -497,6 +510,33 @@ _NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
 NAPPY_SAID = re.compile(r"\b(wet|wee\w*|pee\w*|urine|dirty|poo\w*|soiled|number (one|two)|stool|bm|dry|both)\b", re.I)
 
 
+# A nappy detail stays only when the parent's words have a word for it (the model can invent "cloudy").
+_AMOUNT = re.compile(r"little|small|tiny|bit|medium|normal|big|large|huge|lot|full|massive|heavy|explosion", re.I)
+PEE_SAID = {"pee_amount": _AMOUNT, "poo_amount": _AMOUNT,
+            "pee_look": re.compile(r"cloud|clear|murky", re.I),
+            "pee_smell": re.compile(r"smell|stink|pong|whiff|strong", re.I),
+            "pee_color": re.compile(r"dark|pale|yellow|orange|pink|red|blood", re.I)}
+
+
+def said_only(ev: dict, text: str) -> dict:
+    return {k: v for k, v in ev.items() if k not in PEE_SAID or PEE_SAID[k].search(text)}
+
+
+def merge_nappies(events: list[dict]) -> list[dict]:
+    """The model can split one nappy change into two events (amounts in one, colour in the other): join nappy
+    events with the same time and mode that do not disagree. Equal events stay (parse marks them "not sure")."""
+    out: list[dict] = []
+    for ev in events:
+        same = next((o for o in out if ev.get("type") == o.get("type") == "nappy" and o != ev
+                     and all(o.get(k) == ev.get(k) for k in ("at", "mode"))
+                     and all(o.get(k, v) == v for k, v in ev.items())), None)
+        if same:
+            same.update(ev)
+        else:
+            out.append(dict(ev))
+    return out
+
+
 def _numbers(text: str) -> set[float]:
     found = {float(n.replace(",", ".")) for n in _NUMBER.findall(text)}
     words = text.lower().replace("-", " ")
@@ -546,8 +586,10 @@ async def parse(s: Session, ctx: Ctx, child_id: int, text: str, limited: bool = 
                 {"role": "user", "content": f"{_context(s, ctx, child, now_local)}\n\nNote: {text.strip()}"}]
     out = await llm.complete_json(ctx.fam, messages, SCHEMA, max_tokens=1500, limited=limited)
     proposals, problems = [], []
-    for ev in out.get("events", []):
+    seen: set[str] = set()  # a model can repeat one event many times: a second equal item is never saved unchecked
+    for ev in merge_nappies(out.get("events", [])):
         try:
+            ev = said_only(ev, text)
             p = to_proposal(ev, now_local)
             if (ev["type"] == "activity" and ev.get("end") and not ev.get("start") and not ev.get("duration")
                     and find(s, child.id, "activity", ev["kind"])):
@@ -563,7 +605,9 @@ async def parse(s: Session, ctx: Ctx, child_id: int, text: str, limited: bool = 
                 check_timer(s, child, p)
             p["summary"] = summary(p, ctx)
             p["unsure"] = doubt(s, ctx, child, ev, p, text, now) or (
-                "your words can mean two things" if out.get("unclear") else None)
+                "your words can mean two things" if out.get("unclear") else None) or (
+                "it is the same as another item" if p["summary"] in seen else None)
+            seen.add(p["summary"])
             proposals.append({k: v for k, v in p.items() if v is not None})
         except (ServiceError, KeyError, TypeError, ValueError) as err:
             problems.append(str(err) if isinstance(err, ServiceError) else "an item was not complete")

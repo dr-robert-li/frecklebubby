@@ -3,7 +3,7 @@
 	import { api, runJob, softMessage } from './api.ts';
 	import { child, units, wording } from './app.svelte.ts';
 	import Cites from './Cites.svelte';
-	import { fmtDay, fmtDur, fmtUnit, localDay } from './format.svelte.ts';
+	import { fmtDay, fmtDur, fmtTime, fmtUnit, localDay } from './format.svelte.ts';
 	import Icon from './Icon.svelte';
 	import SourceSheet, { type Citation } from './SourceSheet.svelte';
 
@@ -73,7 +73,7 @@
 <section class="card support" aria-label="Support report">
 	<h2>How can I support {name}?</h2>
 	{#if report}
-		<p class="muted small">Made {fmtDay(localDay(report.created_at), { day: 'numeric', month: 'long' })} · the last 7 days and today</p>
+		<p class="muted small">Made {fmtDay(localDay(report.created_at), { day: 'numeric', month: 'long' })} at {fmtTime(report.created_at)} · the last 7 days and today</p>
 	{:else if report === null}
 		<p class="muted">A short report on the last 7 days and today: sleep, feeds, {wording() === 'diaper' ? 'diapers' : 'nappies'}, play, time in a seat, crying, growth and milestones. Each area is compared with a trusted source, with ideas to try.</p>
 	{/if}
