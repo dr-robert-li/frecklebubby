@@ -11,6 +11,10 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 - Cloudflare Tunnel: an optional `cloudflared` service in `compose.yaml` (profile `tunnel`, token from `.env`).
 - `compose.gpu.yaml`: run the model server on an NVIDIA GPU through CDI.
 
+### Fixed
+
+- Clerk sign-in showed no form. `@clerk/clerk-js` 6 gets its form from `@clerk/ui`, and the app did not load it.
+
 ### Tested
 
 - The app image, the llama.cpp CUDA image and cloudflared run on arm64 with Docker.

@@ -41,9 +41,10 @@ export function setDevUser(email: string) {
 export async function initAuth(): Promise<{ config: Config; signedIn: boolean }> {
 	config = await api<Config>('/config', { anonymous: true });
 	if (config.auth_mode !== 'clerk') return { config, signedIn: true };
-	const { Clerk } = await import('@clerk/clerk-js');
+	// clerk-js 6 has no sign-in form of its own: the form comes from @clerk/ui.
+	const [{ Clerk }, { ui }] = await Promise.all([import('@clerk/clerk-js'), import('@clerk/ui')]);
 	clerk = new Clerk(config.clerk_publishable_key);
-	await clerk.load();
+	await clerk.load({ ui });
 	return { config, signedIn: !!clerk.user };
 }
 
