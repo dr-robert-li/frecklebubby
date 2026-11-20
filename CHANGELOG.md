@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `compose.yaml` did not pass `OPERATOR_EMAILS`, `BEHIND_CLOUDFLARE`, the `LIMIT_` settings and the `LLM_QUEUE_`
+  settings to the app container. With 0.4.0 and compose, these settings in `.env` had no effect: the server was
+  not invite only.
+
 ## [0.4.0] - 2026-11-20
 
 An invite-only server for more than one family, with protection for a public address.
