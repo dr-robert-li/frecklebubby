@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { signOut } from '#lib/api.ts';
 	import { app } from '#lib/app.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
 
@@ -31,6 +32,7 @@
 	{/each}
 </nav>
 <p class="muted small center">Signed in as {app.me?.user.email} · Frecklebubby {app.config?.version}</p>
+{#if app.config?.auth_mode === 'clerk'}<button class="ghost wide" onclick={signOut}>Sign out</button>{/if}
 
 <style>
 	.menu {

@@ -27,7 +27,7 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	await s.getByRole('button', { name: 'Big' }).click();
 	await shot(page, '04-nappy-sheet');
 	await s.getByRole('button', { name: 'Save' }).click();
-	await expectLogged(page, 'Nappy', 'Dirty · Yellow · Runny');
+	await expectLogged(page, 'Nappy', 'Poo · Yellow · Runny');
 
 	// solids
 	s = await openTile(page, 'Solids');
@@ -52,7 +52,7 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	await s.getByRole('button', { name: 'Went in the potty' }).click();
 	await s.getByRole('button', { name: 'Wee', exact: true }).click();
 	await s.getByRole('button', { name: 'Save' }).click();
-	await expectLogged(page, 'Potty', 'Went in the potty · Wet');
+	await expectLogged(page, 'Potty', 'Went in the potty · Wee');
 
 	// medicine
 	s = await openTile(page, 'Medicine');

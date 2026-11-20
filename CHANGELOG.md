@@ -6,9 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-21
+
 ### Changed
 
 - Home: the "Today" totals always show the bottle volume, also when it is zero.
+- Settings: a "Sign out" button is on the main Settings page. Before, it was only in Appearance.
 - Nappies: the app says "Wee" and "Poo" where it said "Wet" and "Dirty" (form, timeline, totals, reports, plain
   words). Text from health sources keeps "wet nappies". The API values `pee`, `poo` and `both` do not change.
 
@@ -17,6 +20,7 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 - `compose.yaml` did not pass `OPERATOR_EMAILS`, `BEHIND_CLOUDFLARE`, the `LIMIT_` settings and the `LLM_QUEUE_`
   settings to the app container. With 0.4.0 and compose, these settings in `.env` had no effect: the server was
   not invite only.
+- The tests no longer read any setting from a local `.env` file.
 
 ## [0.4.0] - 2026-11-20
 
