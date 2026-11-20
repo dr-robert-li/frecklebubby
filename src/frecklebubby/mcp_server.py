@@ -176,8 +176,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
             "nursing_timer / log_nursing; bottle (formula or expressed milk) = log_bottle; food = log_solids; nappy "
             "or diaper change = log_nappy; potty or toilet = log_potty; the parent's pumping = pump_timer / log_pump; "
             "play and tummy time = play_timer / log_play; car seat, pram, bouncer, swing, carrier or high chair = "
-            "confined_timer / log_confined; crying = log_cry; bath, story, screen time, skin to skin, teeth = "
-            "activity_timer / log_activity; weight, length, head = log_growth; temperature = log_temperature; "
+            "confined_timer / log_confined; crying = log_cry; bath = log_bath; story, screen time, skin to skin, "
+            "teeth = activity_timer / log_activity; weight, length, head = log_growth; temperature = log_temperature; "
             "medicine = log_medicine; a first (smiled, sat, walked) = log_milestone; anything else = log_note. "
             "log_in_plain_words reads the parent's own words with the server model and saves what it is sure of. "
             "To fix or remove an entry: call list_entries, confirm the entry with "
@@ -359,8 +359,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save an activity that is over: bath, story time, screen time, skin to skin, brushing teeth. For play and
-        tummy time use log_play; for a car seat, pram or bouncer use log_confined."""
+        """Save an activity that is over: story time, screen time, skin to skin, brushing teeth. For a bath use
+        log_bath; for play and tummy time use log_play; for a car seat, pram or bouncer use log_confined."""
         return log_entry(child, "activity", start_time, {"kind": kind}, notes, end_time)
 
     @mcp.tool(annotations=DESTRUCTIVE)
@@ -536,6 +536,15 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
     ) -> dict[str, Any]:
         """Save a free-text note, for something no other log_* tool fits."""
         return log_entry(child, "note", start_time, {}, text)
+
+    @mcp.tool
+    def log_bath(
+        start_time: Time = None,
+        notes: Notes = None,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Log a bath: the time and optional notes."""
+        return log_entry(child, "bath", start_time, {}, notes)
 
     @mcp.tool
     def log_cry(

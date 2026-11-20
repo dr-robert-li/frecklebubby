@@ -78,10 +78,11 @@ EVENTS = [
     _ev("temperature", {"at": TIME, "value": _NUM, "unit": _enum("C", "F")}, ["at", "value", "unit"]),
     _ev("medicine", {"at": TIME, "name": _STR, "amount": _NUM, "unit": _enum("ml", "oz", "tsp", "drops", "mg")},
         ["at", "name"]),
-    _ev("activity", {**_SPAN, "kind": _enum("bath", "tummyTime", "storyTime", "screenTime", "skinToSkin",
+    _ev("activity", {**_SPAN, "kind": _enum("tummyTime", "storyTime", "screenTime", "skinToSkin",
                                            "outdoorPlay", "indoorPlay", "brushTeeth")}, ["kind"]),
     _ev("milestone", {"at": TIME, "title": _STR}, ["at", "title"]),
     _ev("note", {"at": TIME, "text": {"type": "string", "maxLength": 500}}, ["at", "text"]),
+    _ev("bath", {"at": TIME}, ["at"]),
     _ev("cry", {**_SPAN, "soothed_by": _STR}, []),
     _ev("play", {**_SPAN, "kind": _enum("indoor", "outdoor"), "tummy_minutes": _NUM}, []),
     _ev("confined", {**_SPAN, "device": _enum(*DEVICES)}, ["device"]),
@@ -113,7 +114,8 @@ Words:
 - temp, temperature, a fever reading = "temperature". paracetamol, Panadol, Calpol, ibuprofen, Nurofen, vitamin D, drops = "medicine".
 - weighed, weight, length, height, head = "growth".
 - ate, tried, had food, puree = "solids". loved it = LOVED, ok or so-so = MEH, hated it or spat it out = HATED, rash, hives or swelling after food = ALLERGIC.
-- bath, tummy time alone, story, reading = "activity".
+- bath, gave a bath, had a bath, bathed = "bath" (only a time).
+- tummy time alone, story, reading = "activity".
 - play, playing, floor play, playing outside = "play" (outside = kind "outdoor"). Minutes of tummy time during the play go to tummy_minutes.
 - in the car seat, pram, stroller, buggy, bouncer, swing, carrier, high chair = "confined" with that device (stroller and buggy = "pram").
 - nappy details: rash = rash true. Nappy off, air time, left it off for N minutes = air_minutes. dark pee, dark wee = pee "dark_yellow"; pale, yellow, orange or pink, red pee = pee_color; cloudy pee = pee_look "cloudy"; smelly or strong-smelling pee = pee_smell true.

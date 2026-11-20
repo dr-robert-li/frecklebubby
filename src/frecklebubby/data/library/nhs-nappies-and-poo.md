@@ -67,8 +67,8 @@ Your baby's first poo is called meconium. This is sticky and greenish-black.
 Some babies may do this kind of poo during or after birth, or some time in the first 48 hours.
 After a few days the poo will change to a yellow or mustard colour. Breastfed babies' poo is runny and doesn't smell. Formula-fed babies' poo is firmer, darker brown and more smelly.
 Some infant formulas can also make your baby's poo dark green. If you change from breast to formula feeding, you'll find your baby's poos become darker and more paste-like.
-If you have a girl, you may see a white discharge on her nappy for a few days after birth.
-It's caused by hormones that have crossed the placenta to your baby, but these will soon disappear from her system.
+If you have a girl, you may see a white discharge on their nappy for a few days after birth.
+It's caused by hormones that have crossed the placenta to your baby, but these will soon disappear from their system.
 These hormones can occasionally cause slight bleeding like a mini period, but in both cases it's nothing to worry about.
 Read the NCT guide to newborn baby poo
 

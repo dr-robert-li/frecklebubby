@@ -2,12 +2,12 @@
 
 A baby tracker that you host yourself.
 
-Version 0.2.0. See [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.1. See [CHANGELOG.md](CHANGELOG.md).
 
 ## What it does
 
 - Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities,
-  play with tummy time, time in a car seat or other seat, crying, milestones and notes.
+  baths, play with tummy time, time in a car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
 - Has live timers for sleep, nursing, pumping, activities, play (with a tummy-time part) and confined time. A timer
   keeps running when you close the app.
@@ -302,6 +302,7 @@ The assistant answers from these sources and shows each source it used:
   - CDC pages: Material developed by CDC. Public domain; reference does not imply endorsement by CDC or the U.S.
     Government. Available free at cdc.gov.
   - CDC "Learn the Signs. Act Early." milestone checklists (public domain), with the same notice.
+  - The app changed gendered pronouns for the child to they, them and their in this text. It made no other change.
 - **Trusted sources (links only)**: for example Raising Children Network, Red Nose, healthdirect, AAP and
   well-known sleep books. Frecklebubby stores only the title and the link, not their text.
 - **WHO growth data** (`src/frecklebubby/data/growth/`): WHO Child Growth Standards, World Health Organization,

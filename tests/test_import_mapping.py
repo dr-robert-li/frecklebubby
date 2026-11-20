@@ -166,7 +166,10 @@ def test_activity():
                                                         notes="calm"))
     assert e == {"type": "activity", "started_at": START, "ended_at": START + timedelta(seconds=1200),
                  "data": {"kind": "skinToSkin"}, "notes": "calm"}
-    assert full("activities", FirebaseActivityIntervalData(mode="bath", start=T0, offset=0))["ended_at"] is None
+    assert full("activities", FirebaseActivityIntervalData(mode="storyTime", start=T0, offset=0))["ended_at"] is None
+    # A bath activity becomes a bath entry; a bath has no end time, so the duration is dropped.
+    e = full("activities", FirebaseActivityIntervalData(mode="bath", start=T0, offset=0, duration=900))
+    assert e == {"type": "bath", "started_at": START, "ended_at": None, "data": {}, "notes": None}
 
 
 def test_range_rules():

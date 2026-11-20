@@ -182,7 +182,7 @@ async def test_assistant_gets_age_context_and_passages(client, fake_llm):
     assert "Development around this age: " in prompt
     assert "4 months: how to help your baby (CDC tips and activities)" in prompt  # picked by age, not by search
     assert "sitting without support" in prompt  # the WHO window passage of the sitting item
-    assert "Hold your baby up while she sits." in prompt  # its CDC tip
+    assert "Hold your baby up while they sit." in prompt  # its CDC tip
     assert "24 months (2 years)" not in prompt
 
 

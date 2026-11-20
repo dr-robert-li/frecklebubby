@@ -28,6 +28,7 @@ due date) until 2 years. Library file `corrected-age-premature`, phrase: "until 
 
 ## Licences
 
+- CDC text was changed in one way: the app changed gendered pronouns (he, she, him, her, his) to they, them and their. It made no other change.
 - CDC text: public domain (US government work). Material developed by CDC; reference does not imply endorsement by
   CDC, HHS or the U.S. Government.
 - nhs.uk text: Open Government Licence v3.0.

@@ -55,7 +55,7 @@ CASES = [
      [("medicine", "D08:00", None, {"name": "vitamin d"})]),
     ("pumped 80 ml from the left and 60 from the right at 9:30", False,
      [("pump", "D09:30", None, {"left_ml": 80, "right_ml": 60})]),
-    ("bath at 6:30 pm yesterday for 15 minutes", False, [("activity", "Y18:30", "Y18:45", {"kind": "bath"})]),
+    ("bath at 6:30 pm yesterday", False, [("bath", "Y18:30", None, {})]),
     ("20 minutes of tummy time, just finished", False, [("activity", "D14:15", "D14:35", {"kind": "tummyTime"})]),
     ("120 ml formula at quarter to 2 and a wet and dirty nappy at 2", False,
      [("bottle", "D13:45", None, {"amount_ml": 120, "milk_type": "Formula"}),
@@ -70,6 +70,9 @@ CASES = [
     ("in the car seat since 9", False, [("timer:confined:start", None, None, {"device": "car_seat"})]),
     ("nappy with a rash, left it off for 10 minutes", False, [("nappy", None, None, {"rash": True, "air_minutes": 10})]),
     ("dark pee", False, [("nappy", None, None, {"mode": "pee", "pee_color": "dark_yellow"})]),
+    # bath
+    ("gave her a bath at 11", False, [("bath", "D11:00", None, {})]),
+    ("just had a bath", False, [("bath", "D14:35", None, {})]),
 ]
 
 

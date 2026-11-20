@@ -5,7 +5,7 @@ url: "https://www.cdc.gov/sudden-infant-death/sleep-safely/index.html"
 licence: "Public domain (US government work)"
 year: 2024
 retrieved: "2026-11-20"
-attribution: "Material developed by CDC. Public domain; reference does not imply endorsement by CDC or the U.S. Government. Available free at cdc.gov."
+attribution: "Material developed by CDC. Public domain; reference does not imply endorsement by CDC or the U.S. Government. Available free at cdc.gov. Pronouns changed to they/them."
 ---
 
 ## What to know
@@ -16,11 +16,11 @@ attribution: "Material developed by CDC. Public domain; reference does not imply
 ## Parents and caregivers - Creating a safe sleep area for babies
 
 CDC supports the 2022 recommendations issued by the American Academy of Pediatrics (AAP). Take the following actions to help reduce the risk of sleep-related infant deaths.
-- Place your baby on his or her back for all sleep times—naps and at night.
+- Place your baby on their back for all sleep times—naps and at night.
 - Use a firm, flat (not at an angle or inclined) sleep surface. For example, a mattress in a safety-approved crib, covered by a fitted sheet.
 - Keep your baby's sleep area (for example, a crib or bassinet) in the same room where you sleep, ideally until your baby is at least 6 months old.
 - Keep soft bedding out of your baby's sleep area. This includes blankets, pillows, bumper pads, and soft toys.
-- Do not cover your baby's head or allow your baby to get too hot. Signs your baby may be getting too hot include sweating or his or her chest feels hot.
+- Do not cover your baby's head or allow your baby to get too hot. Signs your baby may be getting too hot include sweating or their chest feels hot.
 
 View a safe sleep area at What does a safe sleep environment look like? from Safe to Sleep®.
 

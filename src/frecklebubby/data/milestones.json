@@ -25,7 +25,7 @@
   "key": "2m-social-3",
   "age_months": 2,
   "domain": "social",
-  "text": "Seems happy to see you when you walk up to her",
+  "text": "Seems happy to see you when you walk up to them",
   "source": {
    "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -36,7 +36,7 @@
   "key": "2m-social-4",
   "age_months": 2,
   "domain": "social",
-  "text": "Smiles when you talk to or smile at her",
+  "text": "Smiles when you talk to or smile at them",
   "source": {
    "title": "Milestones by 2 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -124,7 +124,7 @@
   "key": "4m-social-1",
   "age_months": 4,
   "domain": "social",
-  "text": "Smiles on his own to get your attention",
+  "text": "Smiles on their own to get your attention",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -135,7 +135,7 @@
   "key": "4m-social-2",
   "age_months": 4,
   "domain": "social",
-  "text": "Chuckles (not yet a full laugh) when you try to make him laugh",
+  "text": "Chuckles (not yet a full laugh) when you try to make them laugh",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -168,7 +168,7 @@
   "key": "4m-language-2",
   "age_months": 4,
   "domain": "language",
-  "text": "Makes sounds back when you talk to him",
+  "text": "Makes sounds back when you talk to them",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -190,7 +190,7 @@
   "key": "4m-cognitive-1",
   "age_months": 4,
   "domain": "cognitive",
-  "text": "If hungry, opens mouth when he sees breast or bottle",
+  "text": "If hungry, opens mouth when they see breast or bottle",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -201,7 +201,7 @@
   "key": "4m-cognitive-2",
   "age_months": 4,
   "domain": "cognitive",
-  "text": "Looks at her hands with interest",
+  "text": "Looks at their hands with interest",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -212,7 +212,7 @@
   "key": "4m-movement-1",
   "age_months": 4,
   "domain": "movement",
-  "text": "Holds head steady without support when you are holding him",
+  "text": "Holds head steady without support when you are holding them",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -223,7 +223,7 @@
   "key": "4m-movement-2",
   "age_months": 4,
   "domain": "movement",
-  "text": "Holds a toy when you put it in his hand",
+  "text": "Holds a toy when you put it in their hand",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -234,7 +234,7 @@
   "key": "4m-movement-3",
   "age_months": 4,
   "domain": "movement",
-  "text": "Uses his arm to swing at toys",
+  "text": "Uses their arm to swing at toys",
   "source": {
    "title": "Milestones by 4 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -333,7 +333,7 @@
   "key": "6m-cognitive-1",
   "age_months": 6,
   "domain": "cognitive",
-  "text": "Puts things in her mouth to explore them",
+  "text": "Puts things in their mouth to explore them",
   "source": {
    "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -344,7 +344,7 @@
   "key": "6m-cognitive-2",
   "age_months": 6,
   "domain": "cognitive",
-  "text": "Reaches to grab a toy she wants",
+  "text": "Reaches to grab a toy they want",
   "source": {
    "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -355,7 +355,7 @@
   "key": "6m-cognitive-3",
   "age_months": 6,
   "domain": "cognitive",
-  "text": "Closes lips to show she doesn’t want more food",
+  "text": "Closes lips to show they don’t want more food",
   "source": {
    "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -388,7 +388,7 @@
   "key": "6m-movement-3",
   "age_months": 6,
   "domain": "movement",
-  "text": "Leans on hands to support herself when sitting",
+  "text": "Leans on hands to support themselves when sitting",
   "source": {
    "title": "Milestones by 6 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -421,7 +421,7 @@
   "key": "9m-social-3",
   "age_months": 9,
   "domain": "social",
-  "text": "Looks when you call her name",
+  "text": "Looks when you call their name",
   "source": {
    "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -476,7 +476,7 @@
   "key": "9m-cognitive-1",
   "age_months": 9,
   "domain": "cognitive",
-  "text": "Looks for objects when dropped out of sight (like his spoon or toy)",
+  "text": "Looks for objects when dropped out of sight (like their spoon or toy)",
   "source": {
    "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -498,7 +498,7 @@
   "key": "9m-movement-1",
   "age_months": 9,
   "domain": "movement",
-  "text": "Gets to a sitting position by herself",
+  "text": "Gets to a sitting position by themselves",
   "source": {
    "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -509,7 +509,7 @@
   "key": "9m-movement-2",
   "age_months": 9,
   "domain": "movement",
-  "text": "Moves things from one hand to her other hand",
+  "text": "Moves things from one hand to their other hand",
   "source": {
    "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -520,7 +520,7 @@
   "key": "9m-movement-3",
   "age_months": 9,
   "domain": "movement",
-  "text": "Uses fingers to “rake” food towards himself",
+  "text": "Uses fingers to “rake” food towards themselves",
   "source": {
    "title": "Milestones by 9 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -597,7 +597,7 @@
   "key": "12m-cognitive-2",
   "age_months": 12,
   "domain": "cognitive",
-  "text": "Looks for things he sees you hide, like a toy under a blanket",
+  "text": "Looks for things they see you hide, like a toy under a blanket",
   "source": {
    "title": "Milestones by 1 Year (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -663,7 +663,7 @@
   "key": "15m-social-2",
   "age_months": 15,
   "domain": "social",
-  "text": "Shows you an object she likes",
+  "text": "Shows you an object they like",
   "source": {
    "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -729,7 +729,7 @@
   "key": "15m-language-3",
   "age_months": 15,
   "domain": "language",
-  "text": "Follows directions given with both a gesture and words. For example, he gives you a toy when you hold out your hand and say, “Give me the toy.”",
+  "text": "Follows directions given with both a gesture and words. For example, they give you a toy when you hold out your hand and say, “Give me the toy.”",
   "source": {
    "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -773,7 +773,7 @@
   "key": "15m-movement-1",
   "age_months": 15,
   "domain": "movement",
-  "text": "Takes a few steps on his own",
+  "text": "Takes a few steps on their own",
   "source": {
    "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -784,7 +784,7 @@
   "key": "15m-movement-2",
   "age_months": 15,
   "domain": "movement",
-  "text": "Uses fingers to feed herself some food",
+  "text": "Uses fingers to feed themselves some food",
   "source": {
    "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -839,7 +839,7 @@
   "key": "18m-social-5",
   "age_months": 18,
   "domain": "social",
-  "text": "Helps you dress him by pushing arm through sleeve or lifting up foot",
+  "text": "Helps you dress them by pushing arm through sleeve or lifting up foot",
   "source": {
    "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -927,7 +927,7 @@
   "key": "18m-movement-4",
   "age_months": 18,
   "domain": "movement",
-  "text": "Feeds himself with his fingers",
+  "text": "Feeds themselves with their fingers",
   "source": {
    "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1004,7 +1004,7 @@
   "key": "24m-language-3",
   "age_months": 24,
   "domain": "language",
-  "text": "Points to at least two body parts when you ask him to show you",
+  "text": "Points to at least two body parts when you ask them to show you",
   "source": {
    "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1114,7 +1114,7 @@
   "key": "30m-social-2",
   "age_months": 30,
   "domain": "social",
-  "text": "Shows you what she can do by saying, “Look at me!”",
+  "text": "Shows you what they can do by saying, “Look at me!”",
   "source": {
    "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1213,7 +1213,7 @@
   "key": "30m-cognitive-4",
   "age_months": 30,
   "domain": "cognitive",
-  "text": "Shows he knows at least one color, like pointing to a red crayon when you ask, “Which one is red?”",
+  "text": "Shows they know at least one color, like pointing to a red crayon when you ask, “Which one is red?”",
   "source": {
    "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1235,7 +1235,7 @@
   "key": "30m-movement-2",
   "age_months": 30,
   "domain": "movement",
-  "text": "Takes some clothes off by himself, like loose pants or an open jacket",
+  "text": "Takes some clothes off by themselves, like loose pants or an open jacket",
   "source": {
    "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1257,7 +1257,7 @@
   "key": "30m-movement-4",
   "age_months": 30,
   "domain": "movement",
-  "text": "Turns book pages, one at a time, when you read to her",
+  "text": "Turns book pages, one at a time, when you read to them",
   "source": {
    "title": "Milestones by 30 Months (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1268,7 +1268,7 @@
   "key": "36m-social-1",
   "age_months": 36,
   "domain": "social",
-  "text": "Calms down within 10 minutes after you leave her, like at a childcare drop off",
+  "text": "Calms down within 10 minutes after you leave them, like at a childcare drop off",
   "source": {
    "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1345,7 +1345,7 @@
   "key": "36m-cognitive-1",
   "age_months": 36,
   "domain": "cognitive",
-  "text": "Draws a circle, when you show him how",
+  "text": "Draws a circle, when you show them how",
   "source": {
    "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1356,7 +1356,7 @@
   "key": "36m-cognitive-2",
   "age_months": 36,
   "domain": "cognitive",
-  "text": "Avoids touching hot objects, like a stove, when you warn her",
+  "text": "Avoids touching hot objects, like a stove, when you warn them",
   "source": {
    "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1378,7 +1378,7 @@
   "key": "36m-movement-2",
   "age_months": 36,
   "domain": "movement",
-  "text": "Puts on some clothes by himself, like loose pants or a jacket",
+  "text": "Puts on some clothes by themselves, like loose pants or a jacket",
   "source": {
    "title": "Milestones by 3 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1455,7 +1455,7 @@
   "key": "48m-social-6",
   "age_months": 48,
   "domain": "social",
-  "text": "Changes behavior based on where she is (place of worship, library, playground)",
+  "text": "Changes behavior based on where they are (place of worship, library, playground)",
   "source": {
    "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1488,7 +1488,7 @@
   "key": "48m-language-3",
   "age_months": 48,
   "domain": "language",
-  "text": "Talks about at least one thing that happened during her day, like “I played soccer.”",
+  "text": "Talks about at least one thing that happened during their day, like “I played soccer.”",
   "source": {
    "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1554,7 +1554,7 @@
   "key": "48m-movement-2",
   "age_months": 48,
   "domain": "movement",
-  "text": "Serves herself food or pours water, with adult supervision",
+  "text": "Serves themselves food or pours water, with adult supervision",
   "source": {
    "title": "Milestones by 4 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1620,7 +1620,7 @@
   "key": "60m-language-1",
   "age_months": 60,
   "domain": "language",
-  "text": "Tells a story she heard or made up with at least two events. For example, a cat was stuck in a tree and a firefighter saved it",
+  "text": "Tells a story they heard or made up with at least two events. For example, a cat was stuck in a tree and a firefighter saved it",
   "source": {
    "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1631,7 +1631,7 @@
   "key": "60m-language-2",
   "age_months": 60,
   "domain": "language",
-  "text": "Answers simple questions about a book or story after you read or tell it to him",
+  "text": "Answers simple questions about a book or story after you read or tell it to them",
   "source": {
    "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",
@@ -1708,7 +1708,7 @@
   "key": "60m-cognitive-5",
   "age_months": 60,
   "domain": "cognitive",
-  "text": "Writes some letters in her name",
+  "text": "Writes some letters in their name",
   "source": {
    "title": "Milestones by 5 Years (CDC, Learn the Signs. Act Early.)",
    "publisher": "CDC",

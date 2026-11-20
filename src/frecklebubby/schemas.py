@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 EntryType = Literal[
     "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry", "play", "confined",
+    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry", "play", "confined", "bath",
 ]
 TimerType = Literal["sleep", "nursing", "pump", "activity", "play", "confined"]
 TimerAction = Literal["start", "pause", "resume", "switch", "cancel", "complete"]
@@ -167,6 +167,7 @@ DATA_MODELS: dict[str, type[_Data]] = {
     "nappy": NappyData, "potty": PottyData, "pump": PumpData, "growth": GrowthData,
     "temperature": TemperatureData, "medicine": MedicineData, "activity": ActivityData,
     "milestone": MilestoneData, "note": _Data, "cry": CryData, "play": PlayData, "confined": ConfinedData,
+    "bath": _Data,
 }
 END_REQUIRED = {"sleep"}
 END_OPTIONAL = {"nursing", "pump", "activity", "cry", "play", "confined"}
@@ -449,6 +450,7 @@ class DayReport(BaseModel):
     nappies: NappyDay = NappyDay()
     pump_ml: float = 0
     medicine_count: int = 0
+    bath_count: int = Field(0, description="bath entries + activity entries of kind bath")
     activities: dict[str, ActivityDay] = {}
     crying: CryDay = CryDay()
     play: PlayDay = PlayDay()
@@ -549,7 +551,8 @@ class MilestonesOut(BaseModel):
 class ReminderIn(BaseModel):
     type: Literal[
         "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-        "growth", "temperature", "medicine", "activity", "milestone", "note", "play", "confined", "sleep_alert",
+        "growth", "temperature", "medicine", "activity", "milestone", "note", "play", "confined", "bath",
+        "sleep_alert",
     ]
     mode: Literal["in", "at"]
     interval_minutes: int | None = Field(None, ge=1, le=10080)

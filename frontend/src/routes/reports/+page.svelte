@@ -116,6 +116,12 @@
 				{fmtDur(Math.max(...days.map((d: any) => d.confined.longest_seconds)))}.</p>
 		</section>
 	{/if}
+	{#if days.some((d: any) => d.bath_count)}
+		<section class="card">
+			<BarChart title="Baths" counts {labels} series={[{ label: 'Baths', color: 'var(--s1)', values: days.map((d: any) => d.bath_count) }]} />
+			<p class="small muted">{days.reduce((a: number, d: any) => a + d.bath_count, 0)} baths this week. Old "Bath" activities count too.</p>
+		</section>
+	{/if}
 	{#if days.some((d: any) => d.crying?.count)}
 		<section class="card">
 			<BarChart title="Crying per day (minutes)" {labels} fmt={(v) => `${Math.round(v)} min`}

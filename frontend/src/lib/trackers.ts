@@ -3,7 +3,7 @@ import { fmtDur, fmtUnit, type UnitKind, type Units } from './format.svelte';
 
 export type EntryType =
 	| 'sleep' | 'nursing' | 'bottle' | 'solids' | 'nappy' | 'potty' | 'pump'
-	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry' | 'play' | 'confined';
+	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry' | 'play' | 'confined' | 'bath';
 
 export type Entry = {
 	id: number;
@@ -153,7 +153,8 @@ export function trackers(wording: Wording): Tracker[] {
 		] },
 		{ type: 'confined', label: 'Confined', color: '--peach', end: 'optional', timer: true, fields: [
 			{ key: 'device', label: 'Where', kind: 'one', required: true, options: DEVICES }
-		] }
+		] },
+		{ type: 'bath', label: 'Bath', color: '--sky', fields: [] }
 	];
 }
 

@@ -22,5 +22,5 @@ CDC states on each page: "Learn the Signs. Act Early. materials are not a substi
 
 ## Notes
 
-- Milestone text is as the CDC page words it (pronouns such as "her" or "him" are kept as published). Domains map to CDC headings: Social/Emotional = social, Language/Communication = language, Cognitive = cognitive, Movement/Physical Development = movement.
+- Milestone text is as the CDC page words it. The app changed the gendered pronouns (he, she, him, her, his, himself, herself) to they, them, their and themselves, and made no other change. Domains map to CDC headings: Social/Emotional = social, Language/Communication = language, Cognitive = cognitive, Movement/Physical Development = movement.
 - CDC no longer publishes per-age "signs of concern" lists on these pages. `milestones_act_early.json` holds the generic "Share with your child's doctor" action text of each age page. The 6-month page, as retrieved, does not carry the paragraph that starts "You know your child best", only the referral steps.

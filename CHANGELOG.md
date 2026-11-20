@@ -6,6 +6,19 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-20
+
+### Added
+
+- Baths: a Bath tile to log a bath with a time and notes. Reports show the number of baths. Claude can use the new
+  `log_bath` tool, and plain words such as "gave her a bath at 6" are logged as a bath. A Huckleberry bath is
+  imported as a bath.
+
+### Changed
+
+- CDC milestone and tip text now uses they, them and their for the child. No other words were changed. The notices
+  and the library files state this.
+
 ## [0.2.0] - 2026-11-20
 
 ### Added

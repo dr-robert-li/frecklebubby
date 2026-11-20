@@ -92,10 +92,13 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
             r.pump_ml += d.get("total_ml", 0)
         elif e.type == "medicine":
             r.medicine_count += 1
+        elif e.type == "bath":
+            r.bath_count += 1
         elif e.type == "activity":
             a = r.activities.setdefault(d["kind"], ActivityDay())
             a.count += 1
             a.seconds += duration
+            r.bath_count += d["kind"] == "bath"  # old bath activities count as baths
             if d["kind"] in PLAY_KINDS:
                 r.play.count += 1
                 r.play.seconds += duration

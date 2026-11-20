@@ -243,5 +243,5 @@ async def test_mcp_log_in_plain_words(client, fake_llm):
                         ("nappy", "log_nappy"), ("potty", "log_potty"), ("pump", "log_pump"),
                         ("milestone", "log_milestone"), ("note", "log_note"), ("medicine", "log_medicine"),
                         ("temperature", "log_temperature"), ("growth", "log_growth"), ("solid", "log_solids"),
-                        ("bath", "log_activity"), ("sleep", "log_sleep")):
+                        ("bath", "log_bath"), ("story", "log_activity"), ("sleep", "log_sleep")):
         assert words in tools[tool].lower(), (words, tool)

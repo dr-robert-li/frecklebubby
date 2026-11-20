@@ -5,7 +5,7 @@ url: "https://www.cdc.gov/act-early/milestones/2-months.html"
 licence: "CDC sentences in quotes are public domain (US government work). Own summary of the Pediatrics paper; its text is not copied."
 year: 2026
 retrieved: "2026-11-20"
-attribution: "Sources: CDC, Learn the Signs. Act Early. milestone pages (material developed by CDC; reference does not imply endorsement by CDC, HHS or the U.S. Government). Zubler JM, et al. Evidence-Informed Milestones for Developmental Surveillance Tools. Pediatrics 2022;149(3):e2021052138. doi:10.1542/peds.2021-052138."
+attribution: "Sources: CDC, Learn the Signs. Act Early. milestone pages (material developed by CDC; reference does not imply endorsement by CDC, HHS or the U.S. Government). Zubler JM, et al. Evidence-Informed Milestones for Developmental Surveillance Tools. Pediatrics 2022;149(3):e2021052138. doi:10.1542/peds.2021-052138. Pronouns changed to they/them."
 ---
 
 ## 2 months to 5 years: what a CDC milestone means
@@ -23,7 +23,7 @@ About 80% of the final milestones had normative data from at least one source. S
 
 ## 2 months to 5 years: when to act
 
-The CDC says: "You know your child best. Don't wait. If your child is not meeting one or more milestones, has lost skills he or she once had, or you have other concerns, act early. Talk with your child's doctor, share your concerns, and ask about developmental screening."
+The CDC says: "You know your child best. Don't wait. If your child is not meeting one or more milestones, has lost skills they once had, or you have other concerns, act early. Talk with your child's doctor, share your concerns, and ask about developmental screening."
 For premature babies, see the file corrected-age-premature.
 
 ## Strength of the evidence

@@ -257,6 +257,8 @@ def map_row(tracker: str, row: Any) -> dict[str, Any]:
             data = {"left_ml": _ml(left, row.units), "right_ml": _ml(right, row.units)}
         return _entry("pump", start, _after(start, row.duration), data, notes)
 
+    if tracker == "activities" and row.mode == "bath":
+        return _entry("bath", start, None, {}, notes)  # a bath has no end time in Frecklebubby
     if tracker == "activities":
         return _entry("activity", start, _after(start, row.duration), {"kind": row.mode}, notes)
 
