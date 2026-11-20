@@ -45,17 +45,41 @@ Your data stays on your server.
   can support your child.
 - Copies your data out of the Huckleberry app, once or as often as you like.
 
-| Home with timers | Activities, timers side by side | Log by plain words | Assistant logs for you |
-|---|---|---|---|
-| ![Home with timers](docs/screenshots/home.png) | ![Activities, timers side by side](docs/screenshots/activity-timers.png) | ![Log by plain words](docs/screenshots/plain-words.png) | ![Assistant logs for you](docs/screenshots/assistant-logged.png) |
+<div align="center">
 
-| Assistant with sources | Insights | Development guidance | Sleep plan |
-|---|---|---|---|
-| ![Assistant with sources](docs/screenshots/assistant.png) | ![Insights](docs/screenshots/insights.png) | ![Development guidance](docs/screenshots/development.png) | ![Sleep plan](docs/screenshots/sleep-plan.png) |
+**Log the day**<br>
+<sub>Home with timers · Activities, with timers side by side · Log by plain words · The assistant logs for you</sub>
 
-| Reports | Support report | Cry helper | Confined-time warning |
-|---|---|---|---|
-| ![Reports](docs/screenshots/reports.png) | ![Support report](docs/screenshots/support-report.png) | ![Cry helper](docs/screenshots/cry-helper.png) | ![Confined-time warning](docs/screenshots/confined.png) |
+<p>
+  <a href="docs/screenshots/home.png"><img src="docs/screenshots/home.png" alt="Home with timers" title="Home with timers" width="23%"></a>
+  <a href="docs/screenshots/activity-timers.png"><img src="docs/screenshots/activity-timers.png" alt="Activities, with timers side by side" title="Activities, with timers side by side" width="23%"></a>
+  <a href="docs/screenshots/plain-words.png"><img src="docs/screenshots/plain-words.png" alt="Log by plain words" title="Log by plain words" width="23%"></a>
+  <a href="docs/screenshots/assistant-logged.png"><img src="docs/screenshots/assistant-logged.png" alt="The assistant logs for you" title="The assistant logs for you" width="23%"></a>
+</p>
+
+**Ask and plan**<br>
+<sub>Assistant with sources · Insights · Development guidance · Sleep plan</sub>
+
+<p>
+  <a href="docs/screenshots/assistant.png"><img src="docs/screenshots/assistant.png" alt="Assistant with sources" title="Assistant with sources" width="23%"></a>
+  <a href="docs/screenshots/insights.png"><img src="docs/screenshots/insights.png" alt="Insights" title="Insights" width="23%"></a>
+  <a href="docs/screenshots/development.png"><img src="docs/screenshots/development.png" alt="Development guidance" title="Development guidance" width="23%"></a>
+  <a href="docs/screenshots/sleep-plan.png"><img src="docs/screenshots/sleep-plan.png" alt="Sleep plan" title="Sleep plan" width="23%"></a>
+</p>
+
+**See the patterns**<br>
+<sub>Reports · Support report · Cry helper · Confined-time warning</sub>
+
+<p>
+  <a href="docs/screenshots/reports.png"><img src="docs/screenshots/reports.png" alt="Reports" title="Reports" width="23%"></a>
+  <a href="docs/screenshots/support-report.png"><img src="docs/screenshots/support-report.png" alt="Support report" title="Support report" width="23%"></a>
+  <a href="docs/screenshots/cry-helper.png"><img src="docs/screenshots/cry-helper.png" alt="Cry helper" title="Cry helper" width="23%"></a>
+  <a href="docs/screenshots/confined.png"><img src="docs/screenshots/confined.png" alt="Confined-time warning" title="Confined-time warning" width="23%"></a>
+</p>
+
+<sub>Select a picture to see it in full size.</sub>
+
+</div>
 
 ## Not medical advice
 
