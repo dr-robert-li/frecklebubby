@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.4.2-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.3-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -445,8 +445,9 @@ web: it reads only the pages in a fixed list, and only from the approved website
 Add only websites you trust for medical facts, such as a health department or a children's hospital. The assistant
 gives the text of these pages to parents as a source.
 
-If a question is not covered by the sources, the assistant says so. Urgent warnings (for example a fever in a
-baby under 3 months) come from fixed rules, not from the model, and always show first.
+If a question is not covered by the sources, the assistant says so. It then lists up to three trusted pages on the
+topic as links. This list comes from the source list by fixed rules, not from the model. Urgent warnings (for
+example a fever in a baby under 3 months) come from fixed rules, not from the model, and always show first.
 
 ## Move from Huckleberry
 

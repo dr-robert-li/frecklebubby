@@ -104,7 +104,9 @@ test('b2: an 8-month-old: safe sleep is cited, car seats are not covered, histor
 	await expect(page.locator('.msgs li.user').last()).toBeInViewport();
 	await expect(car).toBeInViewport();
 	await expect(car).toContainText(/do not cover|don't cover|not covered/i);
-	await expect(car.locator('.cite')).toHaveCount(0);
+	// 0.4.3: a "not covered" answer lists trusted pages on the topic as links.
+	await expect(car).toContainText('These trusted pages are about this topic');
+	expect(await car.locator('.cite').count()).toBeGreaterThan(0);
 	await snap(page, 'b2-car-seat');
 
 	await page.reload();

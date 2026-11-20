@@ -6,6 +6,8 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-11-21
+
 ### Changed
 
 - Assistant: when the sources do not cover a question, the answer lists up to three trusted pages on the topic
