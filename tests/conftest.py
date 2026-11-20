@@ -24,7 +24,7 @@ def pushes(monkeypatch):
 def env(tmp_path, monkeypatch):
     for key in ("ALLOWED_EMAILS", "CLERK_DOMAIN", "CLERK_PUBLISHABLE_KEY", "CLERK_OAUTH_CLIENT_ID",
                 "CLERK_OAUTH_CLIENT_SECRET", "BASE_URL"):
-        monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv(key, "")  # empty, not deleted: a deleted key falls back to a local .env file
     monkeypatch.setenv("AUTH_MODE", "dev")
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("BUNDLED_DATA_DIR", str(FIXTURES))

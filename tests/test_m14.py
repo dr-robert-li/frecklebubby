@@ -167,6 +167,24 @@ async def test_unsure_double_old_note_and_running_timer(client, fake_llm):
     assert len(await entries(client, h, cid, "bottle")) == 1
 
 
+async def test_repeated_item_is_not_saved_twice(client, fake_llm):
+    h, cid = await make_family(client)
+    fake_llm.replies.append({"events": [{"type": "nappy", "at": "now", "mode": "pee"}] * 3})
+    logged = (await chat(client, h, cid, "wet nappy"))[0][1]
+    assert len(logged["items"]) == 1
+    assert [p["unsure"] for p in logged["proposals"]] == ["it is the same as another item"] * 2
+    assert len(await entries(client, h, cid, "nappy")) == 1
+
+
+async def test_invented_pee_details_are_dropped(client, fake_llm):
+    h, cid = await make_family(client)
+    fake_llm.replies.append({"events": [{"type": "nappy", "at": "now", "mode": "pee", "pee_color": "dark_yellow",
+                                         "pee_look": "cloudy", "pee_smell": True}]})
+    await chat(client, h, cid, "dark pee")
+    assert (await entries(client, h, cid, "nappy"))[0]["data"] == {"mode": "pee", "rash": False,
+                                                                   "pee_color": "dark_yellow"}
+
+
 async def test_timer_from_chat_and_undo_cancels_it(client, fake_llm):
     h, cid = await make_family(client)
     fake_llm.replies.append({"events": [{"type": "timer", "timer": "sleep", "action": "start"}]})

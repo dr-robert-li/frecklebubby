@@ -15,6 +15,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 - Clerk sign-in showed no form. `@clerk/clerk-js` 6 gets its form from `@clerk/ui`, and the app did not load it.
 
+- Plain words: one nappy with pee and poo gave up to 12 items. The prompt now says one nappy change is one
+  event. The server marks a repeated item "not sure" and does not save it twice. It drops pee details that are
+  not in the parent's words.
+- The support report shows the time it was made. A new report with the same content looked like nothing happened.
+- The tests no longer read a local `.env` file.
+
 ### Tested
 
 - The app image, the llama.cpp CUDA image and cloudflared run on arm64 with Docker.
