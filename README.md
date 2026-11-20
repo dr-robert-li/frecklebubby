@@ -79,6 +79,16 @@ Your data stays on your server.
   <a href="docs/screenshots/confined.png"><img src="docs/screenshots/confined.png" alt="Confined-time warning" title="Confined-time warning" width="23%"></a>
 </p>
 
+**Run a server for more than one family**<br>
+<sub>Server access for the operator · Refused sign-in · Delete data · Waiting for the assistant</sub>
+
+<p>
+  <a href="docs/screenshots/server-access.png"><img src="docs/screenshots/server-access.png" alt="Server access for the operator" title="Server access for the operator" width="23%"></a>
+  <a href="docs/screenshots/no-access.png"><img src="docs/screenshots/no-access.png" alt="Refused sign-in" title="Refused sign-in" width="23%"></a>
+  <a href="docs/screenshots/delete-data.png"><img src="docs/screenshots/delete-data.png" alt="Delete data" title="Delete data" width="23%"></a>
+  <a href="docs/screenshots/assistant-waiting.png"><img src="docs/screenshots/assistant-waiting.png" alt="Waiting for the assistant" title="Waiting for the assistant" width="23%"></a>
+</p>
+
 <sub>Select a picture to see it in full size.</sub>
 
 </div>
