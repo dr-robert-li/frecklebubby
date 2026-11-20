@@ -6,20 +6,6 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Added
-
-- Sleep model (optional norms file, `SLEEP_NORMS_PATH`): the next nap or bedtime uses the child's last 14 days and
-  typical patterns of babies of the same age, with an 80 % range, the nap number and the expected length. Without
-  the file the app uses the wake-window table as before. Insights show the nap stage, total sleep compared with
-  babies of the same age and a card when a nap change is common at this age. The sleep plan gets the typical nap
-  count and bedtime for the age. Research kit in `training/sleep/` (Liu et al. 2019 infant-sleep data).
-- Cry helper: the **Crying?** tile ranks what to check first from the logs, gives things to try and says when to get
-  medical help, with sources. Optional and experimental: a guess from a recording of up to 60 seconds (cry detector
-  and cry-reason model, ONNX, analysed on the server, audio not stored). The model files are not in the repository;
-  set `CRY_MODEL_DIR` or copy them to `DATA_DIR/models/cry`. New entry type `cry`, crying per day in reports, MCP
-  tools `log_cry` and `get_cry_help`. Research kit in `training/cry/`. The container image now has `ffmpeg` and
-  the `cry` extra.
-
 ## [0.1.0] - 2026-11-20
 
 ### Added
@@ -46,3 +32,14 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 - Containers: `Containerfile` and `compose.yaml` (app and llama.cpp server), `.env.example`.
 - Tests: pytest for the backend; Playwright journeys on a phone screen with video, including the AI journeys with
   the real model.
+- Sleep model (optional norms file, `SLEEP_NORMS_PATH`): the next nap or bedtime uses the child's last 14 days and
+  typical patterns of babies of the same age, with an 80 % range, the nap number and the expected length. Without
+  the file the app uses the wake-window table as before. Insights show the nap stage, total sleep compared with
+  babies of the same age and a card when a nap change is common at this age. The sleep plan gets the typical nap
+  count and bedtime for the age. Research kit in `training/sleep/` (Liu et al. 2019 infant-sleep data).
+- Cry helper: the **Crying?** tile ranks what to check first from the logs, gives things to try and says when to get
+  medical help, with sources. Optional and experimental: a guess from a recording of up to 60 seconds (cry detector
+  and cry-reason model, ONNX, analysed on the server, audio not stored). The model files are not in the repository;
+  set `CRY_MODEL_DIR` or copy them to `DATA_DIR/models/cry`. New entry type `cry`, crying per day in reports, MCP
+  tools `log_cry` and `get_cry_help`. Research kit in `training/cry/`. The container image now has `ffmpeg` and
+  the `cry` extra.
