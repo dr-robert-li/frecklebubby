@@ -1,0 +1,1063 @@
+[
+ {
+  "key": "who-sitting-without-support",
+  "domain": "activity",
+  "text": "Most healthy babies (99% in the WHO study) sit without support by 9.2 months. Half of them did so by 5.9 months. The WHO window is 3.8 to 9.2 months.",
+  "from_days": 115,
+  "typical_days": 179,
+  "to_days": 279,
+  "tip": "Hold your baby up while she sits. Let her look around and give her toys to look at while she learns to balance herself.",
+  "tip_library": "cdc-tips-6-months",
+  "library": "who-motor-windows",
+  "phrase": "WHO window for sitting without support: 3.8 to 9.2 months (115 to 279 days). Median 5.9 months (179 days).",
+  "source": {
+   "title": "WHO Motor Development Study: windows of achievement for six gross motor milestones",
+   "publisher": "WHO",
+   "url": "https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones"
+  }
+ },
+ {
+  "key": "who-standing-with-assistance",
+  "domain": "activity",
+  "text": "Most healthy babies (99% in the WHO study) stand holding on to furniture by 11.4 months. Half of them did so by 7.4 months. The WHO window is 4.8 to 11.4 months.",
+  "from_days": 147,
+  "typical_days": 226,
+  "to_days": 348,
+  "tip": "Put your baby close to things that she can pull up on safely.",
+  "tip_library": "cdc-tips-9-months",
+  "library": "who-motor-windows",
+  "phrase": "WHO window for standing with assistance: 4.8 to 11.4 months (147 to 348 days). Median 7.4 months (226 days).",
+  "source": {
+   "title": "WHO Motor Development Study: windows of achievement for six gross motor milestones",
+   "publisher": "WHO",
+   "url": "https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones"
+  }
+ },
+ {
+  "key": "who-hands-and-knees-crawling",
+  "domain": "activity",
+  "text": "Most healthy babies (99% of the crawlers in the WHO study) crawl on hands and knees by 13.5 months. Half of them did so by 8.3 months. Some babies never crawl on hands and knees (4.3% in the WHO study).",
+  "from_days": 157,
+  "typical_days": 254,
+  "to_days": 409,
+  "tip": "Place toys on the ground or on a play mat a little out of reach and encourage your baby to crawl, scoot, or roll to get them.",
+  "tip_library": "cdc-tips-9-months",
+  "library": "who-motor-windows",
+  "phrase": "WHO window for hands-and-knees crawling: 5.2 to 13.5 months (157 to 409 days). Median 8.3 months (254 days).",
+  "source": {
+   "title": "WHO Motor Development Study: windows of achievement for six gross motor milestones",
+   "publisher": "WHO",
+   "url": "https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones"
+  }
+ },
+ {
+  "key": "who-walking-with-assistance",
+  "domain": "activity",
+  "text": "Most healthy babies (99% in the WHO study) walk holding on to furniture by 13.7 months. Half of them did so by 9.0 months. The WHO window is 5.9 to 13.7 months.",
+  "from_days": 181,
+  "typical_days": 275,
+  "to_days": 418,
+  "tip": "Let your baby push things around, such as empty boxes, a \"kiddie chair,\" or \"push toys,\" so he can practice walking.",
+  "tip_library": "cdc-tips-1-year",
+  "library": "who-motor-windows",
+  "phrase": "WHO window for walking with assistance: 5.9 to 13.7 months (181 to 418 days). Median 9.0 months (275 days).",
+  "source": {
+   "title": "WHO Motor Development Study: windows of achievement for six gross motor milestones",
+   "publisher": "WHO",
+   "url": "https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones"
+  }
+ },
+ {
+  "key": "who-standing-alone",
+  "domain": "activity",
+  "text": "Most healthy babies (99% in the WHO study) stand alone by 16.9 months. Half of them did so by 10.8 months. The WHO window is 6.9 to 16.9 months.",
+  "from_days": 211,
+  "typical_days": 330,
+  "to_days": 514,
+  "library": "who-motor-windows",
+  "phrase": "WHO window for standing alone: 6.9 to 16.9 months (211 to 514 days). Median 10.8 months (330 days).",
+  "source": {
+   "title": "WHO Motor Development Study: windows of achievement for six gross motor milestones",
+   "publisher": "WHO",
+   "url": "https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones"
+  }
+ },
+ {
+  "key": "who-walking-alone",
+  "domain": "activity",
+  "text": "Most healthy children (99% in the WHO study) walk alone by 17.6 months. Half of them did so by 12.0 months. The WHO window is 8.2 to 17.6 months.",
+  "from_days": 250,
+  "typical_days": 365,
+  "to_days": 534,
+  "tip": "Encourage your baby to practice walking on her own. Baby walkers are not recommended.",
+  "tip_library": "cdc-tips-1-year",
+  "library": "who-motor-windows",
+  "phrase": "WHO window for walking alone: 8.2 to 17.6 months (250 to 534 days). Median 12.0 months (365 days).",
+  "source": {
+   "title": "WHO Motor Development Study: windows of achievement for six gross motor milestones",
+   "publisher": "WHO",
+   "url": "https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones"
+  }
+ },
+ {
+  "key": "nhs-tummy-time-from-birth",
+  "domain": "activity",
+  "text": "You can start tummy time from birth, with your baby on your chest when you are wide awake.",
+  "from_days": 0,
+  "typical_days": null,
+  "to_days": null,
+  "tip": "Little and often is best to begin with. Gradually increase the amount of time you do this day by day.",
+  "tip_library": "nhs-keep-baby-active",
+  "library": "nhs-keep-baby-active",
+  "phrase": "You can start doing tummy time from birth by lying your baby on your chest",
+  "source": {
+   "title": "How to keep your baby or toddler active",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/play-and-learning/keep-baby-or-toddler-active/"
+  }
+ },
+ {
+  "key": "who-activity-infants",
+  "domain": "activity",
+  "text": "For babies under 1 year, WHO advises active play several times a day, mostly on the floor. For babies not yet mobile, this includes at least 30 minutes of tummy time a day while awake.",
+  "from_days": 0,
+  "typical_days": null,
+  "to_days": 364,
+  "library": "who-under-5-activity-sleep",
+  "phrase": "For infants not yet mobile, this includes at least 30 minutes in prone position (tummy time) spread throughout the day while awake.",
+  "source": {
+   "title": "Guidelines on physical activity, sedentary behaviour and sleep for children under 5 years of age",
+   "publisher": "WHO",
+   "url": "https://www.who.int/publications/i/item/9789241550536"
+  }
+ },
+ {
+  "key": "who-activity-1-2-years",
+  "domain": "activity",
+  "text": "For children 1 to 2 years, WHO advises at least 180 minutes of physical activity of any intensity a day, spread through the day.",
+  "from_days": 365,
+  "typical_days": null,
+  "to_days": 1095,
+  "library": "who-under-5-activity-sleep",
+  "phrase": "Children 1-2 years of age should spend at least 180 minutes in a variety of physical activities at any intensity",
+  "source": {
+   "title": "Guidelines on physical activity, sedentary behaviour and sleep for children under 5 years of age",
+   "publisher": "WHO",
+   "url": "https://www.who.int/publications/i/item/9789241550536"
+  }
+ },
+ {
+  "key": "who-activity-3-4-years",
+  "domain": "activity",
+  "text": "For children 3 to 4 years, WHO advises at least 180 minutes of physical activity a day, with at least 60 minutes of moderate to vigorous activity.",
+  "from_days": 1096,
+  "typical_days": null,
+  "to_days": 1825,
+  "library": "who-under-5-activity-sleep",
+  "phrase": "Children 3-4 years of age should spend at least 180 minutes in a variety of physical activities, of which at least 60 minutes is moderate- to vigorous-intensity physical activity",
+  "source": {
+   "title": "Guidelines on physical activity, sedentary behaviour and sleep for children under 5 years of age",
+   "publisher": "WHO",
+   "url": "https://www.who.int/publications/i/item/9789241550536"
+  }
+ },
+ {
+  "key": "nice-weight-loss-stops",
+  "domain": "physiological",
+  "text": "Most babies lose some weight in the first days after birth. NICE says this loss usually stops after about 3 or 4 days.",
+  "from_days": 3,
+  "typical_days": null,
+  "to_days": 4,
+  "library": "newborn-weight-loss",
+  "phrase": "NICE says this weight loss usually stops after about 3 or 4 days of life.",
+  "source": {
+   "title": "Faltering growth: recognition and management (NG75)",
+   "publisher": "NICE",
+   "url": "https://www.nice.org.uk/guidance/ng75/chapter/Recommendations"
+  }
+ },
+ {
+  "key": "nhs-birthweight-regain",
+  "domain": "physiological",
+  "text": "Most babies are at, or above, their birth weight by 3 weeks.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 21,
+  "library": "nhs-baby-weight-height",
+  "phrase": "Most babies are at, or above, their birthweight by 3 weeks.",
+  "source": {
+   "title": "Your baby's weight and height",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-height-and-weight/"
+  }
+ },
+ {
+  "key": "nhs-weight-gain-first-6-months",
+  "domain": "physiological",
+  "text": "Babies usually gain weight fastest in the first 6 months. Growth then slows down in the toddler years.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 183,
+  "library": "nhs-baby-weight-height",
+  "phrase": "Usually your baby will gain weight most rapidly in the first 6 months.",
+  "source": {
+   "title": "Your baby's weight and height",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-height-and-weight/"
+  }
+ },
+ {
+  "key": "nhs-cord-drops-off",
+  "domain": "physiological",
+  "text": "The umbilical cord stump takes about a week to dry out and drop off. Tell your midwife, health visitor or GP about any bleeding or discharge.",
+  "from_days": null,
+  "typical_days": 7,
+  "to_days": null,
+  "library": "nhs-newborn-baby",
+  "phrase": "Your newborn’s umbilical cord takes about a week to dry out and drop off.",
+  "source": {
+   "title": "Your newborn baby",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/pregnancy/labour-and-birth/getting-to-know-your-newborn/"
+  }
+ },
+ {
+  "key": "nhs-skin-matures",
+  "domain": "physiological",
+  "text": "A newborn's skin matures over the first month, or longer for premature babies.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 30,
+  "library": "nhs-newborn-baby",
+  "phrase": "Over the first month, or longer for premature babies, your baby's skin matures and develops its own natural protective barrier.",
+  "source": {
+   "title": "Your newborn baby",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/pregnancy/labour-and-birth/getting-to-know-your-newborn/"
+  }
+ },
+ {
+  "key": "nhs-jaundice-mild",
+  "domain": "physiological",
+  "text": "Some babies get mild jaundice when they are about 2 to 3 days old. It usually fades within about 10 days. Jaundice in the first 24 hours needs a check by a health professional straight away.",
+  "from_days": 2,
+  "typical_days": null,
+  "to_days": 3,
+  "library": "nhs-newborn-baby",
+  "phrase": "When they're about 2 to 3 days old, some babies develop mild jaundice.",
+  "source": {
+   "title": "Your newborn baby",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/pregnancy/labour-and-birth/getting-to-know-your-newborn/"
+  }
+ },
+ {
+  "key": "nhs-newborn-squint",
+  "domain": "physiological",
+  "text": "Eyes that sometimes roll away from each other (a squint) are normal in a newborn. The NHS says this goes away by 4 months. Talk to your health visitor or GP if it does not.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 122,
+  "library": "nhs-newborn-baby",
+  "phrase": "This is called a squint and is normal in a newborn. It should go away by 4 months.",
+  "source": {
+   "title": "Your newborn baby",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/pregnancy/labour-and-birth/getting-to-know-your-newborn/"
+  }
+ },
+ {
+  "key": "nhs-fontanelles-close",
+  "domain": "physiological",
+  "text": "The soft spots (fontanelles) on a baby's head usually take a year or more to close.",
+  "from_days": 365,
+  "typical_days": null,
+  "to_days": null,
+  "library": "nhs-newborn-baby",
+  "phrase": "It will probably be a year or more before the bones close over.",
+  "source": {
+   "title": "Your newborn baby",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/pregnancy/labour-and-birth/getting-to-know-your-newborn/"
+  }
+ },
+ {
+  "key": "aap-reflex-stepping-fades",
+  "domain": "physiological",
+  "text": "The stepping reflex is present from birth. The AAP says it goes away at 2 months. Babies differ in when they lose reflexes.",
+  "from_days": null,
+  "typical_days": 61,
+  "to_days": null,
+  "library": "aap-newborn-reflexes",
+  "phrase": "The AAP gives 2 months as the age when the stepping reflex goes away.",
+  "source": {
+   "title": "Newborn Reflexes",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx"
+  }
+ },
+ {
+  "key": "aap-reflex-moro-fades",
+  "domain": "physiological",
+  "text": "The Moro (startle) reflex is present from birth. The AAP says it peaks in the first month and starts to go away after about 2 months. Babies differ in when they lose reflexes.",
+  "from_days": null,
+  "typical_days": 61,
+  "to_days": null,
+  "library": "aap-newborn-reflexes",
+  "phrase": "The AAP says the Moro reflex usually peaks in the first month and starts to go away after about 2 months.",
+  "source": {
+   "title": "Newborn Reflexes",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx"
+  }
+ },
+ {
+  "key": "aap-reflex-rooting-fades",
+  "domain": "physiological",
+  "text": "The rooting reflex is present from birth. The AAP says it goes away at 4 months. Babies differ in when they lose reflexes.",
+  "from_days": null,
+  "typical_days": 122,
+  "to_days": null,
+  "library": "aap-newborn-reflexes",
+  "phrase": "The AAP gives 4 months as the age when the rooting reflex goes away.",
+  "source": {
+   "title": "Newborn Reflexes",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx"
+  }
+ },
+ {
+  "key": "aap-reflex-palmar-grasp-fades",
+  "domain": "physiological",
+  "text": "The palmar grasp reflex is present from birth. The AAP says it goes away at 5 to 6 months. Babies differ in when they lose reflexes.",
+  "from_days": 152,
+  "typical_days": null,
+  "to_days": 183,
+  "library": "aap-newborn-reflexes",
+  "phrase": "The AAP gives 5 to 6 months as the age when the palmar grasp reflex goes away.",
+  "source": {
+   "title": "Newborn Reflexes",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx"
+  }
+ },
+ {
+  "key": "aap-reflex-tonic-neck-fades",
+  "domain": "physiological",
+  "text": "The tonic neck (fencing) reflex is present from birth. The AAP says it goes away at 5 to 7 months. Babies differ in when they lose reflexes.",
+  "from_days": 152,
+  "typical_days": null,
+  "to_days": 213,
+  "library": "aap-newborn-reflexes",
+  "phrase": "The AAP gives 5 to 7 months as the age when the tonic neck reflex goes away.",
+  "source": {
+   "title": "Newborn Reflexes",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx"
+  }
+ },
+ {
+  "key": "aap-reflex-plantar-grasp-fades",
+  "domain": "physiological",
+  "text": "The plantar grasp reflex is present from birth. The AAP says it goes away at 9 to 12 months. Babies differ in when they lose reflexes.",
+  "from_days": 274,
+  "typical_days": null,
+  "to_days": 365,
+  "library": "aap-newborn-reflexes",
+  "phrase": "The AAP gives 9 to 12 months as the age when the plantar grasp reflex goes away.",
+  "source": {
+   "title": "Newborn Reflexes",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx"
+  }
+ },
+ {
+  "key": "nhs-first-tooth",
+  "domain": "physiological",
+  "text": "Most babies start teething at around 6 months. Some start before 4 months and some after 12 months.",
+  "from_days": null,
+  "typical_days": 183,
+  "to_days": null,
+  "library": "nhs-teething-symptoms",
+  "phrase": "Most babies start teething at around 6 months, but others start teething before they are 4 months old and some after 12 months.",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-teeth-central-incisors",
+  "domain": "physiological",
+  "text": "The central incisors (front teeth) usually come through first, at around 6 months. Bottom teeth often come before the top ones. The NHS calls this a rough guide.",
+  "from_days": null,
+  "typical_days": 183,
+  "to_days": null,
+  "library": "nhs-teething-symptoms",
+  "phrase": "central incisors (front teeth) – these are usually the first to come through, usually at around 6 months",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-teeth-lateral-incisors",
+  "domain": "physiological",
+  "text": "The lateral incisors (either side of the front teeth) usually come through at around 8 months. The NHS calls this a rough guide.",
+  "from_days": null,
+  "typical_days": 244,
+  "to_days": null,
+  "library": "nhs-teething-symptoms",
+  "phrase": "lateral incisors (either side of the front teeth) – around 8 months",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-teeth-first-molars",
+  "domain": "physiological",
+  "text": "The first molars (back teeth) usually come through at around 12 months. The NHS calls this a rough guide.",
+  "from_days": null,
+  "typical_days": 365,
+  "to_days": null,
+  "library": "nhs-teething-symptoms",
+  "phrase": "first molars (back teeth) – these come through at around 12 months",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-teeth-canines",
+  "domain": "physiological",
+  "text": "The canines usually come through at around 18 months. The NHS calls this a rough guide.",
+  "from_days": null,
+  "typical_days": 548,
+  "to_days": null,
+  "library": "nhs-teething-symptoms",
+  "phrase": "canines (pointed teeth between the lateral incisors and the first molars) – around 18 months",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-teeth-second-molars",
+  "domain": "physiological",
+  "text": "The second molars usually come through at around 24 months. The NHS calls this a rough guide.",
+  "from_days": null,
+  "typical_days": 730,
+  "to_days": null,
+  "library": "nhs-teething-symptoms",
+  "phrase": "second molars – around 24 months",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-all-milk-teeth",
+  "domain": "physiological",
+  "text": "Most children have all their milk teeth by the time they are 2 to 3 years old.",
+  "from_days": 730,
+  "typical_days": null,
+  "to_days": 1096,
+  "library": "nhs-teething-symptoms",
+  "phrase": "Most children will have all their milk teeth by the time they are 2 to 3 years old.",
+  "source": {
+   "title": "Baby teething symptoms",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/teething/baby-teething-symptoms/"
+  }
+ },
+ {
+  "key": "nhs-check-newborn-exam",
+  "domain": "physiological",
+  "text": "Health check (England): a newborn physical examination within 72 hours of birth (eyes, heart, hips and, for boys, testicles). Schedules differ by country.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 3,
+  "library": "nhs-development-reviews",
+  "phrase": "They will also have a thorough physical examination within 72 hours of being born.",
+  "source": {
+   "title": "Your baby's health and development reviews",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-reviews/"
+  }
+ },
+ {
+  "key": "nhs-check-blood-spot",
+  "domain": "physiological",
+  "text": "Health check (England): the blood spot (heel prick) test at 5 to 8 days old, usually on day 5. Schedules differ by country.",
+  "from_days": 5,
+  "typical_days": 5,
+  "to_days": 8,
+  "library": "nhs-development-reviews",
+  "phrase": "At between 5 and 8 days old your baby will have a blood spot (heel prick) test",
+  "source": {
+   "title": "Your baby's health and development reviews",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-reviews/"
+  }
+ },
+ {
+  "key": "nhs-check-hearing-screening",
+  "domain": "physiological",
+  "text": "Health check (England): newborn hearing screening, usually before 4 weeks and up to 3 months of age. Schedules differ by country.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 91,
+  "library": "nhs-newborn-hearing-screening",
+  "phrase": "Newborn hearing screening is usually offered before your baby is 4 weeks old, but it can be done up to 3 months of age.",
+  "source": {
+   "title": "Newborn hearing screening",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/newborn-screening/hearing-test/"
+  }
+ },
+ {
+  "key": "nhs-check-new-baby-review",
+  "domain": "physiological",
+  "text": "Health check (England): a health visitor new baby review within 10 to 14 days of birth. Schedules differ by country.",
+  "from_days": 10,
+  "typical_days": null,
+  "to_days": 14,
+  "library": "nhs-development-reviews",
+  "phrase": "A health visitor will do a new baby review within 10 to 14 days of the birth.",
+  "source": {
+   "title": "Your baby's health and development reviews",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-reviews/"
+  }
+ },
+ {
+  "key": "nhs-check-6-8-weeks",
+  "domain": "physiological",
+  "text": "Health check (England): a physical examination at 6 to 8 weeks, usually by a GP, with weight, length and head size. Schedules differ by country.",
+  "from_days": 42,
+  "typical_days": null,
+  "to_days": 56,
+  "library": "nhs-development-reviews",
+  "phrase": "Your baby will be invited for a thorough physical examination. This is usually done by a GP.",
+  "source": {
+   "title": "Your baby's health and development reviews",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-reviews/"
+  }
+ },
+ {
+  "key": "nhs-first-vaccinations",
+  "domain": "physiological",
+  "text": "Vaccines (UK schedule): the first vaccinations are offered at 8 weeks. Schedules differ by country; ask your own health service.",
+  "from_days": null,
+  "typical_days": 56,
+  "to_days": null,
+  "library": "nhs-newborn-baby",
+  "phrase": "Your baby's first vaccinations are offered at 8 weeks.",
+  "source": {
+   "title": "Your newborn baby",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/pregnancy/labour-and-birth/getting-to-know-your-newborn/"
+  }
+ },
+ {
+  "key": "nhs-check-9-12-months",
+  "domain": "physiological",
+  "text": "Health check (England): a review at 9 to 12 months that looks at language and learning, safety, diet and behaviour. Schedules differ by country.",
+  "from_days": 274,
+  "typical_days": null,
+  "to_days": 365,
+  "library": "nhs-development-reviews",
+  "phrase": "During this time, your baby should be offered another review looking at, among other things, language and learning, safety, diet and behaviour.",
+  "source": {
+   "title": "Your baby's health and development reviews",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-reviews/"
+  }
+ },
+ {
+  "key": "nhs-check-2-years",
+  "domain": "physiological",
+  "text": "Health check (England): a review at 2 to 2 and a half years that covers movement, speech, social skills, behaviour, hearing and vision. Schedules differ by country.",
+  "from_days": 730,
+  "typical_days": null,
+  "to_days": 913,
+  "library": "nhs-development-reviews",
+  "phrase": "At 2 to 2-and-a-half years your child will have another health and development review.",
+  "source": {
+   "title": "Your baby's health and development reviews",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/height-weight-and-reviews/baby-reviews/"
+  }
+ },
+ {
+  "key": "nhs-check-vision-screening",
+  "domain": "physiological",
+  "text": "Health check (England): vision screening at around 4 or 5 years, often at school. If there is none at school, an optician can check. Schedules differ by country.",
+  "from_days": 1461,
+  "typical_days": null,
+  "to_days": 1826,
+  "library": "nhs-eye-tests-children",
+  "phrase": "Around 4 or 5 years old: Your child's eyes may be examined soon after they start school.",
+  "source": {
+   "title": "Eye tests for children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/conditions/eye-tests-in-children/"
+  }
+ },
+ {
+  "key": "nhs-bow-legs",
+  "domain": "physiological",
+  "text": "Before 18 months, a small gap between the knees and ankles when standing (bow legs) is very common. Talk to your GP or health visitor if you are concerned.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 548,
+  "library": "nhs-leg-foot-development",
+  "phrase": "Before the age of 18 months, it is very common for children to have a small gap between their knees and ankles when they stand.",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "nhs-tiptoe-walking",
+  "domain": "physiological",
+  "text": "It is common for children aged 3 and under to walk on their toes. Talk to your GP or health visitor if you are concerned.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 1096,
+  "library": "nhs-leg-foot-development",
+  "phrase": "It's common for children aged 3 and under to walk on their toes.",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "nhs-out-toeing",
+  "domain": "physiological",
+  "text": "Feet that point outwards (out-toeing) usually correct themselves at around 4 years. Talk to your GP or health visitor if you are concerned.",
+  "from_days": null,
+  "typical_days": 1461,
+  "to_days": null,
+  "library": "nhs-leg-foot-development",
+  "phrase": "this usually corrects itself around the age of 4",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "nhs-flat-feet",
+  "domain": "physiological",
+  "text": "Flat feet usually correct themselves by 6 years. Talk to your GP or health visitor if you are concerned.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 2192,
+  "library": "nhs-leg-foot-development",
+  "phrase": "Flat feet usually correct themselves by the age of 6.",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "nhs-knock-knees",
+  "domain": "physiological",
+  "text": "Knock knees usually correct themselves by 7 years. Talk to your GP or health visitor if you are concerned.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 2557,
+  "library": "nhs-leg-foot-development",
+  "phrase": "Knock knees usually correct themselves by the age of 7.",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "nhs-in-toeing",
+  "domain": "physiological",
+  "text": "Feet that turn in (in-toeing, pigeon toes) usually correct themselves at around 8 years. Talk to your GP or health visitor if you are concerned.",
+  "from_days": null,
+  "typical_days": 2922,
+  "to_days": null,
+  "library": "nhs-leg-foot-development",
+  "phrase": "The condition usually corrects itself around the age of 8",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "nhs-growing-pains",
+  "domain": "physiological",
+  "text": "Growing pains (leg pain) are common in children aged 3 to 12. They are usually harmless. Talk to your GP or health visitor if you are concerned.",
+  "from_days": 1096,
+  "typical_days": null,
+  "to_days": 4383,
+  "library": "nhs-leg-foot-development",
+  "phrase": "a type of leg pain that is common in children aged 3 to 12",
+  "source": {
+   "title": "Leg and foot problems in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/health/leg-and-foot-problems-in-children/"
+  }
+ },
+ {
+  "key": "aap-bladder-bowel-control-signs",
+  "domain": "physiological",
+  "text": "The AAP says children in general show signs of bladder and bowel control between 18 and 24 months.",
+  "from_days": 548,
+  "typical_days": null,
+  "to_days": 730,
+  "library": "toilet-training-ages",
+  "phrase": "The AAP says children in general show signs of bladder and bowel control between 18 and 24 months.",
+  "source": {
+   "title": "The Right Age to Potty Train",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/toddler/toilet-training/Pages/the-right-age-to-toilet-train.aspx"
+  }
+ },
+ {
+  "key": "nhs-bedwetting-under-5",
+  "domain": "physiological",
+  "text": "Many children under 5 wet the bed. This is normal. Night-time dryness takes time.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 1826,
+  "library": "nhs-bedwetting",
+  "phrase": "Many children under the age of 5 wet the bed.",
+  "source": {
+   "title": "Bedwetting in children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/conditions/bedwetting/"
+  }
+ },
+ {
+  "key": "wolke-crying-first-6-weeks",
+  "domain": "behavioural",
+  "text": "In the first 6 weeks, babies fuss and cry for about 2 hours a day on average (117 to 133 minutes in a 2017 review). Babies vary a lot.",
+  "from_days": 0,
+  "typical_days": null,
+  "to_days": 42,
+  "tip": "Infant crying is often worse in the first few months of life, but it gets better!",
+  "tip_library": "cdc-tips-2-months",
+  "library": "infant-crying-first-months",
+  "phrase": "In the first 6 weeks, the average fussing and crying time was about 2 hours a day (117 to 133 minutes).",
+  "source": {
+   "title": "Systematic Review and Meta-Analysis: Fussing and Crying Durations and Prevalence of Colic in Infants (J Pediatr 2017)",
+   "publisher": "Wolke D, Bilgin A, Samara M",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/28385295/"
+  }
+ },
+ {
+  "key": "wolke-crying-drops",
+  "domain": "behavioural",
+  "text": "Fussing and crying time drops a lot after 8 to 9 weeks of age, to about 1 hour a day on average by 10 to 12 weeks.",
+  "from_days": 56,
+  "typical_days": null,
+  "to_days": 63,
+  "library": "infant-crying-first-months",
+  "phrase": "The review says fussing and crying time drops a lot after 8 to 9 weeks of age.",
+  "source": {
+   "title": "Systematic Review and Meta-Analysis: Fussing and Crying Durations and Prevalence of Colic in Infants (J Pediatr 2017)",
+   "publisher": "Wolke D, Bilgin A, Samara M",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/28385295/"
+  }
+ },
+ {
+  "key": "nhs-colic-stops",
+  "domain": "behavioural",
+  "text": "Colic can start when a baby is a few weeks old. It usually stops by 3 to 4 months.",
+  "from_days": 91,
+  "typical_days": null,
+  "to_days": 122,
+  "library": "nhs-colic",
+  "phrase": "It usually stops by the time they're 3 to 4 months old.",
+  "source": {
+   "title": "Colic",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/conditions/colic/"
+  }
+ },
+ {
+  "key": "nhs-night-sleep-3-6-months",
+  "domain": "behavioural",
+  "text": "At 3 to 6 months, babies need fewer night feeds. Some sleep 5 to 8 hours or longer at night, but not all.",
+  "from_days": 91,
+  "typical_days": null,
+  "to_days": 183,
+  "library": "nhs-helping-baby-sleep",
+  "phrase": "Some babies may sleep for 5 to 8 hours or longer at night, but not all.",
+  "source": {
+   "title": "Helping your baby to sleep",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/caring-for-a-newborn/helping-your-baby-to-sleep/"
+  }
+ },
+ {
+  "key": "bsil-night-sleep-6-months",
+  "domain": "behavioural",
+  "text": "From around 6 months, some babies sleep up to 12 hours at night. Teething and hunger can still wake them.",
+  "from_days": null,
+  "typical_days": 183,
+  "to_days": null,
+  "library": "nhs-best-start-summary",
+  "phrase": "From around 6 months it says babies may sleep up to 12 hours at night, but teething and hunger can wake them.",
+  "source": {
+   "title": "Your baby's sleep patterns",
+   "publisher": "NHS Best Start in Life",
+   "url": "https://www.nhs.uk/best-start-in-life/baby/baby-basics/newborn-and-baby-sleeping-advice-for-parents/your-babys-sleep-patterns/"
+  }
+ },
+ {
+  "key": "nhs-solids-around-6-months",
+  "domain": "behavioural",
+  "text": "The NHS advises starting solid foods at around 6 months. Ask your health visitor or GP if your baby was born prematurely.",
+  "from_days": null,
+  "typical_days": 183,
+  "to_days": null,
+  "library": "nhs-first-solid-foods",
+  "phrase": "should start when your baby is around 6 months old.",
+  "source": {
+   "title": "Your baby's first solid foods",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/weaning-and-feeding/babys-first-solid-foods/"
+  }
+ },
+ {
+  "key": "nhs-cup-from-6-months",
+  "domain": "behavioural",
+  "text": "From around 6 months, offer sips of water from an open or free-flow cup with meals.",
+  "from_days": null,
+  "typical_days": 183,
+  "to_days": null,
+  "tip": "Let him practice feeding himself with his fingers and using a cup with a small amount of water.",
+  "tip_library": "cdc-tips-9-months",
+  "library": "nhs-drinks-and-cups",
+  "phrase": "Introduce your baby to drinking from a cup or beaker from around 6 months and offer sips of water with meals.",
+  "source": {
+   "title": "Drinks and cups for babies and young children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/weaning-and-feeding/drinks-and-cups-for-babies-and-young-children/"
+  }
+ },
+ {
+  "key": "nhs-bottle-from-1-year",
+  "domain": "behavioural",
+  "text": "From 1 year, the NHS advises moving away from bottles. Whole or semi-skimmed cows' milk can be a main drink from 1 year.",
+  "from_days": 365,
+  "typical_days": null,
+  "to_days": null,
+  "library": "nhs-drinks-and-cups",
+  "phrase": "Once your baby is 1 year old, feeding from a bottle should be discouraged.",
+  "source": {
+   "title": "Drinks and cups for babies and young children",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/weaning-and-feeding/drinks-and-cups-for-babies-and-young-children/"
+  }
+ },
+ {
+  "key": "nhs-dummy-stop-by-12-months",
+  "domain": "behavioural",
+  "text": "To help talking, the NHS suggests offering a dummy only at sleep time and stopping dummies by 12 months.",
+  "from_days": 183,
+  "typical_days": null,
+  "to_days": 365,
+  "library": "nhs-help-baby-learn-to-talk",
+  "phrase": "Aim to stop using dummies completely by 12 months.",
+  "source": {
+   "title": "Help your baby learn to talk",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/play-and-learning/help-your-baby-learn-to-talk/"
+  }
+ },
+ {
+  "key": "nhs-separation-anxiety",
+  "domain": "behavioural",
+  "text": "Separation anxiety and fear of strangers are common between 6 months and 3 years. They are a normal part of development.",
+  "from_days": 183,
+  "typical_days": null,
+  "to_days": 1096,
+  "tip": "Playing games of peek-a-boo are a good way to show your baby you always come back.",
+  "tip_library": "nhs-separation-anxiety",
+  "library": "nhs-separation-anxiety",
+  "phrase": "Separation anxiety and fear of strangers is common in young children between the ages of 6 months and 3 years",
+  "source": {
+   "title": "Separation anxiety",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/behaviour/separation-anxiety/"
+  }
+ },
+ {
+  "key": "cdc-tantrums-15-months",
+  "domain": "behavioural",
+  "text": "The CDC 15-month tips say tantrums are normal at this age, and more likely when a child is tired or hungry.",
+  "from_days": null,
+  "typical_days": 457,
+  "to_days": null,
+  "library": "cdc-tips-15-months",
+  "phrase": "Expect tantrums. They are normal at this age and are more likely if your child is tired or hungry.",
+  "source": {
+   "title": "Milestones by 15 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/15-months.html"
+  }
+ },
+ {
+  "key": "nhs-tantrums-start",
+  "domain": "behavioural",
+  "text": "Temper tantrums usually start at around 18 months and are very common in toddlers.",
+  "from_days": null,
+  "typical_days": 548,
+  "to_days": null,
+  "tip": "If you think your child is starting a tantrum, find something to distract them with straight away.",
+  "tip_library": "nhs-temper-tantrums",
+  "library": "nhs-temper-tantrums",
+  "phrase": "Temper tantrums usually start at around 18 months and are very common in toddlers.",
+  "source": {
+   "title": "Temper tantrums",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/behaviour/temper-tantrums/"
+  }
+ },
+ {
+  "key": "nhs-tantrums-less-by-4",
+  "domain": "behavioural",
+  "text": "Once a child can talk more, tantrums become less likely. By 4 years, tantrums are far less common.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 1461,
+  "library": "nhs-temper-tantrums",
+  "phrase": "By the age of 4, tantrums are far less common.",
+  "source": {
+   "title": "Temper tantrums",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/behaviour/temper-tantrums/"
+  }
+ },
+ {
+  "key": "cdc-play-next-to-others-2-years",
+  "domain": "behavioural",
+  "text": "At 2 years, children play next to each other but do not yet know how to share and solve problems.",
+  "from_days": null,
+  "typical_days": 730,
+  "to_days": null,
+  "tip": "Show your child how to deal with conflicts by helping her share, take turns, and use words when possible.",
+  "tip_library": "cdc-tips-2-years",
+  "library": "cdc-tips-2-years",
+  "phrase": "Children this age play next to each other, but do not know how to share and solve problems.",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ },
+ {
+  "key": "nhs-simple-sentences-2-years",
+  "domain": "behavioural",
+  "text": "Children start to put simple sentences together at around 2 years.",
+  "from_days": null,
+  "typical_days": 730,
+  "to_days": null,
+  "tip": "Try to reply using sentences that are a few words longer.",
+  "tip_library": "nhs-help-baby-learn-to-talk",
+  "library": "nhs-help-baby-learn-to-talk",
+  "phrase": "your child will start to put simple sentences together at around age 2",
+  "source": {
+   "title": "Help your baby learn to talk",
+   "publisher": "NHS",
+   "url": "https://www.nhs.uk/baby/babys-development/play-and-learning/help-your-baby-learn-to-talk/"
+  }
+ },
+ {
+  "key": "bsil-potty-training-window",
+  "domain": "behavioural",
+  "text": "NHS Best Start in Life says almost all children can be potty trained between 18 months and 2 and a half years.",
+  "from_days": 548,
+  "typical_days": null,
+  "to_days": 913,
+  "library": "toilet-training-ages",
+  "phrase": "NHS Best Start in Life (England, 2026) says almost all children can be potty trained between 18 months and 2 and a half years.",
+  "source": {
+   "title": "Potty training your child",
+   "publisher": "NHS Best Start in Life",
+   "url": "https://www.nhs.uk/best-start-in-life/toddler/potty-training-your-child/"
+  }
+ },
+ {
+  "key": "cdc-toilet-training-2-3-years",
+  "domain": "behavioural",
+  "text": "The CDC says most children are not successful at toilet training until 2 to 3 years old.",
+  "from_days": 730,
+  "typical_days": null,
+  "to_days": 1096,
+  "tip": "Ask your child's doctor and/or teachers if your child is ready for toilet training.",
+  "tip_library": "cdc-tips-18-months",
+  "library": "cdc-tips-18-months",
+  "phrase": "Most children are not successful at toilet training until 2 to 3 years old.",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "aap-toilet-trained-by-4",
+  "domain": "behavioural",
+  "text": "The AAP says most children in the United States are bowel and bladder trained by 4 years.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 1461,
+  "library": "toilet-training-ages",
+  "phrase": "The AAP says most children in the United States are bowel and bladder trained by 4 years of age.",
+  "source": {
+   "title": "The Right Age to Potty Train",
+   "publisher": "American Academy of Pediatrics (HealthyChildren.org)",
+   "url": "https://www.healthychildren.org/English/ages-stages/toddler/toilet-training/Pages/the-right-age-to-toilet-train.aspx"
+  }
+ },
+ {
+  "key": "cdc-screen-time-under-2",
+  "domain": "behavioural",
+  "text": "The CDC says screen time is not recommended for children younger than 2 years, except video calls with loved ones.",
+  "from_days": null,
+  "typical_days": null,
+  "to_days": 729,
+  "library": "cdc-tips-18-months",
+  "phrase": "Screen time is not recommended for children younger than 2 years of age.",
+  "source": {
+   "title": "Milestones by 18 Months (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/18-months.html"
+  }
+ },
+ {
+  "key": "cdc-screen-time-2-to-5",
+  "domain": "behavioural",
+  "text": "From 2 years, the CDC advises no more than 1 hour a day of a children's program, with an adult present.",
+  "from_days": 730,
+  "typical_days": null,
+  "to_days": null,
+  "library": "cdc-tips-2-years",
+  "phrase": "Limit screen time (TV, tablets, phones, etc.) to no more than 1 hour a day of a children's program with an adult present.",
+  "source": {
+   "title": "Milestones by 2 Years (CDC, Learn the Signs. Act Early.)",
+   "publisher": "CDC",
+   "url": "https://www.cdc.gov/act-early/milestones/2-years.html"
+  }
+ }
+]

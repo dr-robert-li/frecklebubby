@@ -725,3 +725,133 @@
   - safe-sleep
   summary: Small pilot of 40 newborns in a car seat simulator. Oxygen fell and heart and breathing rates rose at
     40 degrees, more so with vibration.
+- id: who-motor-windows-2006
+  title: 'WHO Motor Development Study: Windows of achievement for six gross motor development milestones'
+  author: WHO Multicentre Growth Reference Study Group
+  publisher: WHO (Acta Paediatrica Supplement 2006;450:86-95)
+  year: 2006
+  url: https://www.who.int/tools/child-growth-standards/standards/motor-development-milestones
+  kind: guideline
+  topics:
+  - development
+  - milestones
+  - motor
+  summary: Age ranges (1st to 99th percentile) in which 816 healthy children in five countries first sat, stood, crawled
+    and walked, with the tables of percentiles in days and months.
+- id: hc-newborn-reflexes
+  title: Newborn Reflexes
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2022
+  url: https://www.healthychildren.org/English/ages-stages/baby/Pages/Newborn-Reflexes.aspx
+  kind: web
+  topics:
+  - development
+  - reflexes
+  - newborn
+  summary: Describes the rooting, sucking, startle, fencing, grasp and stepping reflexes, with a table of the ages when
+    each one usually goes away.
+- id: hc-corrected-age
+  title: Corrected Age For Preemies
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2018
+  url: https://www.healthychildren.org/English/ages-stages/baby/preemie/Pages/Corrected-Age-For-Preemies.aspx
+  kind: web
+  topics:
+  - development
+  - milestones
+  - premature
+  summary: How to work out the corrected age of a baby born early, and why to use it for development in the first 2
+    years.
+- id: hc-preemie-milestones
+  title: Your Preemie's Growth & Developmental Milestones
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2024
+  url: https://www.healthychildren.org/English/ages-stages/baby/preemie/Pages/Preemie-Milestones.aspx
+  kind: web
+  topics:
+  - development
+  - milestones
+  - premature
+  summary: Adjusted age for babies born more than 3 weeks early, with examples and milestone lists from 1 month to
+    6 years.
+- id: hc-toilet-training-age
+  title: The Right Age to Potty Train
+  author: American Academy of Pediatrics
+  publisher: American Academy of Pediatrics (HealthyChildren.org)
+  year: 2022
+  url: https://www.healthychildren.org/English/ages-stages/toddler/toilet-training/Pages/the-right-age-to-toilet-train.aspx
+  kind: web
+  topics:
+  - toilet-training
+  - potty
+  - development
+  summary: Signs that a child may be ready to start toilet training, the usual ages in the United States, and tips.
+- id: nhs-bsil-potty-training
+  title: Potty training your child
+  author: NHS Best Start in Life
+  publisher: NHS (Best Start in Life)
+  year: 2026
+  url: https://www.nhs.uk/best-start-in-life/toddler/potty-training-your-child/
+  kind: web
+  topics:
+  - toilet-training
+  - potty
+  - development
+  summary: English government advice to start potty training between 18 months and 2 and a half years, in five steps.
+    Crown copyright, not under the Open Government Licence.
+  live_fetch: false
+- id: nhs-bsil-hub
+  title: Best Start in Life
+  author: NHS Best Start in Life
+  publisher: NHS (Best Start in Life)
+  year: 2026
+  url: https://www.nhs.uk/best-start-in-life/
+  kind: web
+  topics:
+  - development
+  - play
+  - talking
+  - sleep
+  summary: English government parent hub on play, talking, sleep, feeding and toddler behaviour by age. Crown
+    copyright, not under the Open Government Licence.
+  live_fetch: false
+- id: nice-ng75-faltering-growth
+  title: 'Faltering growth: recognition and management of faltering growth in children (NG75)'
+  author: National Institute for Health and Care Excellence
+  publisher: NICE
+  year: 2017
+  url: https://www.nice.org.uk/guidance/ng75/chapter/Recommendations
+  kind: guideline
+  topics:
+  - growth
+  - weight
+  - newborn
+  summary: UK clinical guideline. Covers weight loss after birth, return to birth weight by 3 weeks, and when slow
+    weight gain needs a closer look.
+- id: wolke-crying-2017
+  title: 'Systematic Review and Meta-Analysis: Fussing and Crying Durations and Prevalence of Colic in Infants'
+  author: Wolke D, Bilgin A, Samara M
+  publisher: The Journal of Pediatrics
+  year: 2017
+  url: https://pubmed.ncbi.nlm.nih.gov/28385295/
+  kind: guideline
+  topics:
+  - crying
+  - colic
+  summary: Pooled 28 diary studies of 8,690 babies. Fussing and crying averaged about 2 hours a day in the first 6 weeks
+    and fell after 8 to 9 weeks. doi:10.1016/j.jpeds.2017.02.020.
+- id: zubler-milestones-2022
+  title: Evidence-Informed Milestones for Developmental Surveillance Tools
+  author: Zubler JM, et al.
+  publisher: Pediatrics (American Academy of Pediatrics)
+  year: 2022
+  url: https://pubmed.ncbi.nlm.nih.gov/35132439/
+  kind: guideline
+  topics:
+  - development
+  - milestones
+  summary: How the CDC and AAP revised the CDC milestone checklists in 2022, using skills that 75% or more of children
+    can do by each age. doi:10.1542/peds.2021-052138.
