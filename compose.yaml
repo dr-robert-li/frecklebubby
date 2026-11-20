@@ -65,6 +65,19 @@ services:
       retries: 3
       start_period: 30m
 
+  # Optional: a Cloudflare Tunnel gives a public HTTPS address with no open port (README "HTTPS").
+  # It starts only with the profile "tunnel": put COMPOSE_PROFILES=tunnel in .env.
+  # In the Cloudflare dashboard, route the public hostname to http://app:8000.
+  cloudflared:
+    image: cloudflare/cloudflared:2026.11.1
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - app
+
 volumes:
   data:
   models:

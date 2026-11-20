@@ -6,6 +6,15 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Cloudflare Tunnel: an optional `cloudflared` service in `compose.yaml` (profile `tunnel`, token from `.env`).
+- `compose.gpu.yaml`: run the model server on an NVIDIA GPU through CDI.
+
+### Tested
+
+- The app image, the llama.cpp CUDA image and cloudflared run on arm64 with Docker.
+
 ## [0.2.2] - 2026-11-20
 
 ### Changed

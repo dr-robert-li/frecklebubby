@@ -200,6 +200,27 @@ tailscale funnel --bg 8000      # https://<machine>.<tailnet>.ts.net -> 127.0.0.
 Funnel must be on for your tailnet. The first `tailscale funnel` run prints a link to turn it on. Put the
 `https://<machine>.<tailnet>.ts.net` address in `BASE_URL` and restart: `docker compose up -d`.
 
+**Cloudflare Tunnel** gives your own domain (at Cloudflare) a public HTTPS address with no open port. In the
+Cloudflare dashboard go to **Zero Trust > Networks > Tunnels**, make a tunnel, and add a public hostname with
+the service `http://app:8000`. Put the tunnel token and the profile in `.env`, then start:
+
+```bash
+# .env
+COMPOSE_PROFILES=tunnel
+CLOUDFLARE_TUNNEL_TOKEN=<the token>
+BASE_URL=https://<your hostname>
+```
+
+```bash
+docker compose up -d
+```
+
+Set `ALLOWED_EMAILS` first: the app is public when the tunnel runs. Cloudflare stops a request that sends no
+data for 125 seconds. On a slow computer the sleep plan and the support report can come near this limit.
+
+**NVIDIA GPU**: to run the model server on the GPU, put `COMPOSE_FILE=compose.yaml:compose.gpu.yaml` in `.env`.
+You need the NVIDIA Container Toolkit with CDI. Tested on arm64.
+
 **A reverse proxy** (Caddy, nginx, Traefik) with your own domain also works. Send all paths to port 8000. Do not
 buffer responses: the assistant streams its answers (Server-Sent Events). Set `BASE_URL` to the public address.
 
