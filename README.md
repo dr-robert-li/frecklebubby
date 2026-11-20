@@ -45,13 +45,17 @@ Your data stays on your server.
   can support your child.
 - Copies your data out of the Huckleberry app, once or as often as you like.
 
-| Home with timers | Log by plain words | Assistant with sources | Assistant logs for you | Development guidance |
-|---|---|---|---|---|
-| ![Home](docs/screenshots/home.png) | ![Plain words](docs/screenshots/plain-words.png) | ![Assistant](docs/screenshots/assistant.png) | ![Logged](docs/screenshots/assistant-logged.png) | ![Insights](docs/screenshots/insights.png) |
+| Home with timers | Activities, timers side by side | Log by plain words | Assistant logs for you |
+|---|---|---|---|
+| ![Home with timers](docs/screenshots/home.png) | ![Activities, timers side by side](docs/screenshots/activity-timers.png) | ![Log by plain words](docs/screenshots/plain-words.png) | ![Assistant logs for you](docs/screenshots/assistant-logged.png) |
 
-| Sleep plan | Reports | Support report | Cry helper | Confined-time warning |
-|---|---|---|---|---|
-| ![Sleep plan](docs/screenshots/sleep-plan.png) | ![Reports](docs/screenshots/reports.png) | ![Support report](docs/screenshots/support-report.png) | ![Cry helper](docs/screenshots/cry-helper.png) | ![Confined](docs/screenshots/confined.png) |
+| Assistant with sources | Insights | Development guidance | Sleep plan |
+|---|---|---|---|
+| ![Assistant with sources](docs/screenshots/assistant.png) | ![Insights](docs/screenshots/insights.png) | ![Development guidance](docs/screenshots/development.png) | ![Sleep plan](docs/screenshots/sleep-plan.png) |
+
+| Reports | Support report | Cry helper | Confined-time warning |
+|---|---|---|---|
+| ![Reports](docs/screenshots/reports.png) | ![Support report](docs/screenshots/support-report.png) | ![Cry helper](docs/screenshots/cry-helper.png) | ![Confined-time warning](docs/screenshots/confined.png) |
 
 ## Not medical advice
 

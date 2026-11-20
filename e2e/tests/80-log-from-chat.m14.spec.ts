@@ -100,15 +100,15 @@ test('d: start tummy time and play from the chat, both run on Home, stop tummy t
 	await page.goto('/assistant');
 	let turn = await send(page, 'started tummy time and indoor play now');
 	let block = turn.getByRole('group', { name: 'Logged' });
-	await expect(block.getByText(/^Activity timer – start – tummyTime – /)).toBeVisible();
-	await expect(block.getByText(/^Activity timer – start – indoorPlay – /)).toBeVisible();
+	await expect(block.getByText(/^Activity timer – start – tummy time – /)).toBeVisible();
+	await expect(block.getByText(/^Activity timer – start – indoor play – /)).toBeVisible();
 	await page.goto('/');
 	await expect(page.getByRole('region', { name: 'Tummy time timer' })).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Indoor play timer' })).toBeVisible();
 	await page.goto('/assistant');
 	turn = await send(page, 'stop tummy time');
 	block = turn.getByRole('group', { name: 'Logged' });
-	await expect(block.getByText(/^Activity – tummyTime – /)).toBeVisible();
+	await expect(block.getByText(/^Activity – tummy time – /)).toBeVisible();
 	await snap(page, 'd1-tummy-stopped');
 	await page.goto('/');
 	await expect(page.getByRole('region', { name: 'Tummy time timer' })).toHaveCount(0);

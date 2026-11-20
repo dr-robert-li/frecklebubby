@@ -381,6 +381,11 @@ def _dur(seconds: float) -> str:
     return f"{m // 60} h {m % 60} min" if m >= 60 else f"{m} min"
 
 
+def _words(kind: str) -> str:
+    """tummyTime -> tummy time"""
+    return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", kind).lower()
+
+
 def summary(p: dict, ctx: Ctx) -> str:
     units = ctx.fam.settings.get("units", {})
     word = "Diaper" if wording(ctx.fam) == "diaper" else "Nappy"
@@ -389,7 +394,7 @@ def summary(p: dict, ctx: Ctx) -> str:
     if p["action"] == "timer":
         what = {"start": "start", "pause": "pause", "resume": "resume", "switch": "switch",
                 "cancel": "cancel", "complete": "stop and save"}[p["timer_action"]]
-        extra = p.get("side") or p.get("kind") or (p.get("device") or "").replace("_", " ")
+        extra = p.get("side") or _words(p.get("kind") or "") or (p.get("device") or "").replace("_", " ")
         at = _hm(p["at"], ctx) if p.get("at") else "now"
         return " – ".join(x for x in (f"{labels.get(p['type'], p['type'].title())} timer", what, extra, at) if x)
     t, d = p["type"], p["data"]
@@ -426,7 +431,7 @@ def summary(p: dict, ctx: Ctx) -> str:
     elif t == "pump":
         detail = f"{d['total_ml']:g} ml" if "total_ml" in d else ""
     elif t == "activity":
-        detail = d["kind"]
+        detail = _words(d["kind"])
     elif t == "milestone":
         detail = d["title"]
     elif t == "note":

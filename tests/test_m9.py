@@ -400,9 +400,9 @@ async def test_nl_summary(client):
     s, ctx = ctx_for("a@example.com")
     p = {"action": "entry", "type": "activity", "started_at": NOW - timedelta(minutes=20), "ended_at": NOW,
          "data": {"kind": "indoorPlay"}}
-    assert summary(p, ctx) == "Activity – indoorPlay – 14:15 to 14:35 (20 min)"
+    assert summary(p, ctx) == "Activity – indoor play – 14:15 to 14:35 (20 min)"
     p = {"action": "timer", "type": "activity", "timer_action": "complete", "kind": "tummyTime"}
-    assert summary(p, ctx) == "Activity timer – stop and save – tummyTime – now"
+    assert summary(p, ctx) == "Activity timer – stop and save – tummy time – now"
     p = {"action": "timer", "type": "confined", "timer_action": "start", "device": "car_seat", "at": NOW}
     assert summary(p, ctx) == "Confined timer – start – car seat – 14:35"
     s.close()
