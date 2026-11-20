@@ -11,8 +11,15 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 - Cloudflare Tunnel: an optional `cloudflared` service in `compose.yaml` (profile `tunnel`, token from `.env`).
 - `compose.gpu.yaml`: run the model server on an NVIDIA GPU through CDI.
 
+### Changed
+
+- Home: Activity is a wide card under the four large tiles and names the activities. The nine small tiles make a
+  3 x 3 grid.
+
 ### Fixed
 
+- The hole of the settings gear icon is in the centre.
+- The sign-in page is centred.
 - Clerk sign-in showed no form. `@clerk/clerk-js` 6 gets its form from `@clerk/ui`, and the app did not load it.
 
 - Plain words: one nappy with pee and poo gave up to 12 items. The prompt now says one nappy change is one
