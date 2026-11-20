@@ -176,6 +176,17 @@ class SleepPlan(Base):
     created_at: Mapped[datetime] = _created()
 
 
+class SupportReport(Base):
+    """The last support report of a child (M11). A new report replaces the old one."""
+
+    __tablename__ = "support_report"
+    id: Mapped[int] = _id()
+    child_id: Mapped[int] = mapped_column(ForeignKey("child.id", ondelete="CASCADE"), unique=True)
+    created_at: Mapped[datetime] = _created()
+    days: Mapped[int] = mapped_column(Integer)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
 class ImportJob(Base):
     __tablename__ = "import_job"
     id: Mapped[int] = _id()

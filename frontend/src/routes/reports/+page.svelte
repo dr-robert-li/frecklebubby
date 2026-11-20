@@ -5,6 +5,7 @@
 	import { addDays, fmtDay, fmtDur, localDay, round, toUnit, unitLabel, type UnitKind } from '#lib/format.svelte.ts';
 	import GrowthChart from '#lib/GrowthChart.svelte';
 	import Icon from '#lib/Icon.svelte';
+	import SupportReport from '#lib/SupportReport.svelte';
 
 	let end = $state(localDay());
 	let report = $state<any>(null);
@@ -63,6 +64,8 @@
 
 <h1>Reports</h1>
 {#if error}<p class="error" role="alert">{error}</p>{/if}
+
+<SupportReport />
 
 <div class="spread week">
 	<button class="icon" aria-label="Earlier week" onclick={() => (end = addDays(end, -7))}><Icon name="left" /></button>

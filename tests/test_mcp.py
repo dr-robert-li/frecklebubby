@@ -12,6 +12,7 @@ EXPECTED = {
     "log_temperature", "log_medicine", "log_milestone", "log_note", "list_entries", "update_entry", "delete_entry",
     "get_daily_report", "get_sleep_prediction", "get_milestones", "get_insights", "search_knowledge",
     "log_cry", "get_cry_help", "play_timer", "log_play", "confined_timer", "log_confined",
+    "get_support_report",
 }
 
 

@@ -640,6 +640,24 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
             c = child_of(s, ctx, child)
             return insights.insights(s, ctx, c.id)
 
+    @mcp.tool
+    async def get_support_report(
+        make: Annotated[bool, Field(description="true = make a new report (slow with the AI model: 30-120 s). "
+                                                "false = return the saved report, or null when there is none.")] = False,
+        child: ChildArg = None,
+    ) -> dict[str, Any] | None:
+        """"How can I support my child?": the last 7 days and today, one block per area (sleep, feeds, nappies,
+        play and tummy time, time in a seat or pram, crying, growth, milestones). Each block has the numbers, the
+        reference it is compared with, a status (ok, watch, no_data) from fixed rules, and cited suggestions for the
+        watch areas. Urgent warning signs come first. General information, not medical advice."""
+        from .ai import support_report
+        from .api.ai import SupportReportOut
+
+        with call() as (s, ctx):
+            c = child_of(s, ctx, child)
+            out = await support_report.generate(s, ctx, c.id) if make else support_report.latest(s, ctx, c.id)
+            return None if out is None else SupportReportOut.model_validate(out).model_dump(mode="json", by_alias=True)
+
     @mcp.tool(annotations=READ)
     def search_knowledge(
         query: Annotated[str, Field(description="Question or words to look for, for example 'wet nappies per day'.",

@@ -1,6 +1,6 @@
 """AI and knowledge routes: NL logging, assistant chat (SSE), sleep plan, insights, LLM test, knowledge sources."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Response, UploadFile
@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from ..ai import assistant, llm, nl_log, sleep_plan
+from ..ai import assistant, llm, nl_log, sleep_plan, support_report
 from ..auth import get_ctx
 from ..db import get_session
 from ..knowledge import uploads
@@ -68,6 +68,49 @@ class SleepPlanOut(BaseModel):
     schedule: list[ScheduleRow]
     advice: list[Advice]
     citations: list[CitationOut]
+
+
+class Cited(BaseModel):
+    text: str
+    cites: list[int]
+
+
+class Number(BaseModel):
+    label: str
+    value: float
+    unit: str  # "" (a count) | h | min | ml | kg | cm | percentile
+
+
+class AreaOut(BaseModel):
+    area: str
+    title: str
+    status: Literal["ok", "watch", "no_data"]
+    compared: bool  # true when the status compares the numbers with a sourced threshold
+    numbers: list[Number]
+    reference: Cited | None
+    note: str | None
+    details: list[str]
+    suggestions: list[Cited]
+    suggested_by: Literal["model", "rules"] | None
+    citations: list[CitationOut]
+
+
+class GoesWell(Cited):
+    citations: list[CitationOut]
+
+
+class SupportReportOut(BaseModel):
+    id: int
+    created_at: datetime
+    days: int
+    from_: date = Field(alias="from")
+    to: date
+    ai: bool
+    notice: str | None
+    urgent: list[InsightOut]
+    blocks: list[AreaOut]
+    goes_well: GoesWell
+    footer: str
 
 
 class SourceOut(BaseModel):
@@ -143,6 +186,17 @@ def get_sleep_plan(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(g
 async def make_sleep_plan(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     get_child(s, ctx, cid)
     return await sleep_plan.generate(s, ctx, cid)
+
+
+@router.get("/children/{cid}/support-report", response_model=SupportReportOut | None, response_model_by_alias=True)
+def get_support_report(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    return support_report.latest(s, ctx, cid)
+
+
+@router.post("/children/{cid}/support-report", response_model=SupportReportOut, response_model_by_alias=True,
+             summary="Make a support report (slow with the model: 30-120 s)")
+async def make_support_report(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    return await support_report.generate(s, ctx, cid)
 
 
 @router.post("/family/settings/llm-test", response_model=LlmTestOut, summary="Test the model server connection")

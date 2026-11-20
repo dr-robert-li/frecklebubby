@@ -68,10 +68,12 @@ export default defineConfig({
 		screenshot: 'on'
 	},
 	projects: [
-		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9)\.spec\.ts$/ },
+		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9|m11)\.spec\.ts$/ },
 		{ name: 'llm', ...slow, testMatch: /\.llm\.spec\.ts$/, outputDir: './recordings/m3/results' },
 		{ name: 'm4', ...slow, testMatch: /\.m4\.spec\.ts$/, outputDir: './recordings/m4/results' },
 		{ name: 'm5', ...slow, testMatch: /\.m5\.spec\.ts$/, outputDir: './recordings/m5/results' },
+		// M11 support report: the real model on the second server.
+		{ name: 'm11', ...slow, testMatch: /\.m11\.spec\.ts$/, outputDir: './recordings/m11/results' },
 		// M9 new logging: the main server (no model); the confined notification waits for the 60 s server tick.
 		{ name: 'm9', use: phone, testMatch: /\.m9\.spec\.ts$/, outputDir: './recordings/m9/results', timeout: 240_000 },
 		{
