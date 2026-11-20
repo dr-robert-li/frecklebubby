@@ -27,10 +27,10 @@ test('sleep timer keeps running after a reload and saves an entry', async ({ pag
 
 test('nursing timer switches side, pauses and resumes', async ({ page, family }) => {
 	await page.goto('/');
-	const sheet = await openTile(page, 'Nursing');
+	const sheet = await openTile(page, 'Breastfeeding');
 	await sheet.getByRole('button', { name: 'Start left' }).click();
 
-	const timer = page.getByRole('region', { name: 'Nursing timer' });
+	const timer = page.getByRole('region', { name: 'Breastfeeding timer' });
 	await expect(timer.getByText('Left (now)')).toBeVisible();
 	await page.waitForTimeout(1500);
 	await timer.getByRole('button', { name: 'Switch side' }).click();
@@ -48,7 +48,7 @@ test('nursing timer switches side, pauses and resumes', async ({ page, family })
 	await expect(timer.getByText(/Running/)).toBeVisible();
 	await timer.getByRole('button', { name: 'Stop and save' }).click();
 
-	const item = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Nursing/ });
+	const item = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Breastfeeding/ });
 	await expect(item).toContainText('Left');
 	await expect(item).toContainText('Right');
 	await shot(page, '03-nursing-saved');

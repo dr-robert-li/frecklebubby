@@ -43,7 +43,7 @@ const CONDITIONS: Opt[] = [
 	['wokeUpChild', 'I woke them']
 ];
 const LOCATIONS: Opt[] = [
-	['onOwnInBed', 'Own bed'], ['nursing', 'Nursing'], ['wornOrHeld', 'Held or worn'], ['nextToCarer', 'Next to carer'],
+	['onOwnInBed', 'Own bed'], ['nursing', 'Breastfeeding'], ['wornOrHeld', 'Held or worn'], ['nextToCarer', 'Next to carer'],
 	['coSleep', 'Co-sleeping'], ['bottle', 'Bottle'], ['stroller', 'Pram'], ['car', 'Car'], ['swing', 'Swing']
 ];
 export const MILK: Opt[] = [
@@ -100,7 +100,7 @@ export function trackers(wording: Wording): Tracker[] {
 			{ key: 'start_conditions', label: 'Falling asleep', kind: 'many', options: CONDITIONS.filter((c) => c[0] !== 'wokeUpChild') },
 			{ key: 'end_conditions', label: 'Waking up', kind: 'many', options: CONDITIONS.filter((c) => !c[0].includes('minutes') && c[0] !== 'longTimeToFallAsleep') }
 		] },
-		{ type: 'nursing', label: 'Nursing', color: '--rose', end: 'optional', timer: true, fields: [
+		{ type: 'nursing', label: 'Breastfeeding', color: '--rose', end: 'optional', timer: true, fields: [
 			{ key: 'left_seconds', label: 'Left side', kind: 'num', unit: 'min', max: 240 },
 			{ key: 'right_seconds', label: 'Right side', kind: 'num', unit: 'min', max: 240 },
 			{ key: 'last_side', label: 'Last side', kind: 'one', options: SIDES }
@@ -131,7 +131,7 @@ export function trackers(wording: Wording): Tracker[] {
 		{ type: 'temperature', label: 'Temperature', color: '--peach', fields: [
 			{ key: 'celsius', label: 'Temperature', kind: 'num', unit: 'temperature', required: true }
 		] },
-		{ type: 'growth', label: 'Growth', color: '--peach', fields: [
+		{ type: 'growth', label: 'Growth', color: '--sage', fields: [
 			{ key: 'weight_kg', label: 'Weight', kind: 'num', unit: 'weight' },
 			{ key: 'height_cm', label: 'Length or height', kind: 'num', unit: 'length' },
 			{ key: 'head_cm', label: 'Head', kind: 'num', unit: 'length' }
@@ -139,15 +139,15 @@ export function trackers(wording: Wording): Tracker[] {
 		{ type: 'activity', label: 'Activity', color: '--butter', end: 'optional', timer: true, fields: [
 			{ key: 'kind', label: 'Activity', kind: 'one', required: true, options: ACTIVITIES }
 		] },
+		{ type: 'confined', label: 'Confined', color: '--sand', end: 'optional', timer: true, fields: [
+			{ key: 'device', label: 'Where', kind: 'one', required: true, options: DEVICES }
+		] },
 		{ type: 'milestone', label: 'Milestone', color: '--lavender', fields: [
 			{ key: 'title', label: 'What happened', kind: 'text', required: true }
 		] },
 		{ type: 'note', label: 'Note', color: '--cloud', fields: [] },
 		{ type: 'cry', label: 'Crying', color: '--coral', end: 'optional', fields: [
 			{ key: 'soothed_by', label: 'What helped', kind: 'text' }
-		] },
-		{ type: 'confined', label: 'Confined', color: '--peach', end: 'optional', timer: true, fields: [
-			{ key: 'device', label: 'Where', kind: 'one', required: true, options: DEVICES }
 		] }
 	];
 }

@@ -6,18 +6,46 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-20
+
+The first public deployment: arm64 with an NVIDIA GPU, Docker, Cloudflare Tunnel and a real Clerk instance.
+There is no release 0.3.0.
+
 ### Added
 
+- A header with the Frecklebubby logo and name on each page.
+- A button at the top right changes between day and night colours.
+- Plain words read nappy amounts: "big pee", "medium poo".
+- The pump timer tab says how to add the amount after the timer stops.
 - Cloudflare Tunnel: an optional `cloudflared` service in `compose.yaml` (profile `tunnel`, token from `.env`).
 - `compose.gpu.yaml`: run the model server on an NVIDIA GPU through CDI.
 
+### Changed
+
+- Home: Activity is a wide card under the four large tiles and names the activities. The nine small tiles make a
+  3 x 3 grid. Confined is now before Milestone and Note. Each small tile has its own colour: Growth and Confined
+  have two new colours.
+
+- Home: the "Today" totals show the breastfeeding time ("Breastfed") in place of the number of feeds.
+- The app says "Breastfeeding" where it said "Nursing".
+
 ### Fixed
 
+- The hole of the settings gear icon is in the centre.
+- The sign-in page is centred.
 - Clerk sign-in showed no form. `@clerk/clerk-js` 6 gets its form from `@clerk/ui`, and the app did not load it.
+
+- Plain words: one nappy with pee and poo gave up to 12 items. The prompt now says one nappy change is one
+  event. The server joins a nappy that the model split in two. The server marks a repeated item "not sure" and does not save it twice. It drops pee details that are
+  not in the parent's words.
+- The support report shows the time it was made. A new report with the same content looked like nothing happened.
+- The tests no longer read a local `.env` file.
 
 ### Tested
 
 - The app image, the llama.cpp CUDA image and cloudflared run on arm64 with Docker.
+- Sign-in with a real Clerk development instance, the Claude connector and the sleep plan work through the
+  tunnel.
 
 ## [0.2.2] - 2026-11-20
 

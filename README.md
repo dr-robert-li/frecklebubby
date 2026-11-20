@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.2.2-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.1-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -22,11 +22,11 @@ Your data stays on your server.
 
 ## What it does
 
-- Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
+- Tracks sleep, breastfeeding, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
   (bath, tummy time, indoor and outdoor play, story time, screen time, skin to skin, brushing teeth), time in a
   car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
-- Has live timers for sleep, nursing, pumping, activities and confined time. Activity timers can
+- Has live timers for sleep, breastfeeding, pumping, activities and confined time. Activity timers can
   run side by side, one for each kind (for example indoor play and tummy time). A timer
   keeps running when you close the app.
 - Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a
@@ -179,7 +179,8 @@ Optional: put a comma list of emails in `ALLOWED_EMAILS`. Then other emails cann
 
 The server does not start in Clerk mode if a value is missing. The log names the missing value.
 
-> Not yet tested with a real Clerk account. The sign-in code is tested with test tokens only.
+> Tested with a real Clerk development instance (0.3.1): sign-in and the email claim. A carer invite and a
+> refused email are not yet tested with a real account.
 
 ## HTTPS
 
@@ -261,7 +262,7 @@ uv run frecklebubby-mcp --stdio --user you@example.com
 
 `--user` can be left out when the database has only one user.
 
-> The Claude connector is not yet tested with a real Clerk account.
+> Tested with a real Clerk development instance through a Cloudflare Tunnel (0.3.1).
 
 ## REST API
 
@@ -454,8 +455,7 @@ The e2e tests act as a parent on a phone screen. They start the real backend wit
 Huckleberry account. Videos, traces and screenshots go to `e2e/recordings/<milestone>/` (not in git).
 Open a trace with `npx playwright show-trace <file>/trace.zip`.
 
-What the tests do not prove yet: sign-in with a real Clerk account, the Claude connector with a real Clerk account,
-push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
+What the tests do not prove yet: a carer invite and a refused email with a real Clerk account, push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
 account.
 
 ## Troubleshooting

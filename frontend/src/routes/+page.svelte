@@ -7,11 +7,14 @@
 	import NlBox from '#lib/NlBox.svelte';
 	import TimerCard from '#lib/TimerCard.svelte';
 	import Timeline from '#lib/Timeline.svelte';
-	import { trackers, type Entry, type EntryType } from '#lib/trackers.ts';
+	import { ACTIVITIES, trackers, type Entry, type EntryType } from '#lib/trackers.ts';
 
 	let sheet = $state<{ type: EntryType; entry?: Entry } | null>(null);
 	let cryHelp = $state(false);
-	const list = $derived(trackers(wording()).filter((t) => t.type !== 'cry'));
+	const all = $derived(trackers(wording()));
+	// Activity and Crying have their own wide cards; the other 9 small tiles make a 3 x 3 grid.
+	const list = $derived(all.filter((t) => t.type !== 'cry' && t.type !== 'activity'));
+	const activity = $derived(all.find((t) => t.type === 'activity')!);
 	const s = $derived(app.status);
 	const timerOf = (type: string) => s?.timers.find((t) => t.type === type);
 
@@ -54,9 +57,13 @@
 			</button>
 		{/each}
 	</div>
-	<button class="tile cry" style="--c: var(--coral)" onclick={() => (cryHelp = true)}>
+	<button class="tile wide" style="--c: var({activity.color})" onclick={() => (sheet = { type: 'activity' })}>
+		<Icon name="activity" size={30} />
+		<span class="wide-text"><strong>Activity</strong><span>{ACTIVITIES.map((a) => a[1]).join(', ')}</span></span>
+	</button>
+	<button class="tile wide" style="--c: var(--coral)" onclick={() => (cryHelp = true)}>
 		<Icon name="cry" size={30} />
-		<span class="cry-text"><strong>Crying?</strong><span>Find out what to check first</span></span>
+		<span class="wide-text"><strong>Crying?</strong><span>Find out what to check first</span></span>
 	</button>
 	<div class="tiles">
 		{#each list.slice(4) as t (t.type)}
@@ -73,7 +80,7 @@
 			<h2>Today</h2>
 			<div class="totals">
 				<div><span>Sleep</span><strong>{fmtDur(d.sleep.total_seconds)}</strong></div>
-				<div><span>Feeds</span><strong>{d.feeds.count}</strong></div>
+				<div><span>Breastfed</span><strong>{fmtDur(d.feeds.nursing_seconds)}</strong></div>
 				<div><span>Wet</span><strong>{d.nappies.wet}</strong></div>
 				<div><span>Dirty</span><strong>{d.nappies.dirty}</strong></div>
 				{#if d.feeds.bottle_ml}<div><span>Bottle</span><strong>{fmtUnit('volume', d.feeds.bottle_ml, units())}</strong></div>{/if}
@@ -142,7 +149,7 @@
 		font-size: 0.85rem;
 		font-weight: 600;
 	}
-	.tile.cry {
+	.tile.wide {
 		width: 100%;
 		flex-direction: row;
 		align-items: center;
@@ -150,11 +157,14 @@
 		min-height: 76px;
 		margin-bottom: 14px;
 	}
-	.cry-text {
+	.tile.wide :global(svg) {
+		flex: none;
+	}
+	.wide-text {
 		display: flex;
 		flex-direction: column;
 	}
-	.cry-text strong {
+	.wide-text strong {
 		font-size: 1.15rem;
 		margin: 0;
 	}

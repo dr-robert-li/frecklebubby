@@ -14,7 +14,7 @@ test('night theme for feeds in the dark, on every screen', async ({ page, api, f
 	await shot(page, '09-dark-appearance');
 
 	await page.getByRole('link', { name: 'Home' }).click();
-	await expect(page.getByRole('region', { name: 'Nursing timer' })).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Breastfeeding timer' })).toBeVisible();
 	await shot(page, '09-dark-home');
 	await shot(page, '09-dark-home-bottom', true);
 	await openTile(page, 'Bottle');
