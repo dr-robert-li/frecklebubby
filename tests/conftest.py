@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from frecklebubby.config import get_settings
+from frecklebubby.config import Settings, get_settings
 from frecklebubby.db import SessionLocal
 from frecklebubby.services import notifications
 from frecklebubby.services.families import context, sign_in
@@ -38,6 +38,8 @@ def env(tmp_path, monkeypatch):
     for key in ("ALLOWED_EMAILS", "CLERK_DOMAIN", "CLERK_PUBLISHABLE_KEY", "CLERK_OAUTH_CLIENT_ID",
                 "CLERK_OAUTH_CLIENT_SECRET", "BASE_URL"):
         monkeypatch.setenv(key, "")  # empty, not deleted: a deleted key falls back to a local .env file
+    # A local .env file (a real deployment) must not change the tests: read the environment only.
+    monkeypatch.setitem(Settings.model_config, "env_file", None)
     monkeypatch.setenv("AUTH_MODE", "dev")
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("BUNDLED_DATA_DIR", str(FIXTURES))

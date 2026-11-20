@@ -77,7 +77,7 @@ test('nappy: quick log in 2 taps; rash, air time and wee details, then edit', as
 	await snap(page, '06-nappy-quick');
 	await s.getByRole('button', { name: 'Save' }).click();
 	await expect(s).toBeHidden();
-	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Nappy/ })).toContainText('Wet');
+	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Nappy/ })).toContainText('Wee');
 
 	s = await openTile(page, 'Nappy');
 	await s.getByText('More details').click();

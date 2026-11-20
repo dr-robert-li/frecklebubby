@@ -9,6 +9,8 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Home: the "Today" totals always show the bottle volume, also when it is zero.
+- Nappies: the app says "Wee" and "Poo" where it said "Wet" and "Dirty" (form, timeline, totals, reports, plain
+  words). Text from health sources keeps "wet nappies". The API values `pee`, `poo` and `both` do not change.
 
 ### Fixed
 

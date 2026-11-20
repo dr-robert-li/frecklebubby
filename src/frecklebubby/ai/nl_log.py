@@ -380,7 +380,7 @@ def to_proposal(ev: dict, now: datetime) -> dict:
 
 # --- summary text -------------------------------------------------------------------------------------------------
 
-NAPPY_WORDS = {"pee": "wet", "poo": "dirty", "both": "wet and dirty", "dry": "dry"}
+NAPPY_WORDS = {"pee": "wee", "poo": "poo", "both": "wee and poo", "dry": "dry"}
 
 
 def _hm(dt: datetime, ctx: Ctx) -> str:
@@ -418,9 +418,9 @@ def summary(p: dict, ctx: Ctx) -> str:
     elif t in ("nappy", "potty"):
         detail = NAPPY_WORDS[d["mode"]] + (f", {d['color']}" if d.get("color") else "") + (
             f", {d['consistency']}" if d.get("consistency") else "") + (", rash" if d.get("rash") else "") + (
-            f", {d['pee_amount']} pee" if d.get("pee_amount") else "") + (
+            f", {d['pee_amount']} wee" if d.get("pee_amount") else "") + (
             f", {d['poo_amount']} poo" if d.get("poo_amount") else "") + (
-            f", pee {d['pee_color'].replace('_', ' ')}" if d.get("pee_color") else "") + (
+            f", wee {d['pee_color'].replace('_', ' ')}" if d.get("pee_color") else "") + (
             ", cloudy" if d.get("pee_look") == "cloudy" else "") + (", strong smell" if d.get("pee_smell") else "") + (
             f", air time {d['air_minutes']} min" if d.get("air_minutes") else "")
         if t == "potty":
@@ -557,7 +557,7 @@ def doubt(s: Session, ctx: Ctx, child: Child, ev: dict, p: dict, text: str, now:
                 n and n not in have for n in _numbers(v)):
             return "the time is not in your words"
     if ev.get("type") in ("nappy", "potty") and not NAPPY_SAID.search(text):
-        return "say if it was wet, dirty or dry"
+        return "say if it was wee, poo or dry"
     when = p.get("started_at") or p.get("at")
     if when and when < now - TOO_OLD:
         return "it is more than 24 hours ago"

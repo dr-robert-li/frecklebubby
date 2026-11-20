@@ -20,7 +20,7 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 
 	// nappy: poo with colour and texture
 	s = await openTile(page, 'Nappy');
-	await s.getByRole('button', { name: 'Dirty', exact: true }).click();
+	await s.getByRole('button', { name: 'Poo', exact: true }).click();
 	await s.getByText('More details').click(); // details are collapsed so that the quick log stays 2 taps (M9)
 	await s.getByRole('button', { name: 'Yellow' }).click();
 	await s.getByRole('button', { name: 'Runny' }).click();
@@ -50,7 +50,7 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	// potty
 	s = await openTile(page, 'Potty');
 	await s.getByRole('button', { name: 'Went in the potty' }).click();
-	await s.getByRole('button', { name: 'Wet', exact: true }).click();
+	await s.getByRole('button', { name: 'Wee', exact: true }).click();
 	await s.getByRole('button', { name: 'Save' }).click();
 	await expectLogged(page, 'Potty', 'Went in the potty · Wet');
 

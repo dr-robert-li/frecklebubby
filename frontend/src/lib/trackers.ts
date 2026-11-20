@@ -79,7 +79,7 @@ const SIDES: Opt[] = [['left', 'Left'], ['right', 'Right']];
 const pee = (v: any) => v.mode === 'pee' || v.mode === 'both';
 const poo = (v: any) => v.mode === 'poo' || v.mode === 'both';
 const nappyFields = (word: string): Field[] => [
-	{ key: 'mode', label: 'Type', kind: 'one', required: true, options: [['pee', 'Wet'], ['poo', 'Dirty'], ['both', 'Wet and dirty'], ['dry', 'Dry']] },
+	{ key: 'mode', label: 'Type', kind: 'one', required: true, options: [['pee', 'Wee'], ['poo', 'Poo'], ['both', 'Wee and poo'], ['dry', 'Dry']] },
 	{ key: 'pee_amount', label: 'Wee amount', kind: 'one', options: AMOUNTS, show: pee, more: true },
 	{ key: 'pee_color', label: 'Wee colour', kind: 'one', options: PEE_COLOURS, show: pee, more: true },
 	{ key: 'pee_look', label: 'Wee looks', kind: 'one', options: PEE_LOOK, show: pee, more: true },
@@ -188,7 +188,7 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 		// falls through: potty has the nappy fields too
 		case 'nappy':
 			parts.push(
-				{ pee: 'Wet', poo: 'Dirty', both: 'Wet and dirty', dry: 'Dry' }[d.mode as string],
+				{ pee: 'Wee', poo: 'Poo', both: 'Wee and poo', dry: 'Dry' }[d.mode as string],
 				d.color && label(POO_COLOURS, d.color),
 				d.consistency && label(CONSISTENCY, d.consistency),
 				d.pee_color && `Wee ${label(PEE_COLOURS, d.pee_color).toLowerCase()}`,

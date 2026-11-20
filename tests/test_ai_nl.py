@@ -80,7 +80,7 @@ async def test_parse_and_commit(client, fake_llm):
     assert [p["type"] for p in out["proposals"]] == ["bottle", "nappy"]
     assert out["proposals"][0]["data"] == {"amount_ml": 118.3, "milk_type": "Formula"}
     assert out["proposals"][0]["summary"].startswith("Bottle – 118.3 ml formula – ")
-    assert out["proposals"][1]["summary"].startswith("Nappy – wet – ")
+    assert out["proposals"][1]["summary"].startswith("Nappy – wee – ")
     assert "could not use 1" in out["message"] and "amount_ml" in out["message"]
     # The prompt has the schema, the current time and the note; the server does the unit conversion.
     req = fake_llm.requests[0]
@@ -141,7 +141,7 @@ async def test_diaper_wording_and_units(client, fake_llm):
     fake_llm.replies.append({"events": [{"type": "nappy", "at": "now", "mode": "both"},
                                         {"type": "bottle", "at": "now", "amount": 120, "unit": "ml"}]})
     out = (await client.post(f"/api/v1/children/{cid}/nl/parse", headers=h, json={"text": "x"})).json()
-    assert out["proposals"][0]["summary"].startswith("Diaper – wet and dirty")
+    assert out["proposals"][0]["summary"].startswith("Diaper – wee and poo")
     assert out["proposals"][1]["summary"].startswith("Bottle – 4.1 oz")
 
 

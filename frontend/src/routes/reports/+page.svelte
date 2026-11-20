@@ -91,8 +91,8 @@
 	<section class="card">
 		<BarChart title={wording() === 'diaper' ? 'Diapers' : 'Nappies'} counts {labels}
 			series={[
-				{ label: 'Wet', color: 'var(--s1)', values: days.map((d: any) => d.nappies.wet) },
-				{ label: 'Dirty', color: 'var(--s2)', values: days.map((d: any) => d.nappies.dirty) }
+				{ label: 'Wee', color: 'var(--s1)', values: days.map((d: any) => d.nappies.wet) },
+				{ label: 'Poo', color: 'var(--s2)', values: days.map((d: any) => d.nappies.dirty) }
 			]} />
 	</section>
 	{#if days.some((d: any) => d.play?.count)}

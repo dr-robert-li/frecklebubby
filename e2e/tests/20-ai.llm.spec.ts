@@ -43,7 +43,7 @@ test('a: the parent logs by plain words, starts and stops a sleep, and gets a ki
 	const bottleAt = near(20), nappyAt = near(0);
 	await expect(page.getByText('I found 2 items. Check and confirm.')).toBeVisible();
 	await expect(page.getByText(new RegExp(`^Bottle – 120 ml formula – (${bottleAt})$`))).toBeVisible();
-	await expect(page.getByText(new RegExp(`^Nappy – wet – (${nappyAt})$`))).toBeVisible();
+	await expect(page.getByText(new RegExp(`^Nappy – wee – (${nappyAt})$`))).toBeVisible();
 	await snap(page, 'a1-nl-preview');
 	await page.getByRole('button', { name: 'Save these 2' }).click();
 	await expect(page.getByText('Saved 2 items')).toBeVisible();

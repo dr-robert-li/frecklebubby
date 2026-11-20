@@ -93,7 +93,7 @@ test('the parent logs by plain words, removes one proposal and confirms', async 
 			message: 'I found 2 things to log.',
 			proposals: [
 				{ action: 'entry', type: 'bottle', started_at: local(Date.now() - 20 * 60_000), data: { amount_ml: 120, milk_type: 'Formula' }, summary: 'Bottle – 120 ml formula' },
-				{ action: 'entry', type: 'nappy', started_at: local(Date.now() - 15 * 60_000), data: { mode: 'pee' }, summary: 'Nappy – wet' }
+				{ action: 'entry', type: 'nappy', started_at: local(Date.now() - 15 * 60_000), data: { mode: 'pee' }, summary: 'Nappy – wee' }
 			]
 		})
 	);
@@ -104,7 +104,7 @@ test('the parent logs by plain words, removes one proposal and confirms', async 
 	await page.getByRole('button', { name: 'Read my words' }).click();
 	await expect(page.getByText('I found 2 things to log.')).toBeVisible();
 	await shot(page, '11-nl-preview');
-	await page.getByRole('button', { name: 'Remove Nappy – wet' }).click();
+	await page.getByRole('button', { name: 'Remove Nappy – wee' }).click();
 	await page.getByRole('button', { name: 'Save this' }).click();
 	await expect(page.getByText('Saved 1 item')).toBeVisible();
 	expect(committed.proposals).toHaveLength(1);

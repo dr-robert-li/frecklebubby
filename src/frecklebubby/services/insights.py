@@ -331,7 +331,7 @@ def _wet_nappy_card(s: Session, ctx: Ctx, child: Child, now: datetime, w: dict) 
                                          Entry.started_at >= lo, Entry.started_at <= now))
     dark = [e for e in dark if e.data.get("pee_color") == "dark_yellow"]
     if dark:
-        body += (f"Dark yellow pee was also logged {len(dark)} {'time' if len(dark) == 1 else 'times'}. The NHS lists "
+        body += (f"Dark yellow wee was also logged {len(dark)} {'time' if len(dark) == 1 else 'times'}. The NHS lists "
                  f"dark yellow, strong-smelling pee and fewer wet {w['nappies']} than usual as signs of dehydration. ")
         cites_.append(source("nhs-dehydration"))
     body += "If you are worried, contact a doctor."

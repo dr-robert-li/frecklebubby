@@ -149,7 +149,7 @@ async def test_unsure_double_old_note_and_running_timer(client, fake_llm):
     # The model must choose a nappy mode; when the words do not say it, that is a guess.
     fake_llm.replies.append({"events": [{"type": "nappy", "at": "now", "mode": "both", "rash": True}]})
     p = (await chat(client, h, cid, "nappy with a rash"))[0][1]["proposals"][0]
-    assert p["unsure"] == "say if it was wet, dirty or dry"
+    assert p["unsure"] == "say if it was wee, poo or dry"
 
     fake_llm.replies.append({"events": [{"type": "note", "at": "now", "text": "seems happy"}]})
     p = (await chat(client, h, cid, "she seems happy"))[0][1]["proposals"][0]
@@ -190,12 +190,12 @@ async def test_nappy_amounts(client, fake_llm):
     ev = {"type": "nappy", "at": "now", "mode": "both", "pee_amount": "big", "poo_amount": "medium"}
     fake_llm.replies.append({"events": [ev]})
     item = (await chat(client, h, cid, "nappy with a medium poo and a big pee"))[0][1]["items"][0]
-    assert item["summary"].startswith("Nappy – wet and dirty, big pee, medium poo – ")
+    assert item["summary"].startswith("Nappy – wee and poo, big wee, medium poo – ")
     # One nappy split in two by the model (amounts in one, colour in the other) is joined again.
     fake_llm.replies.append({"events": [ev | {"at": "2 hours ago"},
                                         {"type": "nappy", "at": "2 hours ago", "mode": "both", "color": "yellow"}]})
     items = (await chat(client, h, cid, "2 hours ago: medium yellow poo and a big pee"))[0][1]["items"]
-    assert [i["summary"].split(" – ")[1] for i in items] == ["wet and dirty, yellow, big pee, medium poo"]
+    assert [i["summary"].split(" – ")[1] for i in items] == ["wee and poo, yellow, big wee, medium poo"]
     # No amount word in the note: the model's amounts are dropped. A dirty nappy has no pee amount.
     fake_llm.replies.append({"events": [ev | {"mode": "poo", "at": "1 hour ago"}]})
     await chat(client, h, cid, "dirty nappy 1 hour ago")

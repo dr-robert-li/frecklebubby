@@ -164,9 +164,9 @@ def nappies_block(p: Period) -> dict:
     rash_days = sum(1 for d in [*p.days[1:], p.now_day] if d.nappies.rash)  # the 7 days of the rash card
     numbers = []
     if logged:
-        numbers = [num(f"Wet a day ({_per_day(len(logged))})", _avg(logged, lambda d: d.nappies.wet)),
-                   num("Dirty a day", _avg(logged, lambda d: d.nappies.dirty)),
-                   num("Wet today so far", p.now_day.nappies.wet)]
+        numbers = [num(f"Wee a day ({_per_day(len(logged))})", _avg(logged, lambda d: d.nappies.wet)),
+                   num("Poo a day", _avg(logged, lambda d: d.nappies.dirty)),
+                   num("Wee today so far", p.now_day.nappies.wet)]
     if rash_days:
         numbers.append(num("Days with a rash (last 7)", rash_days))
     air = sum(d.nappies.air_minutes for d in [*p.days, p.now_day])
