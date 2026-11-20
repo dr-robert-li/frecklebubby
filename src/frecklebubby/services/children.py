@@ -2,12 +2,12 @@
 
 from datetime import date, datetime, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from ..models import Child
+from ..models import Child, ImportJob
 from ..schemas import ChildIn, ChildPatch
-from . import Ctx, Invalid, NotFound, hm
+from . import Conflict, Ctx, Invalid, NotFound, hm
 
 
 def get_child(s: Session, ctx: Ctx, child_id: int) -> Child:
@@ -64,6 +64,23 @@ def update_child(s: Session, ctx: Ctx, child_id: int, body: ChildPatch) -> Child
 
 def archive_child(s: Session, ctx: Ctx, child_id: int) -> None:
     get_child(s, ctx, child_id).archived = True
+    s.commit()
+
+
+def delete_child(s: Session, ctx: Ctx, child_id: int, confirm: str) -> None:
+    """The owner deletes one child and all its data for good. confirm must be the child's name. The foreign keys
+    cascade from child: entries, timers, reminders, notifications, chats, the sleep plan and the support report."""
+    ctx.require_owner()
+    child = get_child(s, ctx, child_id)
+    if confirm.strip().casefold() != child.name.strip().casefold():
+        raise Invalid("confirm: type the child's name to delete the child.")
+    from ..importer.huckleberry import _recover
+
+    _recover(s)
+    if s.scalar(select(ImportJob.id).where(ImportJob.family_id == ctx.fam.id,
+                                           ImportJob.status.in_(("pending", "running")))):
+        raise Conflict("An import is running. Wait until it is done, then try again.")
+    s.execute(delete(Child).where(Child.id == child.id))
     s.commit()
 
 

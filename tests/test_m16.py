@@ -79,6 +79,31 @@ async def test_delete_family_leaves_no_row_and_keeps_the_other(client, fake_llm)
     assert me["family"] is None and me["children"] == []
 
 
+async def test_delete_child_removes_only_that_child(client, fake_llm):
+    h, keep = await fill(client, fake_llm, "a@example.com", "Ada")
+    carer = as_user("carer@example.com")
+    await client.post(f"{API}/family/invites", headers=h, json={"email": "carer@example.com"})
+    assert (await client.get(f"{API}/me", headers=carer)).json()["role"] == "carer"
+    other, _ = await make_family(client, email="other@example.com")
+    before = dump()
+
+    r = await client.post(f"{API}/children", headers=h, json={"name": "Twin", "birthdate": "2026-06-01", "sex": "F"})
+    twin = r.json()["id"]
+    await client.post(f"{API}/children/{twin}/entries", headers=h, json={"type": "nappy", "data": {"mode": "pee"}})
+    await client.post(f"{API}/children/{twin}/timers/sleep/start", headers=h)
+    assert dump() != before
+    url = f"{API}/children/{twin}/permanent"
+
+    r = await client.request("DELETE", url, headers=h, json={"confirm": "Ada"})
+    assert r.status_code == 422 and "child's name" in r.json()["detail"]
+    assert (await client.request("DELETE", url, headers=carer, json={"confirm": "Twin"})).status_code == 403
+    assert (await client.request("DELETE", url, headers=other, json={"confirm": "Twin"})).status_code == 404
+    assert (await client.request("DELETE", url, headers=h, json={"confirm": " twin "})).status_code == 204
+
+    assert dump() == before  # no row of the deleted child is left, and no other row changed
+    assert [c["id"] for c in (await client.get(f"{API}/me", headers=h)).json()["children"]] == [keep]
+
+
 async def test_delete_family_refused_while_import_runs(client, monkeypatch):
     h, _ = await make_family(client)
     with SessionLocal() as s:

@@ -93,6 +93,8 @@ def llm_config(family: Family) -> tuple[str, str, str]:
 
 
 def get_family_settings(ctx: Ctx) -> SettingsOut:
+    from ..knowledge.web_lookup import allowlist
+
     st = ctx.fam.settings
     base_url, model, _ = llm_config(ctx.fam)
     return SettingsOut(
@@ -100,6 +102,7 @@ def get_family_settings(ctx: Ctx) -> SettingsOut:
         wording=st.get("wording", "nappy"),
         llm=LlmOut(base_url=base_url, model=model, has_api_key=bool(st.get("llm", {}).get("api_key"))),
         web_lookup=st.get("web_lookup", False),
+        web_lookup_sites=sorted(allowlist()),
         milestone_alerts=st.get("milestone_alerts", True),
     )
 

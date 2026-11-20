@@ -414,7 +414,36 @@ The assistant answers from these sources and shows each source it used:
 - **Your uploads**: in **Settings > Knowledge sources** you can add PDF, EPUB, text or Markdown files (up to
   50 MB), for example notes from your doctor. Only your family can use them. You can delete them.
 - **Web lookup** (off by default): in **Settings > AI model** you can let the assistant read pages from an approved
-  list of medical websites (`src/frecklebubby/data/web_allowlist.txt`). Pages are kept for 7 days.
+  list of medical websites. The same page shows the list. Pages are kept for 7 days.
+
+#### Change the approved websites
+
+The person who runs the server sets the list. A user cannot change it in the app. The assistant does not search the
+web: it reads only the pages in a fixed list, and only from the approved websites.
+
+1. Add or remove the website in `src/frecklebubby/data/web_allowlist.txt`. Write one host name on each line,
+   for example `www.rch.org.au`. Do not write `https://` or a path. `example.org` and `www.example.org` are two
+   different hosts.
+2. Add or remove the pages in `src/frecklebubby/data/sources.yaml`. Each page is one item with `kind: web`:
+
+   ```yaml
+   - id: rch-fever
+     title: Fever in children
+     publisher: The Royal Children's Hospital Melbourne
+     year: 2025
+     url: https://www.rch.org.au/kidsinfo/fact_sheets/Fever_in_children/
+     kind: web
+     topics:
+     - fever
+     summary: One or two sentences that say what the page tells a parent.
+   ```
+
+   The `id` must be new. The `url` must start with `https://` and its host must be in `web_allowlist.txt`.
+   The assistant selects a page when the question shares words with its `topics`, `title` or `summary`.
+3. Build the app again and restart it: `docker compose build app && docker compose up -d`.
+
+Add only websites you trust for medical facts, such as a health department or a children's hospital. The assistant
+gives the text of these pages to parents as a source.
 
 If a question is not covered by the sources, the assistant says so. Urgent warnings (for example a fever in a
 baby under 3 months) come from fixed rules, not from the model, and always show first.

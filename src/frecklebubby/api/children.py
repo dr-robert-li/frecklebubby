@@ -11,6 +11,7 @@ from ..schemas import (
     ChildIn,
     ChildOut,
     ChildPatch,
+    ConfirmIn,
     DailyReport,
     EntryIn,
     EntryOut,
@@ -54,6 +55,13 @@ def patch_child(cid: int, body: ChildPatch, ctx: Ctx = Depends(get_ctx), s: Sess
 @router.delete("/children/{cid}", status_code=204, summary="Archive a child")
 def archive_child(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     children.archive_child(s, ctx, cid)
+
+
+@router.delete("/children/{cid}/permanent", status_code=204, summary=(
+    "Delete a child and all its data for good (owner only). `confirm` is the child's name. "
+    "This cannot be undone. To hide a child and keep the data, archive it."))
+def delete_child(cid: int, body: ConfirmIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    children.delete_child(s, ctx, cid, body.confirm)
 
 
 # --- entries --------------------------------------------------------------------------------------

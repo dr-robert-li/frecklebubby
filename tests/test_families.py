@@ -49,6 +49,7 @@ async def test_invite_flow(client):
 async def test_settings(client):
     h, _ = await make_family(client)
     st = (await client.get(f"{API}/family/settings", headers=h)).json()
+    assert "www.nhs.uk" in st.pop("web_lookup_sites")  # the approved websites, read only
     assert st == {"units": {"volume": "ml", "weight": "kg", "length": "cm", "temperature": "C"}, "wording": "nappy",
                   "llm": {"base_url": "http://llama:8080/v1", "model": "", "has_api_key": False},
                   "web_lookup": False, "milestone_alerts": True}

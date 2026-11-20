@@ -8,6 +8,9 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Settings > Delete data: the owner can delete one child and all the data of that child. Select the child and
+  type the name to confirm. API: `DELETE /children/{id}/permanent`.
+- Settings > AI model shows the approved websites for web lookup. The README says how to change the list.
 - Huckleberry import: select where the data goes, a new child (as before) or a child you have now. The page says
   where the data is when the import is done. API: the optional field `child_id` of `POST /import/huckleberry`.
 

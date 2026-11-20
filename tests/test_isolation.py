@@ -87,6 +87,7 @@ OPERATOR = {("GET", "/operator/invites"), ("POST", "/operator/invites"), ("DELET
 # A request body, so that the route reaches its family check (else the answer is 422).
 BODIES = {
     ("PATCH", "/children/{cid}"): {"name": "x"},
+    ("DELETE", "/children/{cid}/permanent"): {"confirm": "Bea"},
     ("POST", "/children/{cid}/entries"): {"type": "note", "started_at": "2026-11-01T10:00:00Z", "notes": "x"},
     ("POST", "/children/{cid}/reminders"): {"type": "bottle", "mode": "in", "interval_minutes": 60},
     ("PATCH", "/entries/{eid}"): {"notes": "x"},

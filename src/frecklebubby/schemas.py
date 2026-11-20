@@ -246,7 +246,7 @@ class MemberOut(BaseModel):
 
 
 class ConfirmIn(BaseModel):
-    confirm: str = Field(max_length=254, description="The family name (delete family) or your email (delete account).")
+    confirm: str = Field(max_length=254, description="The family name (delete family), your email (delete account) or the child's name (delete child).")
 
 
 class InviteIn(BaseModel):
@@ -307,6 +307,7 @@ class SettingsOut(BaseModel):
     wording: Literal["nappy", "diaper"]
     llm: LlmOut
     web_lookup: bool
+    web_lookup_sites: list[str] = []  # the approved websites (fixed by the server, read only)
     milestone_alerts: bool = True  # M13: a notification when a child reaches a new milestone band
 
 

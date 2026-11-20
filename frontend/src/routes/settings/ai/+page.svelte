@@ -70,7 +70,13 @@
 <section class="card">
 	<label class="check"><input type="checkbox" checked={app.settings?.web_lookup} onchange={(e) => webLookup(e.currentTarget.checked)} />
 		Look up approved medical websites for answers</label>
-	<p class="muted small">Only sites on the approved list, such as health departments and children's hospitals.</p>
+	<p class="muted small">Only sites on the approved list, such as health departments and children's hospitals. The list is fixed by this server. You cannot change it here.</p>
+	{#if app.settings?.web_lookup_sites?.length}
+		<details class="small">
+			<summary>Show the {app.settings.web_lookup_sites.length} approved websites</summary>
+			<ul>{#each app.settings.web_lookup_sites as site (site)}<li>{site}</li>{/each}</ul>
+		</details>
+	{/if}
 </section>
 
 <style>

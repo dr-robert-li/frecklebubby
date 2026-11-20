@@ -39,6 +39,7 @@ export type Settings = {
 	wording: Wording;
 	llm: { base_url: string; model: string; has_api_key: boolean };
 	web_lookup: boolean;
+	web_lookup_sites?: string[];
 	milestone_alerts: boolean;
 };
 type Me = {

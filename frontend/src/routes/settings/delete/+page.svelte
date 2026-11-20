@@ -8,6 +8,11 @@
 	const family = $derived(app.me?.family ?? null);
 	const owner = $derived(app.me?.role === 'owner');
 	let familyName = $state('');
+	type Kid = { id: number; name: string; archived: boolean };
+	let kids = $state<Kid[]>([]);
+	let kidId = $state<number | null>(null);
+	let kidName = $state('');
+	const kid = $derived(kids.find((c) => c.id === kidId) ?? null);
 	let email = $state('');
 	let error = $state('');
 	let busy = $state(false);
@@ -24,14 +29,38 @@
 			busy = false;
 		}
 	}
+	const deleteChild = (e: SubmitEvent) => (e.preventDefault(), remove(`/children/${kidId}/permanent`, kidName));
 	const deleteFamily = (e: SubmitEvent) => (e.preventDefault(), remove('/family', familyName));
 	const deleteAccount = (e: SubmitEvent) => (e.preventDefault(), remove('/me', email));
 	$effect(() => void loadMe());
+	$effect(() => {
+		if (family) api<Kid[]>('/children?archived=true').then((list) => (kids = list)).catch(() => {});
+	});
 </script>
 
 <Back title="Delete data" />
 <p class="muted">Deletion is permanent. You cannot undo it. To keep a copy, download the CSV export of each child first (on the Reports page).</p>
 {#if error}<p class="error" role="alert">{error}</p>{/if}
+
+{#if family && owner && kids.length}
+	<form class="card stack" onsubmit={deleteChild} aria-label="Delete a child">
+		<h2>Delete a child</h2>
+		<p>This deletes one child and all the data of that child: entries, timers, reminders, notifications, chats, the sleep plan and the support report. The family and the other children stay. To hide a child and keep the data, archive the child (Settings › Children).</p>
+		<label class="field"><span>Child</span>
+			<select bind:value={kidId} onchange={() => (kidName = '')} required>
+				<option value={null} disabled>Select a child</option>
+				{#each kids as c (c.id)}<option value={c.id}>{c.name}{c.archived ? ' (archived)' : ''}</option>{/each}
+			</select></label>
+		{#if kid}
+			<label class="field"><span>Type the child's name to confirm: <strong>{kid.name}</strong></span>
+				<input bind:value={kidName} autocomplete="off" required /></label>
+		{/if}
+		<button type="submit" class="danger" disabled={busy || !kid || kidName.trim().toLowerCase() !== kid.name.trim().toLowerCase()}>
+			<Icon name="trash" size={20} /> Delete the child for good</button>
+	</form>
+{:else if family && kids.length}
+	<p class="card muted">Only the family owner can delete a child.</p>
+{/if}
 
 {#if family && owner}
 	<form class="card stack" onsubmit={deleteFamily} aria-label="Delete the family">
