@@ -117,14 +117,7 @@
 	{#if !onboarding && app.me?.family}
 		{@const c = child()}
 		<header>
-			{#if c}
-				<button class="who" onclick={() => (switcher = true)} aria-label="Child: {c.name}. Change child">
-					<span class="dot" style="background:{c.color}"></span>
-					<span class="name">{c.name}</span>
-					<span class="muted small age">{ageText(c.birthdate)}</span>
-					{#if app.me.children.length > 1}<Icon name="down" size={18} />{/if}
-				</button>
-			{/if}
+			<a class="brand" href="/"><img src="/icon.svg" alt="" width="34" height="34" /> Frecklebubby</a>
 			<button class="bell theme" onclick={() => (dark = applyTheme(dark ? 'light' : 'dark'))} aria-label={dark ? 'Change to day colours' : 'Change to night colours'}>
 				<Icon name={dark ? 'sun' : 'moon'} />
 			</button>
@@ -132,6 +125,16 @@
 				<Icon name="bell" />
 				{#if app.status?.unread_notifications}<span class="badge">{app.status.unread_notifications}</span>{/if}
 			</a>
+			{#if c}
+				<div class="child-row">
+					<button class="who" onclick={() => (switcher = true)} aria-label="Child: {c.name}. Change child">
+						<span class="dot" style="background:{c.color}"></span>
+						<span class="name">{c.name}</span>
+						<span class="muted small age">{ageText(c.birthdate)}</span>
+						{#if app.me.children.length > 1}<Icon name="down" size={18} />{/if}
+					</button>
+				</div>
+			{/if}
 		</header>
 	{/if}
 
@@ -215,7 +218,22 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		flex-wrap: wrap;
 		gap: 8px;
+	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 1.3rem;
+		font-weight: 800;
+		color: var(--ink-strong);
+		text-decoration: none;
+	}
+	.child-row {
+		flex-basis: 100%;
+		display: flex;
+		min-width: 0;
 	}
 	.who {
 		background: var(--surface);

@@ -13,6 +13,7 @@ There is no release 0.3.0.
 
 ### Added
 
+- A header with the Frecklebubby logo and name on each page.
 - A button at the top right changes between day and night colours.
 - Plain words read nappy amounts: "big pee", "medium poo".
 - The pump timer tab says how to add the amount after the timer stops.
@@ -25,7 +26,8 @@ There is no release 0.3.0.
   3 x 3 grid. Confined is now before Milestone and Note. Each small tile has its own colour: Growth and Confined
   have two new colours.
 
-- Home: the "Today" totals show the nursing time ("Nursing") in place of the number of feeds.
+- Home: the "Today" totals show the breastfeeding time ("Breastfed") in place of the number of feeds.
+- The app says "Breastfeeding" where it said "Nursing".
 
 ### Fixed
 

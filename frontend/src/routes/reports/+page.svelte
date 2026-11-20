@@ -86,7 +86,7 @@
 	</section>
 	<section class="card">
 		<BarChart title="Feeds" counts {labels} series={[{ label: 'Feeds', color: 'var(--s1)', values: days.map((d: any) => d.feeds.count) }]} />
-		<p class="small muted">Nursing and bottle feeds.</p>
+		<p class="small muted">Breastfeeding and bottle feeds.</p>
 	</section>
 	<section class="card">
 		<BarChart title={wording() === 'diaper' ? 'Diapers' : 'Nappies'} counts {labels}

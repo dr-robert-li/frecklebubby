@@ -22,11 +22,11 @@ Your data stays on your server.
 
 ## What it does
 
-- Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
+- Tracks sleep, breastfeeding, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
   (bath, tummy time, indoor and outdoor play, story time, screen time, skin to skin, brushing teeth), time in a
   car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
-- Has live timers for sleep, nursing, pumping, activities and confined time. Activity timers can
+- Has live timers for sleep, breastfeeding, pumping, activities and confined time. Activity timers can
   run side by side, one for each kind (for example indoor play and tummy time). A timer
   keeps running when you close the app.
 - Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a

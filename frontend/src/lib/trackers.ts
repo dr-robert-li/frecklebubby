@@ -43,7 +43,7 @@ const CONDITIONS: Opt[] = [
 	['wokeUpChild', 'I woke them']
 ];
 const LOCATIONS: Opt[] = [
-	['onOwnInBed', 'Own bed'], ['nursing', 'Nursing'], ['wornOrHeld', 'Held or worn'], ['nextToCarer', 'Next to carer'],
+	['onOwnInBed', 'Own bed'], ['nursing', 'Breastfeeding'], ['wornOrHeld', 'Held or worn'], ['nextToCarer', 'Next to carer'],
 	['coSleep', 'Co-sleeping'], ['bottle', 'Bottle'], ['stroller', 'Pram'], ['car', 'Car'], ['swing', 'Swing']
 ];
 export const MILK: Opt[] = [
@@ -100,7 +100,7 @@ export function trackers(wording: Wording): Tracker[] {
 			{ key: 'start_conditions', label: 'Falling asleep', kind: 'many', options: CONDITIONS.filter((c) => c[0] !== 'wokeUpChild') },
 			{ key: 'end_conditions', label: 'Waking up', kind: 'many', options: CONDITIONS.filter((c) => !c[0].includes('minutes') && c[0] !== 'longTimeToFallAsleep') }
 		] },
-		{ type: 'nursing', label: 'Nursing', color: '--rose', end: 'optional', timer: true, fields: [
+		{ type: 'nursing', label: 'Breastfeeding', color: '--rose', end: 'optional', timer: true, fields: [
 			{ key: 'left_seconds', label: 'Left side', kind: 'num', unit: 'min', max: 240 },
 			{ key: 'right_seconds', label: 'Right side', kind: 'num', unit: 'min', max: 240 },
 			{ key: 'last_side', label: 'Last side', kind: 'one', options: SIDES }
