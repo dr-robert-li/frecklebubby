@@ -185,6 +185,25 @@ async def test_invented_pee_details_are_dropped(client, fake_llm):
                                                                    "pee_color": "dark_yellow"}
 
 
+async def test_nappy_amounts(client, fake_llm):
+    h, cid = await make_family(client)
+    ev = {"type": "nappy", "at": "now", "mode": "both", "pee_amount": "big", "poo_amount": "medium"}
+    fake_llm.replies.append({"events": [ev]})
+    item = (await chat(client, h, cid, "nappy with a medium poo and a big pee"))[0][1]["items"][0]
+    assert item["summary"].startswith("Nappy – wet and dirty, big pee, medium poo – ")
+    # One nappy split in two by the model (amounts in one, colour in the other) is joined again.
+    fake_llm.replies.append({"events": [ev | {"at": "2 hours ago"},
+                                        {"type": "nappy", "at": "2 hours ago", "mode": "both", "color": "yellow"}]})
+    items = (await chat(client, h, cid, "2 hours ago: medium yellow poo and a big pee"))[0][1]["items"]
+    assert [i["summary"].split(" – ")[1] for i in items] == ["wet and dirty, yellow, big pee, medium poo"]
+    # No amount word in the note: the model's amounts are dropped. A dirty nappy has no pee amount.
+    fake_llm.replies.append({"events": [ev | {"mode": "poo", "at": "1 hour ago"}]})
+    await chat(client, h, cid, "dirty nappy 1 hour ago")
+    data = [e["data"] for e in await entries(client, h, cid, "nappy")]
+    assert {"mode": "poo", "rash": False} in data and {"mode": "both", "rash": False, "pee_amount": "big",
+                                                        "poo_amount": "medium"} in data
+
+
 async def test_timer_from_chat_and_undo_cancels_it(client, fake_llm):
     h, cid = await make_family(client)
     fake_llm.replies.append({"events": [{"type": "timer", "timer": "sleep", "action": "start"}]})

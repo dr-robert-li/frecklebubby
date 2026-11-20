@@ -80,7 +80,7 @@
 			<h2>Today</h2>
 			<div class="totals">
 				<div><span>Sleep</span><strong>{fmtDur(d.sleep.total_seconds)}</strong></div>
-				<div><span>Feeds</span><strong>{d.feeds.count}</strong></div>
+				<div><span>Nursing</span><strong>{fmtDur(d.feeds.nursing_seconds)}</strong></div>
 				<div><span>Wet</span><strong>{d.nappies.wet}</strong></div>
 				<div><span>Dirty</span><strong>{d.nappies.dirty}</strong></div>
 				{#if d.feeds.bottle_ml}<div><span>Bottle</span><strong>{fmtUnit('volume', d.feeds.bottle_ml, units())}</strong></div>{/if}

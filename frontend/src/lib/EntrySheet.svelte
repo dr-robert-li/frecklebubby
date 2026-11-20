@@ -259,6 +259,8 @@
 							<button class="chip" aria-pressed={vals.device === v} onclick={() => (vals.device = v)}>{l}</button>
 						{/each}
 					</div>
+				{:else if type === 'pump'}
+					<p class="muted">The timer saves the time only. To add the amount, stop the timer, then select the saved pump entry in the timeline and edit it.</p>
 				{/if}
 				<button class="big wide" style="background: var({t.color})" disabled={busy} onclick={() => startTimer()}>
 					<Icon name="play" /> Start {t.label.toLowerCase()} timer

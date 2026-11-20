@@ -21,6 +21,7 @@
 	let switcher = $state(false);
 	let devEdit = $state(false);
 	let devEmail = $state(devUser());
+	let dark = $state(false);
 
 	const tabs = [
 		['/', 'Home', 'home'],
@@ -33,7 +34,7 @@
 	const active = (href: string) => (href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href));
 
 	async function start() {
-		applyTheme();
+		dark = applyTheme();
 		try {
 			prefs.clock24 = localStorage.getItem('fb.clock') !== '12';
 		} catch {
@@ -124,6 +125,9 @@
 					{#if app.me.children.length > 1}<Icon name="down" size={18} />{/if}
 				</button>
 			{/if}
+			<button class="bell theme" onclick={() => (dark = applyTheme(dark ? 'light' : 'dark'))} aria-label={dark ? 'Change to day colours' : 'Change to night colours'}>
+				<Icon name={dark ? 'sun' : 'moon'} />
+			</button>
 			<a class="bell" href="/notifications" aria-label="Notifications{app.status?.unread_notifications ? `, ${app.status.unread_notifications} unread` : ''}">
 				<Icon name="bell" />
 				{#if app.status?.unread_notifications}<span class="badge">{app.status.unread_notifications}</span>{/if}
@@ -250,6 +254,10 @@
 		box-shadow: var(--shadow);
 		color: var(--ink-strong);
 		flex: none;
+	}
+	.bell.theme {
+		margin-left: auto;
+		padding: 0;
 	}
 	.bell .badge {
 		position: absolute;
