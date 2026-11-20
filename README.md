@@ -396,7 +396,8 @@ docker compose cp app:/data/backup.db ./frecklebubby-backup.db
 podman cp frecklebubby_app_1:/data/backup.db ./frecklebubby-backup.db
 ```
 
-To restore: stop the app, copy the file back to `/data/frecklebubby.db`, start the app. You can also copy the whole
+To restore: stop the app, copy the file back to `/data/frecklebubby.db`, delete `frecklebubby.db-wal` and
+`frecklebubby.db-shm` if they are in the folder (they belong to the old database), and start the app. You can also copy the whole
 volume with your normal volume backup tool. You can also export a CSV for each child in **Reports**.
 
 ## Development

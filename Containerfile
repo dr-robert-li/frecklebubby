@@ -11,7 +11,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: install the Python app with uv. git is needed for the optional Huckleberry import extra.
-# The cry extra (onnxruntime) runs the cry models; the model files go in the data volume (/data/models/cry).
+# The cry extra (onnxruntime) runs the cry models. The model files are in the package (src/frecklebubby/data).
 FROM docker.io/library/python:3.14-slim AS build
 COPY --from=ghcr.io/astral-sh/uv:0.13 /uv /usr/local/bin/uv
 RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
