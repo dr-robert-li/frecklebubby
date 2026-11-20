@@ -1,4 +1,4 @@
-"""M9 new logging: play with tummy time, confined time with the note and the warning, nappy details and their rules."""
+"""M9 new logging: play and tummy time (activity kinds), confined time with the note and the warning, nappy details and their rules."""
 
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -13,7 +13,7 @@ from frecklebubby.db import SessionLocal
 from frecklebubby.mcp_server import create_mcp
 from frecklebubby.models import Child, Entry, Notification
 from frecklebubby.schemas import TimerBody
-from frecklebubby.services import Conflict, Invalid, confined, insights, reports
+from frecklebubby.services import Invalid, confined, insights, reports
 from frecklebubby.services.library import library
 from frecklebubby.services.reminders import tick
 from frecklebubby.services.timers import act
@@ -45,9 +45,6 @@ async def post(client, h, cid, **entry):
 async def test_validation(client):
     h, cid = await make_family(client)
     ok = [
-        {"type": "play", "started_at": "2026-11-10T09:00", "ended_at": "2026-11-10T09:20",
-         "data": {"kind": "outdoor", "tummy_seconds": 300}},
-        {"type": "play", "started_at": "2026-11-10T09:00", "data": {}},
         {"type": "confined", "started_at": "2026-11-10T09:00", "ended_at": "2026-11-10T10:00",
          "data": {"device": "car_seat"}},
         {"type": "nappy", "started_at": "2026-11-10T09:00", "data": {"mode": "poo"}},  # old shape stays valid
@@ -62,8 +59,8 @@ async def test_validation(client):
                    data={"mode": "pee", "rash_severity": "mild"})
     assert r.json()["data"]["rash"] is True  # severity means a rash
     bad = [
-        ("confined", {}), ("confined", {"device": "sofa"}), ("play", {"tummy_seconds": 86401}),
-        ("play", {"kind": "park"}), ("nappy", {"mode": "pee", "air_minutes": 241}),
+        ("confined", {}), ("confined", {"device": "sofa"}), ("play", {}),
+        ("bath", {}), ("activity", {"kind": "park"}), ("nappy", {"mode": "pee", "air_minutes": 241}),
         ("nappy", {"mode": "poo", "pee_color": "red"}), ("nappy", {"mode": "dry", "pee_smell": True}),
         ("nappy", {"mode": "pee", "pee_color": "green"}), ("nappy", {"mode": "pee", "rash_severity": "bad"}),
     ]
@@ -71,33 +68,11 @@ async def test_validation(client):
         r = await post(client, h, cid, type=type_, started_at="2026-11-10T09:00", data=data)
         assert r.status_code == 422, (type_, data, r.text)
     r = await client.post(f"{API}/children/{cid}/reminders", headers=h,
-                          json={"type": "play", "mode": "in", "interval_minutes": 180})
+                          json={"type": "activity", "mode": "in", "interval_minutes": 180})
     assert r.status_code == 201
 
 
 # --- timers -------------------------------------------------------------------------------------------------------
-
-
-async def test_play_timer_tummy_toggle(client):
-    _, cid = await make_family(client)
-    s, ctx = ctx_for("a@example.com")
-    t, _ = act(s, ctx, cid, "play", "start", TimerBody(), now=at(0))
-    assert t.data == {"tummy_seconds": 0, "tummy_started_at": None}
-    t, _ = act(s, ctx, cid, "play", "switch", TimerBody(), now=at(2))  # tummy on
-    assert t.data["tummy_started_at"] == at(2).isoformat()
-    t, _ = act(s, ctx, cid, "play", "switch", TimerBody(), now=at(5))  # off: 3 min
-    assert t.data == {"tummy_seconds": 180, "tummy_started_at": None}
-    act(s, ctx, cid, "play", "switch", TimerBody(), now=at(6))  # on again
-    t, _ = act(s, ctx, cid, "play", "pause", TimerBody(), now=at(8))  # pause closes the tummy part: +2 min
-    assert t.data == {"tummy_seconds": 300, "tummy_started_at": None}
-    with pytest.raises(Conflict):
-        act(s, ctx, cid, "play", "switch", TimerBody(), now=at(9))
-    act(s, ctx, cid, "play", "resume", TimerBody(), now=at(10))
-    act(s, ctx, cid, "play", "switch", TimerBody(), now=at(11))
-    _, e = act(s, ctx, cid, "play", "complete", TimerBody(data={"kind": "indoor"}), now=at(15))  # +4 min
-    assert e.data == {"tummy_seconds": 540, "kind": "indoor"}
-    assert (e.type, e.started_at, e.ended_at) == ("play", at(0), at(15))
-    s.close()
 
 
 async def test_confined_timer_needs_device(client):
@@ -121,8 +96,11 @@ async def test_confined_timer_needs_device(client):
 async def test_day_report_play_confined_nappies(client):
     h, cid = await make_family(client)
     for e in [
-        {"type": "play", "started_at": "2026-11-09T09:00", "ended_at": "2026-11-09T09:30",
-         "data": {"tummy_seconds": 600}},
+        # indoor play and tummy time in parallel: the 10 tummy minutes are inside the 30 play minutes
+        {"type": "activity", "started_at": "2026-11-09T09:00", "ended_at": "2026-11-09T09:30",
+         "data": {"kind": "indoorPlay"}},
+        {"type": "activity", "started_at": "2026-11-09T09:05", "ended_at": "2026-11-09T09:15",
+         "data": {"kind": "tummyTime"}},
         {"type": "activity", "started_at": "2026-11-09T10:00", "ended_at": "2026-11-09T10:05",
          "data": {"kind": "tummyTime"}},
         {"type": "activity", "started_at": "2026-11-09T11:00", "ended_at": "2026-11-09T11:20",
@@ -145,7 +123,8 @@ async def test_day_report_play_confined_nappies(client):
     assert d["play"] == {"count": 3, "seconds": 1800 + 300 + 1200, "tummy_seconds": 600 + 300}
     assert d["confined"] == {"count": 3, "seconds": 2400 + 1320 + 1200, "longest_seconds": 70 * 60}
     assert d["nappies"] == {"wet": 1, "dirty": 1, "air_minutes": 20, "rash": 1}
-    assert d["activities"]["tummyTime"] == {"count": 1, "seconds": 300}  # old activity totals stay
+    assert d["activities"]["tummyTime"] == {"count": 2, "seconds": 900}
+    assert d["bath_count"] == 1
     rec = r.json()["tummy_recommendation"]  # child born 2026-06-01: under 12 months
     assert rec["minutes"] == 30 and rec["citation"]["url"].startswith("https://www.who.int/")
 
@@ -367,9 +346,9 @@ def test_support_phrases_are_in_the_cited_files():
 async def test_mcp_tools(client):
     h, cid = await make_family(client)
     async with Client(create_mcp(fixed_email="a@example.com")) as mcp:
-        r = (await mcp.call_tool("log_play", {"start_time": "2026-11-10T09:00", "end_time": "2026-11-10T09:20",
-                                              "tummy_minutes": 5, "kind": "indoor"})).structured_content
-        assert r["data"] == {"kind": "indoor", "tummy_seconds": 300.0}
+        r = (await mcp.call_tool("log_activity", {"start_time": "2026-11-10T09:00", "end_time": "2026-11-10T09:20",
+                                                  "kind": "tummyTime"})).structured_content
+        assert r["data"] == {"kind": "tummyTime"}
         r = (await mcp.call_tool("confined_timer", {"action": "start", "device": "high_chair"})).structured_content
         assert r["timer"]["data"] == {"device": "high_chair"}
         r = (await mcp.call_tool("log_nappy", {"mode": "pee", "rash_severity": "moderate", "air_minutes": 10,
@@ -379,19 +358,34 @@ async def test_mcp_tools(client):
         r = (await mcp.call_tool("log_confined", {"device": "pram", "start_time": "2026-11-10T08:00",
                                                   "end_time": "2026-11-10T08:30"})).structured_content
         assert r["type"] == "confined"
-        r = (await mcp.call_tool("play_timer", {"action": "start"})).structured_content
-        r = (await mcp.call_tool("play_timer", {"action": "switch"})).structured_content
-        assert r["timer"]["data"]["tummy_started_at"]
+        await mcp.call_tool("activity_timer", {"action": "start", "kind": "indoorPlay"})
+        r = (await mcp.call_tool("activity_timer", {"action": "start", "kind": "tummyTime"})).structured_content
+        assert r["timer"]["data"] == {"kind": "tummyTime"}
+        with pytest.raises(Exception, match="Say which kind"):
+            await mcp.call_tool("activity_timer", {"action": "complete"})
+        r = (await mcp.call_tool("activity_timer", {"action": "complete", "kind": "tummyTime"})).structured_content
+        assert r["entry"]["data"] == {"kind": "tummyTime"} and r["done"] == "tummyTime timer: complete"
     csv = (await client.get(f"{API}/children/{cid}/export.csv", headers=h)).text
-    assert 'play,' in csv and '"{""kind"":""indoor"",""tummy_seconds"":300.0}"' in csv
+    assert csv.count('activity,') == 2 and '"{""kind"":""tummyTime""}"' in csv
 
 
 NOW = datetime(2026, 11, 20, 14, 35, tzinfo=BNE)
 
 
 def test_nl_proposals():
-    p = to_proposal({"type": "play", "end": "now", "duration": "20 minutes", "tummy_minutes": 5}, NOW)
-    assert (p["started_at"], p["ended_at"], p["data"]) == (NOW - timedelta(minutes=20), NOW, {"tummy_seconds": 300})
+    p = to_proposal({"type": "activity", "kind": "tummyTime", "end": "now", "duration": "10 minutes"}, NOW)
+    assert (p["started_at"], p["ended_at"], p["data"]) == (NOW - timedelta(minutes=10), NOW, {"kind": "tummyTime"})
+    for ev in ({"start": "now"}, {"start": "now", "end": "now"}, {"end": "now"}):  # "playing outside now"
+        p = to_proposal({"type": "activity", "kind": "outdoorPlay"} | ev, NOW)
+        assert p == {"action": "timer", "type": "activity", "timer_action": "start", "at": NOW, "kind": "outdoorPlay"}
+    p = to_proposal({"type": "activity", "kind": "bath", "start": "11", "end": "11"}, NOW)
+    assert (p["action"], p["ended_at"]) == ("entry", None)
+    p = to_proposal({"type": "activity", "kind": "outdoorPlay", "start": "now"}, NOW)
+    assert p == {"action": "timer", "type": "activity", "timer_action": "start", "at": NOW, "kind": "outdoorPlay"}
+    p = to_proposal({"type": "activity", "kind": "tummyTime", "start": "now"}, NOW)  # "started tummy time now"
+    assert (p["action"], p["kind"]) == ("timer", "tummyTime")
+    p = to_proposal({"type": "activity", "kind": "bath", "start": "6"}, NOW)  # "gave her a bath at 6": no timer
+    assert (p["action"], p["started_at"].hour, p["ended_at"], p["data"]) == ("entry", 6, None, {"kind": "bath"})
     p = to_proposal({"type": "confined", "start": "9", "device": "car_seat"}, NOW)
     assert p == {"action": "timer", "type": "confined", "timer_action": "start", "at": NOW.replace(hour=9, minute=0),
                  "device": "car_seat"}
@@ -404,9 +398,11 @@ def test_nl_proposals():
 async def test_nl_summary(client):
     await make_family(client)
     s, ctx = ctx_for("a@example.com")
-    p = {"action": "entry", "type": "play", "started_at": NOW - timedelta(minutes=20), "ended_at": NOW,
-         "data": {"tummy_seconds": 300}}
-    assert summary(p, ctx) == "Play – tummy time 5 min – 14:15 to 14:35 (20 min)"
+    p = {"action": "entry", "type": "activity", "started_at": NOW - timedelta(minutes=20), "ended_at": NOW,
+         "data": {"kind": "indoorPlay"}}
+    assert summary(p, ctx) == "Activity – indoorPlay – 14:15 to 14:35 (20 min)"
+    p = {"action": "timer", "type": "activity", "timer_action": "complete", "kind": "tummyTime"}
+    assert summary(p, ctx) == "Activity timer – stop and save – tummyTime – now"
     p = {"action": "timer", "type": "confined", "timer_action": "start", "device": "car_seat", "at": NOW}
     assert summary(p, ctx) == "Confined timer – start – car seat – 14:35"
     s.close()

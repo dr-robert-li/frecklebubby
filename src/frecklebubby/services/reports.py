@@ -16,7 +16,7 @@ from .library import source
 from .sleep import predict, recommendations
 from .timers import list_timers, timer_out
 
-PLAY_KINDS = ("tummyTime", "indoorPlay", "outdoorPlay")  # old activity kinds that count as play
+PLAY_KINDS = ("tummyTime", "indoorPlay", "outdoorPlay")  # activity kinds that count as play
 # WHO 2019 (who-under-5-activity-sleep.md): "For infants not yet mobile, this includes at least 30 minutes in prone
 # position (tummy time)"; checked in tests/test_m9.py.
 TUMMY = {"minutes": 30, "under_months": 12, "source": "who-under-5-activity-sleep",
@@ -49,6 +49,8 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
     reports = [DayReport(date=d) for d in days]
     lo, hi = bounds[0][0], bounds[-1][1]
     confined_spans: dict[date, list] = {}
+    play_spans: dict[date, list] = {}
+    tummy_spans: dict[date, list] = {}
 
     # Sleeps that start up to 2 days earlier can reach into the range.
     entries = s.scalars(select(Entry).where(Entry.child_id == child.id, Entry.started_at >= lo - timedelta(days=2),
@@ -92,24 +94,19 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
             r.pump_ml += d.get("total_ml", 0)
         elif e.type == "medicine":
             r.medicine_count += 1
-        elif e.type == "bath":
-            r.bath_count += 1
         elif e.type == "activity":
             a = r.activities.setdefault(d["kind"], ActivityDay())
             a.count += 1
             a.seconds += duration
-            r.bath_count += d["kind"] == "bath"  # old bath activities count as baths
+            r.bath_count += d["kind"] == "bath"
+            span = (e.started_at, e.ended_at or e.started_at)
             if d["kind"] in PLAY_KINDS:
-                r.play.count += 1
-                r.play.seconds += duration
-                r.play.tummy_seconds += duration if d["kind"] == "tummyTime" else 0
+                play_spans.setdefault(r.date, []).append(span)
+            if d["kind"] == "tummyTime":
+                tummy_spans.setdefault(r.date, []).append(span)
         elif e.type == "cry":
             r.crying.count += 1
             r.crying.seconds += duration
-        elif e.type == "play":
-            r.play.count += 1
-            r.play.seconds += duration
-            r.play.tummy_seconds += int(d.get("tummy_seconds", 0))
         elif e.type == "confined":
             r.confined.count += 1
             r.confined.seconds += duration
@@ -118,6 +115,10 @@ def daily(s: Session, ctx: Ctx, child_id: int, start: date | None = None, end: d
     for r in reports:
         # Longest continuous period of the entries that start on this day.
         r.confined.longest_seconds = max((_seconds(a, b) for a, b in merge(confined_spans.get(r.date, []))), default=0)
+        # Play timers can run in parallel (indoor play and tummy time): overlapping time counts once.
+        play = merge(play_spans.get(r.date, []), timedelta(0))
+        r.play.count, r.play.seconds = len(play), sum(_seconds(a, b) for a, b in play)
+        r.play.tummy_seconds = sum(_seconds(a, b) for a, b in merge(tummy_spans.get(r.date, []), timedelta(0)))
     return {"timezone": ctx.fam.timezone, "sleep_recommendations": recommendations(age_months(child, now)),
             "tummy_recommendation": tummy_recommendation(child, now.astimezone(tz).date()), "days": reports}
 

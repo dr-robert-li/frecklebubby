@@ -238,10 +238,10 @@ async def test_mcp_log_in_plain_words(client, fake_llm):
 
         tools = {t.name: t.description for t in await mcp.list_tools()}
     # Each entry type has a tool whose description names it.
-    for words, tool in (("play", "log_play"), ("tummy time", "log_play"), ("car seat", "log_confined"),
+    for words, tool in (("play", "log_activity"), ("tummy time", "log_activity"), ("car seat", "log_confined"),
                         ("crying", "log_cry"), ("bottle", "log_bottle"), ("breastfeed", "log_nursing"),
                         ("nappy", "log_nappy"), ("potty", "log_potty"), ("pump", "log_pump"),
                         ("milestone", "log_milestone"), ("note", "log_note"), ("medicine", "log_medicine"),
                         ("temperature", "log_temperature"), ("growth", "log_growth"), ("solid", "log_solids"),
-                        ("bath", "log_bath"), ("story", "log_activity"), ("sleep", "log_sleep")):
+                        ("bath", "log_activity"), ("story", "log_activity"), ("sleep", "log_sleep")):
         assert words in tools[tool].lower(), (words, tool)

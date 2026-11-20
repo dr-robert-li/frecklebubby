@@ -45,7 +45,8 @@ async def seed(client, birth_days=130):
     for d in (1, 2, 3):
         rows.append({"type": "sleep", "started_at": t(d, 9), "ended_at": t(d, 17), "data": {}})
         rows += [{"type": "nappy", "started_at": t(d, hr), "data": {"mode": "pee"}} for hr in (8, 12, 16)]
-        rows.append({"type": "play", "started_at": t(d, 10), "ended_at": t(d, 10, 20), "data": {"tummy_seconds": 300}})
+        rows += [{"type": "activity", "started_at": t(d, 10), "ended_at": t(d, 10, 20), "data": {"kind": "indoorPlay"}},
+                 {"type": "activity", "started_at": t(d, 10), "ended_at": t(d, 10, 5), "data": {"kind": "tummyTime"}}]
     rows.append({"type": "confined", "started_at": t(2, 13), "ended_at": t(2, 14, 30), "data": {"device": "car_seat"}})
     rows.append({"type": "cry", "started_at": t(1, 18), "ended_at": t(1, 18, 20), "data": {}})
     rows.append({"type": "nappy", "started_at": t(0, 9), "data": {"mode": "pee"}})
@@ -107,7 +108,8 @@ async def test_ok_against_the_references(client, fake_llm):
     h, cid = await make_family(client, birthdate=born)
     for d in (1, 2, 3):
         rows = [{"type": "sleep", "started_at": t(d, 1), "ended_at": t(d, 14), "data": {}},
-                {"type": "play", "started_at": t(d, 15), "ended_at": t(d, 16), "data": {"tummy_seconds": 1900}}]
+                {"type": "activity", "started_at": t(d, 15), "ended_at": t(d, 16), "data": {"kind": "indoorPlay"}},
+                {"type": "activity", "started_at": t(d, 15), "ended_at": t(d, 15, 32), "data": {"kind": "tummyTime"}}]
         rows += [{"type": "nappy", "started_at": t(d, 14, m), "data": {"mode": "pee"}} for m in range(0, 60, 9)]
         for r in rows:
             assert (await client.post(f"{API}/children/{cid}/entries", headers=h, json=r)).status_code == 201

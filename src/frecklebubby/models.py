@@ -87,10 +87,11 @@ class Entry(Base):
 
 class Timer(Base):
     __tablename__ = "timer"
-    __table_args__ = (UniqueConstraint("child_id", "type"),)
+    __table_args__ = (UniqueConstraint("child_id", "type", "kind"),)
     id: Mapped[int] = _id()
     child_id: Mapped[int] = mapped_column(ForeignKey("child.id", ondelete="CASCADE"))
     type: Mapped[str] = mapped_column(String)
+    kind: Mapped[str] = mapped_column(String, default="", server_default="")  # activity kind; "" for other types
     started_at: Mapped[datetime] = mapped_column(UTCDateTime)
     paused_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     paused_seconds: Mapped[int] = mapped_column(Integer, default=0)

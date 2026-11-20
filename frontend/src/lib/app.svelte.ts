@@ -122,12 +122,6 @@ export function elapsed(t: Timer): number {
 	return (end - Date.parse(t.started_at)) / 1000 - t.paused_seconds;
 }
 
-/** Tummy time seconds of a play timer, live. */
-export function tummySeconds(t: Timer): number {
-	const d = t.data;
-	return (d.tummy_seconds ?? 0) + (d.tummy_started_at ? (serverNow() - Date.parse(d.tummy_started_at)) / 1000 : 0);
-}
-
 /** Seconds on each nursing side, live. */
 export function sideSeconds(t: Timer): { left: number; right: number } {
 	const d = t.data;

@@ -384,10 +384,10 @@ def undo(s: Session, ctx: Ctx, child_id: int, message_id: int, index: int) -> Ch
             pass  # deleted already, for example in the edit sheet
     else:
         back = UNDO.get(item.get("timer_action", ""))
-        if back is None or (back == "switch" and item["type"] not in ("nursing", "play")):
+        if back is None or (back == "switch" and item["type"] != "nursing"):
             raise Invalid("This cannot be undone. Change it on the Home page.")
         try:
-            act(s, ctx, m.child_id, item["type"], back, TimerBody())
+            act(s, ctx, m.child_id, item["type"], back, TimerBody(kind=item.get("kind")))
         except NotFound as err:
             raise Conflict("The timer is not running now. Change it on the Home page.") from err
     item["undone"] = True

@@ -22,7 +22,8 @@ async function seedWeek(api: APIRequestContext, childId: number) {
 	}
 	for (let n = 1; n <= 3; n++) {
 		for (const h of ['08', '12', '16']) rows.push({ type: 'nappy', started_at: `${day(n)}T${h}:00`, data: { mode: 'pee' } });
-		rows.push({ type: 'play', started_at: `${day(n)}T10:00`, ended_at: `${day(n)}T10:20`, data: { tummy_seconds: 300 } });
+		rows.push({ type: 'activity', started_at: `${day(n)}T10:00`, ended_at: `${day(n)}T10:20`, data: { kind: 'indoorPlay' } });
+		rows.push({ type: 'activity', started_at: `${day(n)}T10:00`, ended_at: `${day(n)}T10:05`, data: { kind: 'tummyTime' } });
 	}
 	rows.push({ type: 'confined', started_at: `${day(2)}T13:00`, ended_at: `${day(2)}T14:30`, data: { device: 'car_seat' } });
 	for (const data of rows) expect((await api.post(`children/${childId}/entries`, { data })).ok(), JSON.stringify(data)).toBeTruthy();
@@ -99,7 +100,7 @@ test('b: the model is down: urgent warning first, the standard tips and the noti
 	await setAge(api, family.childId, 42);
 	expect((await api.patch('family/settings', { data: { llm: { base_url: 'http://127.0.0.1:9/v1' } } })).ok()).toBeTruthy();
 	for (let n = 1; n <= 3; n++)
-		await api.post(`children/${family.childId}/entries`, { data: { type: 'play', started_at: `${day(n)}T10:00`, ended_at: `${day(n)}T10:20`, data: { tummy_seconds: 300 } } });
+		await api.post(`children/${family.childId}/entries`, { data: { type: 'activity', started_at: `${day(n)}T10:00`, ended_at: `${day(n)}T10:05`, data: { kind: 'tummyTime' } } });
 	await api.post(`children/${family.childId}/entries`, { data: { type: 'temperature', started_at: local(Date.now() - 10 * 60_000), data: { celsius: 38.4 } } });
 	await page.goto('/reports');
 	const { card, waiting } = await makeReport(page);

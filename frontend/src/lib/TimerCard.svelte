@@ -1,7 +1,7 @@
 <script lang="ts">
 	// One running timer. Time comes from server state, so it is right after reload and for every carer.
 	import { api } from './api';
-	import { app, elapsed, refresh, serverNow, sideSeconds, toast, tummySeconds, wording, type Timer } from './app.svelte';
+	import { app, elapsed, refresh, serverNow, sideSeconds, toast, wording, type Timer } from './app.svelte';
 	import Cites from './Cites.svelte';
 	import { fmtClock, fmtTime, toLocalInput } from './format.svelte';
 	import Icon from './Icon.svelte';
@@ -20,7 +20,6 @@
 		conf?.warning && confSecs >= conf.warning.after_seconds ? { ...conf.warning, urgent: true }
 		: conf?.note && confSecs >= conf.note.after_seconds ? { ...conf.note, urgent: false } : null
 	);
-	const tummyOn = $derived(timer.type === 'play' && !!timer.data.tummy_started_at);
 	let busy = $state(false);
 	let error = $state('');
 	let editStart = $state(false);
@@ -31,6 +30,8 @@
 		busy = true;
 		error = '';
 		try {
+			// Activity timers run one per kind, so each action names its kind.
+			if (timer.type === 'activity') body = { ...body, kind: timer.data.kind };
 			await api(`/children/${childId}/timers/${timer.type}/${action}`, { method: 'POST', body });
 			if (msg) toast(msg);
 		} catch (e) {
@@ -64,14 +65,6 @@
 				</div>
 			{/each}
 		</div>
-	{/if}
-
-	{#if timer.type === 'play'}
-		<button class="tummy" aria-pressed={tummyOn} disabled={busy || paused}
-			onclick={() => act('switch', {}, tummyOn ? 'Tummy time stopped' : 'Tummy time started')}>
-			<span>Tummy time{tummyOn ? ' (now)' : ''}<small>{paused ? 'Resume to use' : tummyOn ? 'Tap to stop' : 'Tap to start'}</small></span>
-			<strong role="timer" aria-label="Tummy time">{fmtClock(tummySeconds(timer))}</strong>
-		</button>
 	{/if}
 
 	{#if conf && conf.since !== timer.started_at}
@@ -181,35 +174,6 @@
 	.discard {
 		margin-top: 4px;
 		font-weight: 600;
-	}
-	.tummy {
-		width: 100%;
-		margin-top: 12px;
-		min-height: 72px;
-		justify-content: space-between;
-		border-radius: 20px;
-		padding: 10px 16px;
-		background: color-mix(in srgb, var(--surface) 55%, transparent);
-		color: var(--ink-strong);
-		border: 2px solid transparent;
-		text-align: left;
-	}
-	.tummy span {
-		display: flex;
-		flex-direction: column;
-		font-size: 1.1rem;
-	}
-	.tummy small {
-		font-weight: 600;
-		font-size: 0.8rem;
-	}
-	.tummy strong {
-		font-size: 1.8rem;
-		font-variant-numeric: tabular-nums;
-	}
-	.tummy[aria-pressed='true'] {
-		background: var(--mint);
-		border-color: var(--ink-strong);
 	}
 	.cont {
 		margin: 8px 0 0;

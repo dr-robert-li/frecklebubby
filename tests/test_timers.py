@@ -57,7 +57,7 @@ async def test_sleep_activity_pump(client):
     act(s, ctx, cid, "sleep", "start", TimerBody(at=at(0)), now=at(1))
     with pytest.raises(Invalid, match="use them only with complete"):
         act(s, ctx, cid, "sleep", "pause", TimerBody(data={}), now=at(2))
-    with pytest.raises(Invalid, match="nursing, activity or play"):
+    with pytest.raises(Invalid, match="only with a nursing timer"):
         act(s, ctx, cid, "sleep", "switch", TimerBody(), now=at(2))
     _, e = act(s, ctx, cid, "sleep", "complete",
                TimerBody(at=at(90), data={"locations": ["car"]}), now=at(95))
@@ -65,10 +65,10 @@ async def test_sleep_activity_pump(client):
 
     with pytest.raises(Invalid, match="kind: required"):
         act(s, ctx, cid, "activity", "start", TimerBody(), now=at(100))
-    act(s, ctx, cid, "activity", "start", TimerBody(kind="bath"), now=at(100))
-    t, _ = act(s, ctx, cid, "activity", "switch", TimerBody(kind="storyTime"), now=at(105))
-    assert t.data["kind"] == "storyTime"
-    _, e = act(s, ctx, cid, "activity", "complete", TimerBody(), now=at(110))
+    act(s, ctx, cid, "activity", "start", TimerBody(kind="storyTime"), now=at(100))
+    with pytest.raises(Invalid, match="only with a nursing timer"):
+        act(s, ctx, cid, "activity", "switch", TimerBody(), now=at(105))
+    _, e = act(s, ctx, cid, "activity", "complete", TimerBody(), now=at(110))  # the one activity timer: no kind
     assert e.data == {"kind": "storyTime"}
 
     act(s, ctx, cid, "pump", "start", TimerBody(), now=at(120))
@@ -96,3 +96,24 @@ async def test_timer_api(client):
     r = await client.post(f"{base}/nursing/complete", headers=h)
     assert r.json()["timer"] is None and r.json()["entry"]["type"] == "nursing"
     assert (await client.get(base, headers=h)).json() == []
+
+
+async def test_parallel_activity_timers(client):
+    _, cid = await make_family(client)
+    s, ctx = ctx_for("a@example.com")
+    act(s, ctx, cid, "activity", "start", TimerBody(kind="indoorPlay"), now=at(0))
+    act(s, ctx, cid, "activity", "start", TimerBody(kind="tummyTime"), now=at(5))
+    act(s, ctx, cid, "sleep", "start", TimerBody(), now=at(5))  # other types still one per child
+    t, _ = act(s, ctx, cid, "activity", "start", TimerBody(kind="tummyTime", at=at(4)), now=at(6))
+    assert t.started_at == at(4)  # a start on a running kind moves its start
+    with pytest.raises(Invalid, match=r"2 activity timers run \(indoorPlay, tummyTime\)"):
+        act(s, ctx, cid, "activity", "complete", TimerBody(), now=at(10))
+    with pytest.raises(NotFound, match="No bath timer"):
+        act(s, ctx, cid, "activity", "pause", TimerBody(kind="bath"), now=at(10))
+    _, tummy = act(s, ctx, cid, "activity", "complete", TimerBody(kind="tummyTime"), now=at(10))
+    assert (tummy.data, tummy.started_at, tummy.ended_at) == ({"kind": "tummyTime"}, at(4), at(10))
+    _, play = act(s, ctx, cid, "activity", "complete", TimerBody(), now=at(20))  # one runs now: no kind
+    assert (play.data, play.started_at, play.ended_at) == ({"kind": "indoorPlay"}, at(0), at(20))
+    with pytest.raises(Invalid, match="only with an activity timer"):
+        act(s, ctx, cid, "sleep", "complete", TimerBody(kind="bath"), now=at(21))
+    s.close()

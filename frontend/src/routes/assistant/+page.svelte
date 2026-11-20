@@ -110,7 +110,7 @@
 	}
 
 	const canUndo = (it: Item) =>
-		!!it.entry_id || ['start', 'pause', 'resume'].includes(it.timer_action ?? '') || (it.timer_action === 'switch' && ['nursing', 'play'].includes(it.type));
+		!!it.entry_id || ['start', 'pause', 'resume'].includes(it.timer_action ?? '') || (it.timer_action === 'switch' && it.type === 'nursing');
 
 	async function undo(m: Msg, k: number) {
 		busyMsg = m.id!;
@@ -210,9 +210,10 @@
 								<p class="lh"><Icon name="check" size={18} /> Logged</p>
 								<ul>
 									{#each m.logged.items as it, k (k)}
-										{@const t = tracker(it.type, wording())}
+										<!-- An item saved before 0.2.2 can name a removed type (play, bath). -->
+										{@const t = tracker(it.type, wording()) ?? tracker('activity', wording())}
 										<li class:undone={it.undone}>
-											<span class="bubble" style="background: var({t.color})"><Icon name={t.icon ?? it.type} size={18} /></span>
+											<span class="bubble" style="background: var({t.color})"><Icon name={t.icon ?? t.type} size={18} /></span>
 											<span class="what">{it.summary}</span>
 											{#if it.undone}<span class="tag small">Undone</span>{/if}
 											{#if !it.undone}

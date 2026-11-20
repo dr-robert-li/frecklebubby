@@ -6,6 +6,33 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-20
+
+### Changed
+
+- One Activity type for bath, tummy time, indoor play, outdoor play, story time, screen time, skin to skin and
+  brushing teeth. Activity timers run side by side, one for each kind, and each saves its own entry.
+- Reports count play, tummy time and baths from activities. Time where two play timers overlap is counted once.
+- Plain words and the assistant chat log baths, tummy time and play as activities. "Stop tummy time" stops that
+  timer.
+- The README has a new header with badges.
+
+### Removed
+
+- The separate Play and Bath entry types, their tiles, and the MCP tools `play_timer`, `log_play` and `log_bath`.
+  Use `activity_timer` and `log_activity` with a kind.
+- The "switch" action of the activity timer. Start a second timer instead.
+
+### Migration
+
+- At the first start, old Play and Bath entries become activities. A Play entry with a tummy part becomes two
+  entries; the tummy-time entry starts at the play start (the real start is not known). Make a backup before
+  the update.
+
+### Added
+
+- CI workflow on GitHub: web app type check and build, backend lint and tests.
+
 ## [0.2.1] - 2026-11-20
 
 ### Added

@@ -3,7 +3,7 @@ import { fmtDur, fmtUnit, type UnitKind, type Units } from './format.svelte';
 
 export type EntryType =
 	| 'sleep' | 'nursing' | 'bottle' | 'solids' | 'nappy' | 'potty' | 'pump'
-	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry' | 'play' | 'confined' | 'bath';
+	| 'growth' | 'temperature' | 'medicine' | 'activity' | 'milestone' | 'note' | 'cry' | 'confined';
 
 export type Entry = {
 	id: number;
@@ -64,7 +64,6 @@ export const ACTIVITIES: Opt[] = [
 	['bath', 'Bath'], ['tummyTime', 'Tummy time'], ['storyTime', 'Story time'], ['screenTime', 'Screen time'],
 	['skinToSkin', 'Skin to skin'], ['outdoorPlay', 'Outdoor play'], ['indoorPlay', 'Indoor play'], ['brushTeeth', 'Brush teeth']
 ];
-export const PLAY_KINDS: Opt[] = [['indoor', 'Indoor'], ['outdoor', 'Outdoor']];
 export const DEVICES: Opt[] = [
 	['car_seat', 'Car seat'], ['pram', 'Pram'], ['bouncer', 'Bouncer'], ['swing', 'Swing'], ['carrier', 'Carrier'],
 	['high_chair', 'High chair'], ['other', 'Other']
@@ -147,14 +146,9 @@ export function trackers(wording: Wording): Tracker[] {
 		{ type: 'cry', label: 'Crying', color: '--coral', end: 'optional', fields: [
 			{ key: 'soothed_by', label: 'What helped', kind: 'text' }
 		] },
-		{ type: 'play', label: 'Play', color: '--butter', icon: 'toy', end: 'optional', timer: true, fields: [
-			{ key: 'kind', label: 'Where', kind: 'one', options: PLAY_KINDS },
-			{ key: 'tummy_seconds', label: 'Tummy time', kind: 'num', unit: 'min', max: 1440 }
-		] },
 		{ type: 'confined', label: 'Confined', color: '--peach', end: 'optional', timer: true, fields: [
 			{ key: 'device', label: 'Where', kind: 'one', required: true, options: DEVICES }
-		] },
-		{ type: 'bath', label: 'Bath', color: '--sky', fields: [] }
+		] }
 	];
 }
 
@@ -203,9 +197,6 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 				d.rash && (d.rash_severity ? `Rash (${d.rash_severity})` : 'Rash'),
 				d.air_minutes && `Air time ${d.air_minutes} min`
 			);
-			break;
-		case 'play':
-			parts.push(d.kind && label(PLAY_KINDS, d.kind), dur, d.tummy_seconds && `Tummy time ${fmtDur(d.tummy_seconds)}`);
 			break;
 		case 'confined':
 			parts.push(label(DEVICES, d.device), dur);

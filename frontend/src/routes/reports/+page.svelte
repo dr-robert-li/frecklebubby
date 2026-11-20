@@ -104,7 +104,7 @@
 					{ label: 'Tummy time', color: 'var(--s1)', values: days.map((d: any) => Math.round(d.play.tummy_seconds / 60)) },
 					{ label: 'Other play', color: 'var(--s2)', values: days.map((d: any) => Math.round(Math.max(0, d.play.seconds - d.play.tummy_seconds) / 60)) }
 				]} />
-			<p class="small muted">Play and tummy time with an end time, also old "Tummy time", "Indoor play" and "Outdoor play" activities.
+			<p class="small muted">Indoor play, outdoor play and tummy time with an end time. Time with two timers at once counts once.
 				{#if tr}{tr.text} (<a href={tr.citation.url} target="_blank" rel="noopener">WHO {tr.citation.year ?? ''}</a>){/if}</p>
 		</section>
 	{/if}
@@ -119,7 +119,7 @@
 	{#if days.some((d: any) => d.bath_count)}
 		<section class="card">
 			<BarChart title="Baths" counts {labels} series={[{ label: 'Baths', color: 'var(--s1)', values: days.map((d: any) => d.bath_count) }]} />
-			<p class="small muted">{days.reduce((a: number, d: any) => a + d.bath_count, 0)} baths this week. Old "Bath" activities count too.</p>
+			<p class="small muted">{days.reduce((a: number, d: any) => a + d.bath_count, 0)} baths this week.</p>
 		</section>
 	{/if}
 	{#if days.some((d: any) => d.crying?.count)}

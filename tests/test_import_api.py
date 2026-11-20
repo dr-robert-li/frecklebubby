@@ -19,8 +19,8 @@ from frecklebubby.models import Entry, ImportJob  # noqa: E402
 from .conftest import as_user, make_family  # noqa: E402
 
 PASSWORD = "Zq7-very-secret-pw-91"
-EXPECTED = {"sleep": 12, "nursing": 12, "bottle": 6, "nappy": 11, "potty": 1, "activity": 4, "pump": 3, "solids": 3,
-            "growth": 2, "temperature": 2, "medicine": 2, "bath": 2}
+EXPECTED = {"sleep": 12, "nursing": 12, "bottle": 6, "nappy": 11, "potty": 1, "activity": 6, "pump": 3, "solids": 3,
+            "growth": 2, "temperature": 2, "medicine": 2}
 
 
 @pytest.fixture

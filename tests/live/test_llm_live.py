@@ -23,7 +23,7 @@ BNE = ZoneInfo("Australia/Brisbane")
 NOW = datetime(2026, 11, 20, 14, 35, tzinfo=BNE)  # Friday
 REPORT: dict = {"model_url": URL, "nl": [], "assistant": [], "sleep_plan": None}
 
-# (note, needs a running sleep timer, expected proposals)
+# (note, needs a running timer: True = sleep, a kind = that activity, expected proposals)
 # An expected proposal: (kind, start "D14:05"/"Y19:15"/None = not checked, end or None, data subset).
 # kind is an entry type or "timer:<type>:<action>". Text values match when they contain the expected text.
 CASES = [
@@ -55,7 +55,7 @@ CASES = [
      [("medicine", "D08:00", None, {"name": "vitamin d"})]),
     ("pumped 80 ml from the left and 60 from the right at 9:30", False,
      [("pump", "D09:30", None, {"left_ml": 80, "right_ml": 60})]),
-    ("bath at 6:30 pm yesterday", False, [("bath", "Y18:30", None, {})]),
+    ("bath at 6:30 pm yesterday", False, [("activity", "Y18:30", None, {"kind": "bath"})]),
     ("20 minutes of tummy time, just finished", False, [("activity", "D14:15", "D14:35", {"kind": "tummyTime"})]),
     ("120 ml formula at quarter to 2 and a wet and dirty nappy at 2", False,
      [("bottle", "D13:45", None, {"amount_ml": 120, "milk_type": "Formula"}),
@@ -66,13 +66,19 @@ CASES = [
     ("started feeding her on the right side", False, [("timer:nursing:start", None, None, {"side": "right"})]),
     ("6oz formula at 2am", False, [("bottle", "D02:00", None, {"amount_ml": 177.4, "milk_type": "Formula"})]),
     # M9
-    ("20 minutes of play with 5 of tummy time", False, [("play", "D14:15", "D14:35", {"tummy_seconds": 300})]),
+    ("20 minutes of play with 5 of tummy time", False, [("activity", "D14:15", "D14:35", {"kind": "indoorPlay"}),
+                                                        ("activity", None, None, {"kind": "tummyTime"})]),
     ("in the car seat since 9", False, [("timer:confined:start", None, None, {"device": "car_seat"})]),
     ("nappy with a rash, left it off for 10 minutes", False, [("nappy", None, None, {"rash": True, "air_minutes": 10})]),
     ("dark pee", False, [("nappy", None, None, {"mode": "pee", "pee_color": "dark_yellow"})]),
-    # bath
-    ("gave her a bath at 11", False, [("bath", "D11:00", None, {})]),
-    ("just had a bath", False, [("bath", "D14:35", None, {})]),
+    # 0.2.2: bath, tummy time and play are activity kinds; activity timers run in parallel
+    ("gave her a bath at 11", False, [("activity", "D11:00", None, {"kind": "bath"})]),
+    ("just had a bath", False, [("activity", "D14:35", None, {"kind": "bath"})]),
+    ("gave her a bath at 6", False, [("activity", "D06:00", None, {"kind": "bath"})]),
+    ("10 minutes of tummy time", False, [("activity", "D14:25", "D14:35", {"kind": "tummyTime"})]),
+    ("started tummy time", False, [("timer:activity:start", None, None, {"kind": "tummyTime"})]),
+    ("playing outside now", False, [("timer:activity:start", None, None, {"kind": "outdoorPlay"})]),
+    ("stop tummy time", "tummyTime", [("timer:activity:complete", None, None, {"kind": "tummyTime"})]),
 ]
 
 
@@ -147,8 +153,9 @@ async def test_nl_accuracy(live, client, monkeypatch):
     h, cid = await make_family(client, birthdate="2026-07-01")
     right = 0
     for note, needs_timer, expected in CASES:
+        timer = ("sleep", {}) if needs_timer is True else ("activity", {"kind": needs_timer})
         if needs_timer:
-            await client.post(f"/api/v1/children/{cid}/timers/sleep/start", headers=h)
+            await client.post(f"/api/v1/children/{cid}/timers/{timer[0]}/start", headers=h, json=timer[1])
         t0 = time.monotonic()
         r = await client.post(f"/api/v1/children/{cid}/nl/parse", headers=h, json={"text": note})
         secs = round(time.monotonic() - t0, 1)
@@ -160,7 +167,7 @@ async def test_nl_accuracy(live, client, monkeypatch):
                              "summaries": [p["summary"] for p in out["proposals"]], "proposals": out["proposals"]})
         print(f"{'OK  ' if ok else 'FAIL'} {secs:5.1f}s {note!r} -> {[p['summary'] for p in out['proposals']]}")
         if needs_timer:
-            await client.post(f"/api/v1/children/{cid}/timers/sleep/cancel", headers=h)
+            await client.post(f"/api/v1/children/{cid}/timers/{timer[0]}/cancel", headers=h, json=timer[1])
     score = right / len(CASES)
     REPORT["nl_score"] = f"{right}/{len(CASES)} ({score:.0%})"
     print("NL score:", REPORT["nl_score"])
@@ -261,7 +268,13 @@ CHAT_LOG = [
     ("she's awake", ["timer:sleep:complete"], False),
     ("wet nappy with a rash, left it off for 10 minutes", ["nappy"], False),
     ("nappy with a rash", "proposal", False),  # wet or dirty is not said: not saved
-    ("20 minutes of play with 5 of tummy time", ["play"], False),
+    ("20 minutes of play with 5 of tummy time", ["activity", "activity"], False),
+    ("gave her a bath at 6", ["activity"], False),
+    # Not "10 minutes of tummy time" alone: the tummy time just above is within 10 minutes, so it is a "maybe double".
+    ("10 minutes of tummy time an hour ago", ["activity"], False),
+    ("started tummy time", ["timer:activity:start"], False),
+    ("playing outside now", ["timer:activity:start"], False),
+    ("stop tummy time", ["timer:activity:complete"], False),
     ("she only slept 20 minutes, is that normal?", ["sleep"], True),
     ("she had a bottle", "proposal", False),
     ("how much milk does a baby this age need?", None, True),

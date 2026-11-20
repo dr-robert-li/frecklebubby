@@ -16,6 +16,8 @@ async def test_family_isolation(client):
                                json={"type": "bottle", "started_at": "2026-11-01T10:00:00Z",
                                      "data": {"amount_ml": 100}})).json()
     await client.post(f"{API}/children/{bcid}/timers/sleep/start", headers=b)
+    for kind in ("indoorPlay", "tummyTime"):
+        await client.post(f"{API}/children/{bcid}/timers/activity/start", headers=b, json={"kind": kind})
     reminder = (await client.post(f"{API}/children/{bcid}/reminders", headers=b,
                                   json={"type": "bottle", "mode": "in", "interval_minutes": 180})).json()
     token = (await client.post(f"{API}/tokens", json={"name": "b"}, headers=b)).json()
@@ -36,6 +38,10 @@ async def test_family_isolation(client):
         ("POST", f"/children/{bcid}/entries", {"type": "note", "started_at": "2026-11-01T10:00:00Z", "notes": "x"}),
         ("POST", f"/children/{bcid}/timers/sleep/complete", None),
         ("POST", f"/children/{bcid}/timers/sleep/cancel", None),
+        ("POST", f"/children/{bcid}/timers/activity/start", {"kind": "tummyTime"}),
+        ("POST", f"/children/{bcid}/timers/activity/pause", {"kind": "tummyTime"}),
+        ("POST", f"/children/{bcid}/timers/activity/complete", {"kind": "indoorPlay"}),
+        ("POST", f"/children/{bcid}/timers/activity/cancel", {"kind": "indoorPlay"}),
         ("POST", f"/children/{bcid}/reminders", {"type": "bottle", "mode": "in", "interval_minutes": 60}),
         ("GET", f"/entries/{entry['id']}", None),
         ("PATCH", f"/entries/{entry['id']}", {"notes": "x"}),
@@ -55,4 +61,5 @@ async def test_family_isolation(client):
     assert (await client.get(f"{API}/tokens", headers=a)).json() == []
     # B's data is untouched.
     assert (await client.get(f"{API}/entries/{entry['id']}", headers=b)).status_code == 200
-    assert len((await client.get(f"{API}/children/{bcid}/timers", headers=b)).json()) == 1
+    assert [(t["type"], t["data"]) for t in (await client.get(f"{API}/children/{bcid}/timers", headers=b)).json()] == [
+        ("sleep", {}), ("activity", {"kind": "indoorPlay"}), ("activity", {"kind": "tummyTime"})]

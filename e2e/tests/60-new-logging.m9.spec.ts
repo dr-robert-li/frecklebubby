@@ -1,4 +1,4 @@
-// M9 new logging: play with tummy time, nappy details, confined time with the 1-hour note and the 2-hour warning.
+// M9 new logging: play and tummy time as parallel activity timers, nappy details, confined time with the 1-hour note and the 2-hour warning.
 // Project `m9` (main server, no model).
 import type { Page } from '@playwright/test';
 import { expect, local, openTile, setAge, shot, test } from './fixtures';
@@ -7,45 +7,56 @@ const snap = (page: Page, name: string, bottom = false) => shot(page, name, bott
 const ago = (min: number) => local(Date.now() - min * 60_000);
 const DAY = 86400_000;
 
-test('play with the tummy time toggle, then the timeline and the report', async ({ page, api, family }) => {
-	// Yesterday: 40 min of play with 25 min of tummy time, so the report has a full bar.
+test('indoor play and tummy time run together and stop separately, then the timeline and the report', async ({ page, api, family }) => {
+	// Yesterday: 40 min of indoor play with 25 min of tummy time at the same time, so the report has a full bar.
 	const y = local(Date.now() - DAY).slice(0, 10);
-	expect((await api.post(`children/${family.childId}/entries`, {
-		data: { type: 'play', started_at: `${y}T09:00`, ended_at: `${y}T09:40`, data: { kind: 'indoor', tummy_seconds: 1500 } }
-	})).ok()).toBeTruthy();
+	for (const [kind, end] of [['indoorPlay', '09:40'], ['tummyTime', '09:25']])
+		expect((await api.post(`children/${family.childId}/entries`, {
+			data: { type: 'activity', started_at: `${y}T09:00`, ended_at: `${y}T${end}`, data: { kind } }
+		})).ok()).toBeTruthy();
 
 	await page.goto('/');
-	const s = await openTile(page, 'Play');
-	await snap(page, '01-play-sheet');
-	await s.getByRole('button', { name: 'Start play timer' }).click();
+	let s = await openTile(page, 'Activity');
+	await snap(page, '01-activity-sheet');
+	await s.getByRole('button', { name: 'Indoor play', exact: true }).click();
+	await s.getByRole('button', { name: 'Start activity timer' }).click();
 	await expect(s).toBeHidden();
-	const card = page.getByRole('region', { name: 'Play timer' });
-	const tummy = card.getByRole('button', { name: /^Tummy time/ });
-	await expect(tummy).toHaveAttribute('aria-pressed', 'false');
-	await tummy.click();
-	await expect(tummy).toHaveAttribute('aria-pressed', 'true');
-	await expect(card.getByRole('timer', { name: 'Tummy time' })).toHaveText(/^0:0[2-9]$/, { timeout: 15_000 });
-	await snap(page, '02-play-tummy-on');
-	await tummy.click();
-	await expect(tummy).toHaveAttribute('aria-pressed', 'false');
-	const stopped = await card.getByRole('timer', { name: 'Tummy time' }).innerText();
-	await page.waitForTimeout(1500);
-	await expect(card.getByRole('timer', { name: 'Tummy time' })).toHaveText(stopped); // the tummy clock stops
-	await snap(page, '03-play-tummy-off');
-	await card.getByRole('button', { name: 'Stop and save' }).click();
-	await expect(card).toBeHidden();
+	const play = page.getByRole('region', { name: 'Indoor play timer' });
+	await expect(play).toBeVisible();
 
-	const row = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Play/ });
-	await expect(row).toContainText(/Tummy time \d+ s/);
+	// A second activity timer while the first one runs.
+	s = await openTile(page, 'Activity');
+	await expect(s.getByRole('button', { name: 'Indoor play (running)' })).toBeDisabled();
+	await s.getByRole('button', { name: 'Tummy time', exact: true }).click();
+	await s.getByRole('button', { name: 'Start activity timer' }).click();
+	await expect(s).toBeHidden();
+	const tummy = page.getByRole('region', { name: 'Tummy time timer' });
+	await expect(tummy.getByRole('timer', { name: 'Tummy time time' })).toHaveText(/^0:0[2-9]$/, { timeout: 15_000 });
+	await expect(play).toBeVisible();
+	await snap(page, '02-two-activity-timers');
+
+	// Stop tummy time only: indoor play goes on.
+	await tummy.getByRole('button', { name: 'Stop and save' }).click();
+	await expect(tummy).toBeHidden();
+	await expect(play).toBeVisible();
+	const at = await play.getByRole('timer').innerText();
+	await page.waitForTimeout(1500);
+	await expect(play.getByRole('timer')).not.toHaveText(at); // the play clock still runs
+	await snap(page, '03-play-runs-on');
+	await play.getByRole('button', { name: 'Stop and save' }).click();
+	await expect(play).toBeHidden();
+
+	const rows = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Activity/ });
+	await expect(rows.filter({ hasText: 'Tummy time' })).toHaveCount(1);
+	const row = rows.filter({ hasText: 'Indoor play' });
+	await expect(row).toHaveCount(1);
 	await snap(page, '04-play-timeline', true);
 	await row.click();
 	const edit = page.getByRole('dialog');
-	await edit.getByRole('button', { name: 'Outdoor' }).click();
-	await edit.getByLabel('Tummy time (min)').fill('3');
+	await edit.getByRole('button', { name: 'Outdoor play' }).click();
 	await edit.getByRole('button', { name: 'Save' }).click();
 	await expect(edit).toBeHidden();
-	await expect(row).toContainText('Outdoor');
-	await expect(row).toContainText('Tummy time 3 min');
+	await expect(rows.filter({ hasText: 'Outdoor play' })).toHaveCount(1);
 
 	await page.getByRole('link', { name: 'Reports' }).click();
 	const chart = page.getByRole('img', { name: /Play per day \(minutes\) chart/ });

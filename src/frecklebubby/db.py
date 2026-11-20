@@ -55,9 +55,47 @@ def init_db(data_dir: Path) -> None:
         for table, column, kind in NEW_COLUMNS:
             if column not in {r[1] for r in conn.execute(text(f'PRAGMA table_info("{table}")'))}:
                 conn.execute(text(f'ALTER TABLE "{table}" ADD COLUMN {column} {kind}'))
+        _merge_play_bath(conn)
         conn.execute(text("CREATE VIRTUAL TABLE IF NOT EXISTS kb_chunk USING fts5(source_id UNINDEXED, heading, text, "
                           "tokenize='porter unicode61')"))
     SessionLocal.configure(bind=engine)
+
+
+_TS = "strftime('%Y-%m-%dT%H:%M:%SZ', {})"  # SQL: a time as UTCDateTime text
+
+
+def _merge_play_bath(conn) -> None:
+    """0.2.2: activity timers run in parallel (one per kind), and the play and bath types become activities.
+    Idempotent: a second run finds no old rows."""
+    if "kind" not in {r[1] for r in conn.execute(text('PRAGMA table_info("timer")'))}:
+        # SQLite cannot change a UNIQUE constraint: make the table again and copy the rows.
+        conn.execute(text("ALTER TABLE timer RENAME TO timer_old"))
+        Base.metadata.tables["timer"].create(conn)
+        conn.execute(text(
+            "INSERT INTO timer (id, child_id, type, kind, started_at, paused_at, paused_seconds, data, started_by) "
+            "SELECT id, child_id, type, CASE type WHEN 'activity' THEN coalesce(json_extract(data, '$.kind'), '') "
+            "ELSE '' END, started_at, paused_at, paused_seconds, data, started_by FROM timer_old"))
+        conn.execute(text("DROP TABLE timer_old"))
+    conn.execute(text("UPDATE entry SET type = 'activity', data = json_object('kind', 'bath') WHERE type = 'bath'"))
+    # The tummy part of a play entry has no own times: approximate it as tummy_seconds from the play start.
+    tummy = "json_extract(data, '$.tummy_seconds')"
+    conn.execute(text(
+        "INSERT INTO entry (child_id, type, started_at, ended_at, data, source, created_by, created_at, updated_at) "
+        f"SELECT child_id, 'activity', started_at, {_TS.format(f"started_at, '+' || CAST({tummy} AS INTEGER) || ' seconds'")}, "
+        "json_object('kind', 'tummyTime'), source, created_by, created_at, updated_at "
+        f"FROM entry WHERE type = 'play' AND {tummy} > 0"))
+    conn.execute(text(
+        "UPDATE entry SET type = 'activity', data = json_object('kind', CASE json_extract(data, '$.kind') "
+        "WHEN 'outdoor' THEN 'outdoorPlay' ELSE 'indoorPlay' END) WHERE type = 'play'"))
+    conn.execute(text(
+        "INSERT OR IGNORE INTO timer (child_id, type, kind, started_at, paused_seconds, data, started_by) "
+        f"SELECT child_id, 'activity', 'tummyTime', {_TS.format("json_extract(data, '$.tummy_started_at')")}, 0, "
+        "json_object('kind', 'tummyTime'), started_by FROM timer "
+        "WHERE type = 'play' AND json_extract(data, '$.tummy_started_at') IS NOT NULL"))
+    conn.execute(text("UPDATE OR IGNORE timer SET type = 'activity', kind = 'indoorPlay', "
+                      "data = json_object('kind', 'indoorPlay') WHERE type = 'play'"))
+    conn.execute(text("DELETE FROM timer WHERE type = 'play'"))  # only when an indoor play timer ran already
+    conn.execute(text("UPDATE reminder SET type = 'activity' WHERE type IN ('play', 'bath')"))
 
 
 def get_session() -> Iterator[Session]:

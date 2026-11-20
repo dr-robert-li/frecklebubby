@@ -7,10 +7,10 @@ all time arithmetic and unit conversion, then checks each proposal with the same
 import dataclasses
 import re
 from datetime import datetime, time, timedelta
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, get_args
 
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
-from sqlalchemy import select
+from sqlalchemy import func, select, true
 from sqlalchemy.orm import Session
 
 from ..db import utcnow
@@ -31,7 +31,7 @@ from ..services import Ctx, Invalid, ServiceError, plain_errors, to_utc
 from ..services.children import age_months, get_child
 from ..services.entries import FUTURE_LIMIT, create_entry, validate
 from ..services.families import wording
-from ..services.timers import act, list_timers, timer_out
+from ..services.timers import act, find, list_timers, timer_out
 from . import llm
 
 OZ_ML, LB_KG, IN_CM = 29.5735, 0.45359237, 2.54
@@ -54,6 +54,7 @@ def _enum(*values: str) -> dict:
 
 
 _SPAN = {"start": TIME, "end": TIME, "duration": TIME}
+ACTIVITY_KINDS = get_args(ActivityKind)
 DEVICES = ("car_seat", "bouncer", "swing", "pram", "carrier", "high_chair", "other")
 EVENTS = [
     _ev("sleep", _SPAN, []),
@@ -78,19 +79,15 @@ EVENTS = [
     _ev("temperature", {"at": TIME, "value": _NUM, "unit": _enum("C", "F")}, ["at", "value", "unit"]),
     _ev("medicine", {"at": TIME, "name": _STR, "amount": _NUM, "unit": _enum("ml", "oz", "tsp", "drops", "mg")},
         ["at", "name"]),
-    _ev("activity", {**_SPAN, "kind": _enum("tummyTime", "storyTime", "screenTime", "skinToSkin",
-                                           "outdoorPlay", "indoorPlay", "brushTeeth")}, ["kind"]),
+    _ev("activity", {**_SPAN, "kind": _enum(*ACTIVITY_KINDS)}, ["kind"]),
     _ev("milestone", {"at": TIME, "title": _STR}, ["at", "title"]),
     _ev("note", {"at": TIME, "text": {"type": "string", "maxLength": 500}}, ["at", "text"]),
-    _ev("bath", {"at": TIME}, ["at"]),
     _ev("cry", {**_SPAN, "soothed_by": _STR}, []),
-    _ev("play", {**_SPAN, "kind": _enum("indoor", "outdoor"), "tummy_minutes": _NUM}, []),
     _ev("confined", {**_SPAN, "device": _enum(*DEVICES)}, ["device"]),
-    _ev("timer", {"timer": _enum("sleep", "nursing", "pump", "activity", "play", "confined"),
+    _ev("timer", {"timer": _enum("sleep", "nursing", "pump", "activity", "confined"),
                   "action": _enum("start", "pause", "resume", "switch", "cancel", "complete"),
                   "at": TIME, "side": _enum("left", "right"),
-                  "kind": _enum("bath", "tummyTime", "storyTime", "screenTime", "skinToSkin", "outdoorPlay",
-                                "indoorPlay", "brushTeeth"),
+                  "kind": _enum(*ACTIVITY_KINDS),
                   "device": _enum(*DEVICES)}, ["timer", "action"]),
 ]
 SCHEMA = {"type": "object", "additionalProperties": False, "required": ["events"],
@@ -102,9 +99,9 @@ SYSTEM = """You turn a parent's note about their baby into log events. Answer wi
 Rules:
 - Make ONE event for EACH thing that happened. Three nappies are three events. Do not invent events. A note with no baby-care event gives {"events": []}.
 - Times: copy the parent's own words for the time of each event into "at", for example "half past 12", "quarter to 2", "7:30 last night", "20 minutes ago", "at 9". Write "now" when the note gives no time or says "just now". Do NOT calculate or change times.
-- Sleep, nursing, activity, cry, play and confined have "start", "end" and "duration" instead of "at". Copy the words for each one the note gives, for example {"start": "9", "end": "10:15"} or {"end": "10 minutes ago", "duration": "45 minutes"}. Leave out the ones the note does not give.
+- Sleep, nursing, activity, cry and confined have "start", "end" and "duration" instead of "at". Copy the words for each one the note gives, for example {"start": "9", "end": "10:15"} or {"end": "10 minutes ago", "duration": "45 minutes"}. Leave out the ones the note does not give.
 - Copy amounts and units as written. Do NOT convert units.
-- Use a "timer" event only for something that goes on now: "fell asleep", "went down", "is asleep" with no end → timer sleep start. "woke up", "is awake", "she's up" with no start, while a sleep timer runs → timer sleep complete. "started feeding on the left" → timer nursing start, side left. Same for pumping, activities, play and confined time.
+- Use a "timer" event only for something that goes on now: "fell asleep", "went down", "is asleep" with no end → timer sleep start. "woke up", "is awake", "she's up" with no start, while a sleep timer runs → timer sleep complete. "started feeding on the left" → timer nursing start, side left. "started tummy time" → timer activity start, kind tummyTime; "stop tummy time" → timer activity complete, kind tummyTime. Same for pumping, the other activities and confined time. Several activity timers can run at once: always give the kind of an activity timer.
 
 Words:
 - wet, wee, pee = "pee". dirty, pooey, poo, poop, soiled, number two = "poo" (only "wet and dirty" is "both"). dry = "dry".
@@ -114,9 +111,9 @@ Words:
 - temp, temperature, a fever reading = "temperature". paracetamol, Panadol, Calpol, ibuprofen, Nurofen, vitamin D, drops = "medicine".
 - weighed, weight, length, height, head = "growth".
 - ate, tried, had food, puree = "solids". loved it = LOVED, ok or so-so = MEH, hated it or spat it out = HATED, rash, hives or swelling after food = ALLERGIC.
-- bath, gave a bath, had a bath, bathed = "bath" (only a time).
-- tummy time alone, story, reading = "activity".
-- play, playing, floor play, playing outside = "play" (outside = kind "outdoor"). Minutes of tummy time during the play go to tummy_minutes.
+- bath, gave a bath, had a bath, bathed = "activity" kind "bath".
+- tummy time, on the tummy = "activity" kind "tummyTime". story, reading, book = "storyTime". TV, screen, tablet = "screenTime". skin to skin, cuddles on the chest = "skinToSkin". brushed teeth = "brushTeeth".
+- play, playing, floor play = "activity" kind "indoorPlay". playing outside, in the garden, at the park = "outdoorPlay". Play with some tummy time is two events: the play and the tummy time.
 - in the car seat, pram, stroller, buggy, bouncer, swing, carrier, high chair = "confined" with that device (stroller and buggy = "pram").
 - nappy details: rash = rash true. Nappy off, air time, left it off for N minutes = air_minutes. dark pee, dark wee = pee "dark_yellow"; pale, yellow, orange or pink, red pee = pee_color; cloudy pee = pee_look "cloudy"; smelly or strong-smelling pee = pee_smell true.
 - cried, was crying, screamed, was unsettled for a time = "cry"; what calmed the baby goes to soothed_by.
@@ -128,8 +125,8 @@ Words:
 Example. Note: "3oz formula at 6:20 this morning then she napped from 7 for 40 min. dirty nappy 10 mins ago, a bit runny"
 {"events":[{"type":"bottle","at":"6:20 this morning","amount":3,"unit":"oz","milk_type":"Formula"},{"type":"sleep","start":"7","duration":"40 min"},{"type":"nappy","at":"10 mins ago","mode":"poo","consistency":"runny"}]}
 
-Example. Note: "20 minutes of play with 5 of tummy time. in the car seat since 9"
-{"events":[{"type":"play","end":"now","duration":"20 minutes","tummy_minutes":5},{"type":"confined","start":"9","device":"car_seat"}]}
+Example. Note: "20 minutes of play, 5 of them tummy time. in the car seat since 9"
+{"events":[{"type":"activity","kind":"indoorPlay","end":"now","duration":"20 minutes"},{"type":"activity","kind":"tummyTime","end":"now","duration":"5 minutes"},{"type":"confined","start":"9","device":"car_seat"}]}
 
 Example (a sleep timer runs). Note: "she's awake now, fed her on the right for 12 minutes"
 {"events":[{"type":"timer","timer":"sleep","action":"complete"},{"type":"nursing","start":"now","right_minutes":12,"last_side":"right"}]}"""
@@ -309,16 +306,20 @@ def to_proposal(ev: dict, now: datetime) -> dict:
     end = None
     data: dict[str, Any] = {}
     notes = None
-    if kind in ("sleep", "nursing", "activity", "cry", "play", "confined"):
+    if kind in ("sleep", "nursing", "activity", "cry", "confined"):
         start, end = _span(ev, now)
         if kind == "nursing" and start is None and end is None:
             mins = (ev.get("left_minutes") or 0) + (ev.get("right_minutes") or 0)
             end = now if mins else None
             start = now - timedelta(minutes=mins) if mins else now
-        if kind in ("sleep", "play", "confined") and end is None and start is not None:
+        if kind == "activity" and end is not None and start in (None, end):
+            # "playing outside now", "bath at 11": the model can put the one time in end, or in start and end.
+            start, end = end, None
+        playing = kind == "activity" and ev["kind"] in ("indoorPlay", "outdoorPlay", "tummyTime")
+        if (kind in ("sleep", "confined") or playing) and end is None and start is not None:
             # Asleep (playing, in the car seat) since `start` with no end: that runs now, it is not finished.
             p = {"action": "timer", "type": kind, "timer_action": "start", "at": start}
-            return p | {"device": ev["device"]} if kind == "confined" else p
+            return p | ({"device": ev["device"]} if kind == "confined" else {"kind": ev["kind"]} if playing else {})
         at = start or end or now
         if kind == "nursing":
             left, right = ev.get("left_minutes"), ev.get("right_minutes")
@@ -330,9 +331,6 @@ def to_proposal(ev: dict, now: datetime) -> dict:
             data = {"kind": ev["kind"]}
         elif kind == "cry":
             data = {"soothed_by": ev.get("soothed_by")}
-        elif kind == "play":
-            tummy = ev.get("tummy_minutes")
-            data = {"kind": ev.get("kind"), "tummy_seconds": round(tummy * 60) if tummy is not None else None}
         elif kind == "confined":
             data = {"device": ev["device"]}
     elif kind == "pump":
@@ -387,7 +385,7 @@ def summary(p: dict, ctx: Ctx) -> str:
     units = ctx.fam.settings.get("units", {})
     word = "Diaper" if wording(ctx.fam) == "diaper" else "Nappy"
     labels = {"sleep": "Sleep", "nursing": "Breastfeed", "pump": "Pump", "activity": "Activity", "nappy": word,
-              "cry": "Crying", "play": "Play", "confined": "Confined"}
+              "cry": "Crying", "confined": "Confined"}
     if p["action"] == "timer":
         what = {"start": "start", "pause": "pause", "resume": "resume", "switch": "switch",
                 "cancel": "cancel", "complete": "stop and save"}[p["timer_action"]]
@@ -435,9 +433,6 @@ def summary(p: dict, ctx: Ctx) -> str:
         detail = (p.get("notes") or "")[:60]
     elif t == "cry":
         detail = f"soothed by {d['soothed_by']}" if d.get("soothed_by") else ""
-    elif t == "play":
-        detail = ", ".join(x for x in (d.get("kind", ""), f"tummy time {_dur(d['tummy_seconds'])}"
-                                       if d.get("tummy_seconds") else "") if x)
     elif t == "confined":
         detail = d["device"].replace("_", " ")
     when = _hm(p["started_at"], ctx)
@@ -456,7 +451,8 @@ def entry_summary(e, ctx: Ctx) -> str:
 
 
 def _context(s: Session, ctx: Ctx, child: Child, now_local: datetime) -> str:
-    running = [f"{t.type} timer since {_hm(t.started_at, ctx)}" for t in list_timers(s, child.id)]
+    running = [f"{t.type} timer{f' {t.kind}' if t.kind else ''} since {_hm(t.started_at, ctx)}"
+               for t in list_timers(s, child.id)]
     weeks = (now_local.date() - child.birthdate).days // 7
     age = f"{weeks} weeks" if weeks < 13 else f"{int(age_months(child, now_local))} months"
     return (f"Now: {now_local.strftime('%A %Y-%m-%d %H:%M')} (24-hour clock).\n"
@@ -474,15 +470,17 @@ def check_timer(s: Session, child: Child, p: dict) -> None:
         raise Invalid("side: use it only with a nursing timer")
     if body.kind and p["type"] != "activity":
         raise Invalid("kind: use it only with an activity timer")
-    if p["type"] == "activity" and p["timer_action"] in ("start", "switch") and not body.kind:
+    if p["type"] == "activity" and p["timer_action"] == "start" and not body.kind:
         raise Invalid("kind: say which activity")
+    if p["type"] == "activity" and p["timer_action"] == "switch":
+        raise Invalid("switch: start the other activity instead")
     running = {t.type for t in list_timers(s, child.id)}
     if body.device and not (p["type"] == "confined" and p["timer_action"] == "start"):
         raise Invalid("device: use it only to start a confined timer")
     if p["type"] == "confined" and p["timer_action"] == "start" and not body.device and "confined" not in running:
         raise Invalid("device: say where the child is, for example the car seat")
-    if p["timer_action"] != "start" and p["type"] not in running:
-        raise Invalid(f"No {p['type']} timer is running.")
+    if p["timer_action"] != "start" and find(s, child.id, p["type"], body.kind) is None:
+        raise Invalid(f"No {body.kind or p['type']} timer is running.")
 
 
 # --- not sure: never save a guess (M14) --------------------------------------------------------------------------
@@ -522,12 +520,14 @@ def doubt(s: Session, ctx: Ctx, child: Child, ev: dict, p: dict, text: str, now:
     if p["action"] == "entry":
         near = s.scalar(select(Entry.started_at).where(
             Entry.child_id == child.id, Entry.type == p["type"], Entry.started_at >= when - DOUBLE,
-            Entry.started_at <= when + DOUBLE).limit(1))
+            Entry.started_at <= when + DOUBLE,
+            func.json_extract(Entry.data, "$.kind") == p["data"]["kind"] if p["type"] == "activity" else true())
+            .limit(1))
         if near:
             return f"a {label.lower()} at {_hm(near, ctx)} is already logged"
         if p["type"] == "note":
             return "check the note"
-    elif p["timer_action"] == "start" and p["type"] in {t.type for t in list_timers(s, child.id)}:
+    elif p["timer_action"] == "start" and find(s, child.id, p["type"], p.get("kind")):
         return f"the {label.lower()} already runs"
     return None
 
@@ -544,6 +544,11 @@ async def parse(s: Session, ctx: Ctx, child_id: int, text: str) -> dict:
     for ev in out.get("events", []):
         try:
             p = to_proposal(ev, now_local)
+            if (ev["type"] == "activity" and ev.get("end") and not ev.get("start") and not ev.get("duration")
+                    and find(s, child.id, "activity", ev["kind"])):
+                # "stop tummy time" can come as an activity that ends now: stop the running timer of that kind.
+                p = {"action": "timer", "type": "activity", "timer_action": "complete", "kind": ev["kind"],
+                     "at": p.get("started_at") or p.get("at")}
             if p["action"] == "entry":
                 p["started_at"] = to_utc(p["started_at"], ctx.tz)
                 p["ended_at"] = to_utc(p["ended_at"], ctx.tz) if p["ended_at"] else None
@@ -591,7 +596,7 @@ def commit(s: Session, ctx: Ctx, child_id: int, proposals: list[EntryProposal | 
                         running.append(timer_out(t, utcnow()))
                     if e:
                         created.append(EntryOut.model_validate(e))
-                    items.append({"action": "timer", "type": p.type, "timer_action": p.timer_action,
+                    items.append({"action": "timer", "type": p.type, "timer_action": p.timer_action, "kind": p.kind,
                                   "summary": entry_summary(e, ctx) if e else summary(p.model_dump(), ctx),
                                   "entry_id": e.id if e else None})
             except ServiceError as err:

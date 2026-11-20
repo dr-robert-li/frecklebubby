@@ -5,7 +5,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Response, UploadFile
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError, field_validator
 from sqlalchemy.orm import Session
 
 from ..ai import assistant, llm, nl_log, sleep_plan, support_report
@@ -54,6 +54,18 @@ class LoggedOut(BaseModel):
     items: list[LoggedItem]
     proposals: list[nl_log.Proposal]
     message: str
+
+    @field_validator("proposals", mode="before")
+    @classmethod
+    def _known(cls, v: list) -> list:
+        """A proposal saved before 0.2.2 can name a removed type (play, bath). Leave it out, so the chat still loads."""
+        out = []
+        for p in v:
+            try:
+                out.append(nl_log.PROPOSAL.validate_python(p))
+            except ValidationError:
+                pass
+        return out
 
 
 class MessageOut(BaseModel):

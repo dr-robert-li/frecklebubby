@@ -9,9 +9,9 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 EntryType = Literal[
     "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry", "play", "confined", "bath",
+    "growth", "temperature", "medicine", "activity", "milestone", "note", "cry", "confined",
 ]
-TimerType = Literal["sleep", "nursing", "pump", "activity", "play", "confined"]
+TimerType = Literal["sleep", "nursing", "pump", "activity", "confined"]
 TimerAction = Literal["start", "pause", "resume", "switch", "cancel", "complete"]
 
 SleepCondition = Literal["happy", "upset", "under_10_minutes", "10-20_minutes", "longTimeToFallAsleep", "wokeUpChild"]
@@ -30,7 +30,6 @@ MedicineUnit = Literal["ml", "oz", "tsp", "drops", "mg"]
 ActivityKind = Literal[
     "bath", "tummyTime", "storyTime", "screenTime", "skinToSkin", "outdoorPlay", "indoorPlay", "brushTeeth"
 ]
-PlayKind = Literal["indoor", "outdoor"]
 ConfinedDevice = Literal["car_seat", "bouncer", "swing", "pram", "carrier", "high_chair", "other"]
 RashSeverity = Literal["mild", "moderate", "severe"]
 PeeColor = Literal["pale", "yellow", "dark_yellow", "orange_pink", "red"]
@@ -153,11 +152,6 @@ class CryData(_Data):
     soothed_by: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)] | None = None
 
 
-class PlayData(_Data):
-    kind: PlayKind | None = None
-    tummy_seconds: float | None = Field(None, ge=0, le=86400)
-
-
 class ConfinedData(_Data):
     device: ConfinedDevice
 
@@ -166,11 +160,10 @@ DATA_MODELS: dict[str, type[_Data]] = {
     "sleep": SleepData, "nursing": NursingData, "bottle": BottleData, "solids": SolidsData,
     "nappy": NappyData, "potty": PottyData, "pump": PumpData, "growth": GrowthData,
     "temperature": TemperatureData, "medicine": MedicineData, "activity": ActivityData,
-    "milestone": MilestoneData, "note": _Data, "cry": CryData, "play": PlayData, "confined": ConfinedData,
-    "bath": _Data,
+    "milestone": MilestoneData, "note": _Data, "cry": CryData, "confined": ConfinedData,
 }
 END_REQUIRED = {"sleep"}
-END_OPTIONAL = {"nursing", "pump", "activity", "cry", "play", "confined"}
+END_OPTIONAL = {"nursing", "pump", "activity", "cry", "confined"}
 
 # --- users, families, children --------------------------------------------------------------------
 
@@ -344,7 +337,8 @@ class EntryOut(Out):
 class TimerBody(BaseModel):
     at: datetime | None = Field(None, description="start: start time; complete: end time. No offset = family time zone.")
     side: Side | None = None
-    kind: ActivityKind | None = None
+    kind: ActivityKind | None = Field(None, description="activity timer only: which activity. Several kinds can "
+                                                       "run at once; omit it when only one activity timer runs.")
     device: ConfinedDevice | None = Field(None, description="confined timer only (start)")
     data: dict[str, Any] | None = None
     notes: Annotated[str, StringConstraints(max_length=2000)] | None = None
@@ -432,9 +426,10 @@ class CryDay(BaseModel):
 
 
 class PlayDay(BaseModel):
-    count: int = Field(0, description="play entries + activity entries of kind tummyTime, indoorPlay, outdoorPlay")
-    seconds: int = 0
-    tummy_seconds: int = Field(0, description="play tummy_seconds + duration of activity entries of kind tummyTime")
+    count: int = Field(0, description="Periods of play: activity entries of kind tummyTime, indoorPlay or outdoorPlay, "
+                                      "with overlapping entries joined")
+    seconds: int = Field(0, description="Time of these periods (parallel timers count once)")
+    tummy_seconds: int = Field(0, description="Time of activity entries of kind tummyTime")
 
 
 class ConfinedDay(BaseModel):
@@ -450,7 +445,7 @@ class DayReport(BaseModel):
     nappies: NappyDay = NappyDay()
     pump_ml: float = 0
     medicine_count: int = 0
-    bath_count: int = Field(0, description="bath entries + activity entries of kind bath")
+    bath_count: int = Field(0, description="Activity entries of kind bath")
     activities: dict[str, ActivityDay] = {}
     crying: CryDay = CryDay()
     play: PlayDay = PlayDay()
@@ -551,7 +546,7 @@ class MilestonesOut(BaseModel):
 class ReminderIn(BaseModel):
     type: Literal[
         "sleep", "nursing", "bottle", "solids", "nappy", "potty", "pump",
-        "growth", "temperature", "medicine", "activity", "milestone", "note", "play", "confined", "bath",
+        "growth", "temperature", "medicine", "activity", "milestone", "note", "confined",
         "sleep_alert",
     ]
     mode: Literal["in", "at"]

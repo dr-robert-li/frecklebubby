@@ -6,14 +6,16 @@
 	import { fromUnit, round, toLocalInput, toUnit, unitLabel, type UnitKind } from './format.svelte';
 	import Icon from './Icon.svelte';
 	import Sheet from './Sheet.svelte';
-	import { ACTIVITIES, DEVICES, tracker, type Entry, type EntryType, type Field } from './trackers';
+	import { ACTIVITIES, activityLabel, DEVICES, tracker, type Entry, type EntryType, type Field } from './trackers';
 
 	let { type, entry = null, childId, onclose }: { type: EntryType; entry?: Entry | null; childId: number; onclose: () => void } =
 		$props();
 
 	const t = $derived(tracker(type, wording()));
 	const u = units();
-	const running = $derived(app.status?.timers.some((x) => x.type === type));
+	// Activity timers run in parallel, one per kind: another kind can start while one runs.
+	const runningKinds = $derived((app.status?.timers ?? []).filter((x) => x.type === 'activity').map((x) => x.data.kind));
+	const running = $derived(type !== 'activity' && app.status?.timers.some((x) => x.type === type));
 	const POO_HEX: Record<string, string> = { yellow: '#E8C547', brown: '#8A5A2B', green: '#6E9B3A', black: '#222', red: '#C0392B', gray: '#9A9A9A' };
 	const PEE_HEX: Record<string, string> = { pale: '#F7F1C8', yellow: '#F2D74E', dark_yellow: '#C9971C', orange_pink: '#F2A07B', red: '#C0392B' };
 	const HEX: Record<string, Record<string, string>> = { color: POO_HEX, pee_color: PEE_HEX };
@@ -162,7 +164,7 @@
 		try {
 			const body = type === 'activity' ? { kind: vals.kind } : type === 'confined' ? { device: vals.device } : extra;
 			await api(`/children/${childId}/timers/${type}/start`, { method: 'POST', body });
-			toast(`${t.label} timer started`);
+			toast(`${type === 'activity' ? activityLabel(vals.kind) : t.label} timer started`);
 			refresh();
 			onclose();
 		} catch (e) {
@@ -246,7 +248,8 @@
 				{#if type === 'activity'}
 					<div class="chips" role="group" aria-label="Activity">
 						{#each ACTIVITIES as [v, l] (v)}
-							<button class="chip" aria-pressed={vals.kind === v} onclick={() => (vals.kind = v)}>{l}</button>
+							<button class="chip" aria-pressed={vals.kind === v} disabled={runningKinds.includes(v)}
+								onclick={() => (vals.kind = v)}>{l}{runningKinds.includes(v) ? ' (running)' : ''}</button>
 						{/each}
 					</div>
 				{:else if type === 'confined'}

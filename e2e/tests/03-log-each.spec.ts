@@ -97,19 +97,16 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	await s.getByRole('button', { name: 'Save' }).click();
 	await expectLogged(page, 'Note', 'Grandma visited');
 
-	// bath: log, edit, delete
-	s = await openTile(page, 'Bath');
-	await s.getByLabel('Notes (optional)').fill('Warm water');
-	await shot(page, '04-bath-sheet');
-	await s.getByRole('button', { name: 'Save' }).click();
-	await expectLogged(page, 'Bath', 'Warm water');
-	const bath = timeline(page).getByRole('button', { name: /Edit Bath/ });
+	// the bath activity: edit, then delete
+	const bath = timeline(page).getByRole('button', { name: /Edit Activity/ }).filter({ hasText: 'Bath' });
 	await bath.click();
-	await expect(s.getByRole('heading', { name: 'Edit bath' })).toBeVisible();
+	await expect(s.getByRole('heading', { name: 'Edit activity' })).toBeVisible();
+	await shot(page, '04-bath-sheet');
 	await s.getByLabel('Notes (optional)').fill('Hair wash');
 	await s.getByRole('button', { name: 'Save' }).click();
-	await expectLogged(page, 'Bath', 'Hair wash');
+	await expect(s).toBeHidden();
 	await bath.click();
+	await expect(s.getByLabel('Notes (optional)')).toHaveValue('Hair wash');
 	await s.getByRole('button', { name: 'Delete entry' }).click();
 	await s.getByRole('button', { name: 'Yes, delete' }).click();
 	await expect(bath).toHaveCount(0);
@@ -127,6 +124,6 @@ test('a parent logs each kind of entry and sees it in the timeline', async ({ pa
 	await s.getByRole('button', { name: 'Save' }).click();
 	await expectLogged(page, 'Sleep', `${mins} min · Own bed`);
 
-	await expect(timeline(page).getByRole('listitem')).toHaveCount(12);
+	await expect(timeline(page).getByRole('listitem')).toHaveCount(11); // the bath activity was deleted above
 	await shot(page, '04-home-timeline', true);
 });

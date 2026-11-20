@@ -1,15 +1,33 @@
+<div align="center">
+
+<img src="frontend/static/icon.svg" alt="Frecklebubby icon" width="112" height="112">
+
 # Frecklebubby
 
-A baby tracker that you host yourself.
+**A baby tracker that you host yourself.**
 
-Version 0.2.1. See [CHANGELOG.md](CHANGELOG.md).
+Log the day, see the patterns, and ask an assistant that shows its sources.
+Your data stays on your server.
+
+[![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-0.2.2-e88fa6)](CHANGELOG.md)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
+[![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
+
+[Quick start](#quick-start) · [Connect Claude](#connect-claude-mcp) · [Screenshots](#what-it-does) · [Changelog](CHANGELOG.md)
+
+</div>
+
+---
 
 ## What it does
 
-- Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities,
-  baths, play with tummy time, time in a car seat or other seat, crying, milestones and notes.
+- Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
+  (bath, tummy time, indoor and outdoor play, story time, screen time, skin to skin, brushing teeth), time in a
+  car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
-- Has live timers for sleep, nursing, pumping, activities, play (with a tummy-time part) and confined time. A timer
+- Has live timers for sleep, nursing, pumping, activities and confined time. Activity timers can
+  run side by side, one for each kind (for example indoor play and tummy time). A timer
   keeps running when you close the app.
 - Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a
   note at 1 hour (children under 5 years) and a break warning at 2 hours (children under 12 months), with sources.

@@ -84,7 +84,7 @@ test('c: start a nap from the chat, see the timer on Home, undo cancels it', asy
 	await page.goto('/assistant');
 	const turn = await send(page, 'start a nap');
 	const block = turn.getByRole('group', { name: 'Logged' });
-	await expect(block.getByText(/^Sleep timer – start – \d\d:\d\d$/)).toBeVisible();
+	await expect(block.getByText(/^Sleep timer – start – (\d\d:\d\d|now)$/)).toBeVisible();
 	await expect(block.getByRole('button', { name: /^Edit / })).toHaveCount(0); // a timer has no entry yet
 	await snap(page, 'c1-timer-logged');
 	await page.goto('/');
@@ -94,4 +94,23 @@ test('c: start a nap from the chat, see the timer on Home, undo cancels it', asy
 	await expect(page.locator('.msgs li.assistant').last().getByText('Undone', { exact: true })).toBeVisible();
 	await page.goto('/');
 	await expect(page.getByRole('region', { name: 'Sleep timer' })).toHaveCount(0);
+});
+
+test('d: start tummy time and play from the chat, both run on Home, stop tummy time only', async ({ page, family }) => {
+	await page.goto('/assistant');
+	let turn = await send(page, 'started tummy time and indoor play now');
+	let block = turn.getByRole('group', { name: 'Logged' });
+	await expect(block.getByText(/^Activity timer – start – tummyTime – /)).toBeVisible();
+	await expect(block.getByText(/^Activity timer – start – indoorPlay – /)).toBeVisible();
+	await page.goto('/');
+	await expect(page.getByRole('region', { name: 'Tummy time timer' })).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Indoor play timer' })).toBeVisible();
+	await page.goto('/assistant');
+	turn = await send(page, 'stop tummy time');
+	block = turn.getByRole('group', { name: 'Logged' });
+	await expect(block.getByText(/^Activity – tummyTime – /)).toBeVisible();
+	await snap(page, 'd1-tummy-stopped');
+	await page.goto('/');
+	await expect(page.getByRole('region', { name: 'Tummy time timer' })).toHaveCount(0);
+	await expect(page.getByRole('region', { name: 'Indoor play timer' })).toBeVisible();
 });

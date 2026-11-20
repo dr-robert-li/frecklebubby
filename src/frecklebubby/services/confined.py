@@ -46,11 +46,11 @@ def under(child: Child, day: date, months: int) -> bool:
     return (day.year, day.month, day.day) < (b.year + y, m + 1, b.day)
 
 
-def merge(spans: list[tuple[datetime, datetime]]) -> list[tuple[datetime, datetime]]:
-    """Join spans that overlap or have a gap of GAP or less."""
+def merge(spans: list[tuple[datetime, datetime]], gap: timedelta = GAP) -> list[tuple[datetime, datetime]]:
+    """Join spans that overlap or have a gap of `gap` or less."""
     out: list[tuple[datetime, datetime]] = []
     for a, b in sorted(spans):
-        if out and a - out[-1][1] <= GAP:
+        if out and a - out[-1][1] <= gap:
             out[-1] = (out[-1][0], max(out[-1][1], b))
         else:
             out.append((a, b))

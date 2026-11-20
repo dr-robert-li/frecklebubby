@@ -26,7 +26,7 @@
 
 {#if child()}
 	{@const c = child()!}
-	{#each s?.timers ?? [] as t (t.type)}
+	{#each s?.timers ?? [] as t (t.type + (t.data.kind ?? ''))}
 		<TimerCard timer={t} childId={c.id} />
 	{/each}
 
