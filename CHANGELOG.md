@@ -6,6 +6,8 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-11-21
+
 ### Added
 
 - Settings > Delete data: the owner can delete one child and all the data of that child. Select the child and
