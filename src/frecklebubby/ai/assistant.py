@@ -35,6 +35,7 @@ log = logging.getLogger(__name__)
 
 FOOTER = "General information, not medical advice."
 CRY_WORDS = re.compile(r"\b(cry|cries|cried|crying|unsettled|fussy|fussing|screaming|colic\w*)\b", re.I)
+NOT_COVERED_BY_MODEL = re.compile(r"sources I have do not cover", re.I)  # the line the system prompt gives
 NOT_COVERED = "The sources I have do not cover this question. Ask your doctor or child health nurse."
 HISTORY_CHARS = 2400  # about 700 tokens; the whole prompt stays under about 6,000 tokens (context 8,192)
 SOURCE_CHARS = 1100
@@ -258,6 +259,18 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
                           **{k: c.get(k) for k in ("title", "publisher", "author", "url", "year", "licence")}})
         return n
 
+    def more_pages() -> str:
+        """Links to trusted pages on the topic, for an answer that says the sources do not cover the question.
+        Fixed rules, no model: the titles and addresses come from the source list."""
+        age = dev_age_months(child, local)
+        # A title says "3-6 months"; the age check reads "3 months to 6 months".
+        links = web_lookup.related_links(message, fits=lambda title: development.fits(
+            re.sub(r"(\d+)-(\d+) (week|month|year)s", r"\1 \3s to \2 \3s", title), age))
+        if not links:
+            return ""
+        return "\n\nThese trusted pages are about this topic:\n" + "\n".join(
+            f"- {c['title']} ({c['publisher']}) [{number(c, 'link')}]" for c in links)
+
     warning = ""
     for f in flags:
         marks = "".join(f"[{number(c, c.get('kind', 'link'))}]" for c in f["citations"])
@@ -315,7 +328,7 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
         return
 
     if not hits:
-        answer = warning + NOT_COVERED + "\n\n" + FOOTER
+        answer = warning + NOT_COVERED + more_pages() + "\n\n" + FOOTER
         yield sse("token", {"text": answer})
         async for e in finish(answer):
             yield e
@@ -337,7 +350,10 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
                 if text:
                     answer, sent = answer + text, True
                     yield sse("token", {"text": text})
-            tail = filt.flush() + "\n\n" + FOOTER
+            tail = filt.flush()
+            if NOT_COVERED_BY_MODEL.search(answer + tail):
+                tail += more_pages()
+            tail += "\n\n" + FOOTER
     except llm.LlmError as err:
         if not sent:
             if not warning and not logged and not waited:

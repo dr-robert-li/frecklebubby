@@ -6,6 +6,18 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Assistant: when the sources do not cover a question, the answer lists up to three trusted pages on the topic
+  as links. The list comes from fixed rules and the source list, not from the model.
+- Assistant: the search and the web lookup find better pages. A word in the title or the topics of a page counts
+  more, common words ("baby", "week", "normal") count nothing, and "settle" and "nap" find the sleep pages.
+
+### Fixed
+
+- The same passage could show two times in the sources of one answer, and two questions at the same moment could
+  store one web page two times.
+
 ## [0.4.2] - 2026-11-21
 
 ### Added

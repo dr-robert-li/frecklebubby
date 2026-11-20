@@ -206,6 +206,9 @@ QUESTIONS = [
     ("older", "When can I start giving her solid foods?", "cited"),
     ("older", "How should I put her down to sleep safely?", "cited"),
     ("older", "What car seat should I buy?", "not_covered"),
+    # 0.4.3: an answer or a "not covered" line with trusted pages; never a dead end with no source.
+    ("baby", "How do I settle her for sleep at night?", "cited"),
+    ("baby", "How long is a normal nap at her age?", "cited"),
 ]
 
 

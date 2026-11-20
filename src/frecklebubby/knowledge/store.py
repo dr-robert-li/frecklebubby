@@ -30,7 +30,8 @@ with would you your yours baby babies child my old normal ok okay get got im ive
 SYNONYMS = {"diaper": "nappy", "diapers": "nappies", "poop": "poo", "pee": "wee", "temp": "temperature",
             "feverish": "fever", "solid": "solids", "weaning": "solids", "crib": "cot", "binky": "dummy",
             "pacifier": "dummy", "tylenol": "paracetamol", "panadol": "paracetamol", "nurse": "breastfeed",
-            "nursing": "breastfeeding", "spit": "reflux", "long": "hours"}
+            "nursing": "breastfeeding", "spit": "reflux", "long": "hours", "nap": "sleep", "naps": "sleep",
+            "settle": "settling"}
 
 
 def fts_query(question: str) -> str:
@@ -59,7 +60,14 @@ def search(s: Session, family: Family, question: str, limit: int = TOP, web: boo
         "FROM kb_chunk c JOIN kb_source s ON s.id = c.source_id "
         "WHERE kb_chunk MATCH :q AND (s.family_id IS NULL OR s.family_id = :fid) "
         f"AND s.kind IN ({', '.join(repr(k) for k in kinds)}) ORDER BY score LIMIT :n"
-    ), {"q": q, "fid": family.id, "n": limit}).all()
+    ), {"q": q, "fid": family.id, "n": 2 * limit}).all()
+    # The same passage can be in the library and in a page read from the web: keep the first one.
+    seen, unique = set(), []
+    for r in rows:
+        if r[2] not in seen:
+            seen.add(r[2])
+            unique.append(r)
+    rows = unique[:limit]
     sources = {src.id: src for src in s.scalars(select(KbSource).where(KbSource.id.in_({r[0] for r in rows})))}
     return [{**source_dict(sources[r[0]]), "heading": r[1], "text": r[2], "score": r[3]} for r in rows]
 

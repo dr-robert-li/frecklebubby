@@ -98,6 +98,22 @@ async def test_no_sources_no_model_call(client, fake_llm):
     assert len(fake_llm.requests) == 1
 
 
+async def test_not_covered_answer_gives_trusted_pages(client, fake_llm):
+    h, cid = await make_family(client)
+    fake_llm.replies.append("The sources I have do not cover this.")
+    r, events = await ask(client, h, cid, "how do I settle my baby to sleep at night?")
+    text = "".join(d["text"] for e, d in events if e == "token")
+    assert "do not cover this.\n\nThese trusted pages are about this topic:\n- " in text and text.endswith(FOOTER)
+    cites = events[-2][1]["citations"]
+    assert cites and all(c["kind"] == "link" and c["url"].startswith("https://") for c in cites)
+    assert all(f"[{c['n']}]" in text and c["title"] in text for c in cites)
+    assert any("settling" in c["url"] for c in cites)
+    # A normal answer gets no list.
+    fake_llm.replies.append("Put her down drowsy [1].")
+    r, events = await ask(client, h, cid, "how do I settle my baby to sleep at night?")
+    assert "trusted pages" not in "".join(d["text"] for e, d in events if e == "token")
+
+
 async def test_other_family_child_404(client, fake_llm):
     await make_family(client)
     hb, _ = await make_family(client, email="b@example.com")

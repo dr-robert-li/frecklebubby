@@ -15,7 +15,7 @@ from ..config import PACKAGE_DATA
 from ..db import utcnow
 from ..models import KbSource
 from .ingest import html_sections
-from .store import STOP, add_source, delete_sources, link_list
+from .store import STOP, SYNONYMS, add_source, delete_sources, link_list
 
 log = logging.getLogger(__name__)
 
@@ -45,27 +45,58 @@ def check_url(url: str) -> None:
 
 
 def _stem(w: str) -> str:
-    return w[:-3] + "y" if w.endswith("ies") else w[:-1] if w.endswith("s") and len(w) > 3 else w
+    """A rough word stem, so that settle, settled and settling are one word. Not for display."""
+    for suffix, end in (("ies", "y"), ("ing", ""), ("ed", ""), ("es", ""), ("s", ""), ("e", "")):
+        if w.endswith(suffix) and len(w) - len(suffix) >= 3:
+            return w[: -len(suffix)] + end
+    return w
+
+
+# Words that are in most questions and most titles: they do not say what the question is about.
+COMMON = {"baby", "babies", "child", "children", "infant", "week", "weeks", "month", "months", "year", "years", "old",
+          "day", "days", "normal", "explain", "detail", "give", "many", "step", "steps", "long", "much", "often",
+          "need", "help", "guide", "hour", "hours", "newborn", "newborns", "toddler", "toddlers"}
+
+
+def _stems(text: str) -> set[str]:
+    return {_stem(w) for w in re.findall(r"[^\W_]+", text.lower())
+            if w not in STOP and w not in COMMON and len(w) > 2}
+
+
+def _ranked(question: str, items: list[dict]) -> list[tuple[int, dict]]:
+    """(score, item), best first. A word of the question in the title or the topics counts 3, in the summary 1."""
+    words = _stems(question) | _stems(" ".join(SYNONYMS.get(w, "") for w in re.findall(r"[^\W_]+", question.lower())))
+    scored = []
+    for item in items:
+        topics = _stems(" ".join(item.get("topics", [])).replace("-", " ").replace("_", " "))
+        title = _stems(item["title"])
+        score = 3 * len(words & (title | topics)) + len(words & (_stems(item.get("summary", "")) - title - topics))
+        if score >= 2:
+            scored.append((score, item))
+    scored.sort(key=lambda x: -x[0])  # stable: equal scores keep the order of sources.yaml
+    return scored
+
+
+def _allowed(item: dict) -> bool:
+    try:
+        check_url(item.get("url", ""))
+    except Refused:
+        return False
+    return True
 
 
 def candidates(question: str, limit: int = 2) -> list[dict]:
-    """sources.yaml web entries whose topics, title or summary share words with the question."""
-    words = {_stem(w) for w in re.findall(r"[^\W_]+", question.lower()) if w not in STOP and len(w) > 2}
-    scored = []
-    for item in link_list():
-        if item.get("kind") != "web" or item.get("live_fetch") is False:
-            continue
-        try:
-            check_url(item.get("url", ""))
-        except Refused:
-            continue
-        topics = {_stem(t) for topic in item.get("topics", []) for t in re.split(r"[-_ ]", topic.lower())}
-        about = {_stem(w) for w in re.findall(r"[^\W_]+", f"{item['title']} {item.get('summary', '')}".lower())}
-        score = 2 * len(words & topics) + len(words & about)
-        if score >= 2:
-            scored.append((score, item))
-    scored.sort(key=lambda x: -x[0])
-    return [item for _, item in scored[:limit]]
+    """sources.yaml web entries whose title, topics or summary share words with the question."""
+    items = [i for i in link_list() if i.get("kind") == "web" and i.get("live_fetch") is not False and _allowed(i)]
+    return [item for _, item in _ranked(question, items)[:limit]]
+
+
+def related_links(question: str, limit: int = 3, fits=lambda title: True) -> list[dict]:
+    """Trusted pages on the topic of the question, to give as links when the sources do not answer it. These
+    include the pages the server may not read (live_fetch false). `fits`: keep a page only when its title fits
+    the child's age. A page needs one word of the question in its title or topics."""
+    items = [i for i in link_list() if i.get("kind") == "web" and str(i.get("url", "")).startswith("https://")]
+    return [item for score, item in _ranked(question, items) if score >= 3 and fits(item["title"])][:limit]
 
 
 async def fetch(url: str, transport: httpx.AsyncBaseTransport | None = None) -> str:
@@ -114,6 +145,8 @@ async def lookup(s: Session, question: str, transport: httpx.AsyncBaseTransport 
             continue
         if not sections:
             continue
+        # Read again: two questions at the same moment can fetch one page two times.
+        cached = s.scalars(select(KbSource).where(KbSource.kind == "web", KbSource.url == item["url"])).all()
         delete_sources(s, [c.id for c in cached])
         add_source(s, None, "web", {k: item.get(k) for k in ("title", "author", "publisher", "url", "year")}
                    | {"licence": "Linked; not stored in the bundle"}, sections)
