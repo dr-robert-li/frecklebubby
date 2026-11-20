@@ -83,7 +83,7 @@
 				<div><span>Breastfed</span><strong>{fmtDur(d.feeds.nursing_seconds)}</strong></div>
 				<div><span>Wet</span><strong>{d.nappies.wet}</strong></div>
 				<div><span>Dirty</span><strong>{d.nappies.dirty}</strong></div>
-				{#if d.feeds.bottle_ml}<div><span>Bottle</span><strong>{fmtUnit('volume', d.feeds.bottle_ml, units())}</strong></div>{/if}
+				<div><span>Bottle</span><strong>{fmtUnit('volume', d.feeds.bottle_ml, units())}</strong></div>
 			</div>
 			<Timeline entries={app.today} onpick={(e) => (sheet = { type: e.type, entry: e })} empty="Nothing logged today. Tap a tile above to start." />
 		</section>

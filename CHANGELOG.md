@@ -6,6 +6,10 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Home: the "Today" totals always show the bottle volume, also when it is zero.
+
 ### Fixed
 
 - `compose.yaml` did not pass `OPERATOR_EMAILS`, `BEHIND_CLOUDFLARE`, the `LIMIT_` settings and the `LLM_QUEUE_`
