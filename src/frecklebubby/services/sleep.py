@@ -1,6 +1,6 @@
 """Sleep prediction (spec section 8, M7) and total sleep recommendations.
 
-With a norms file (SLEEP_NORMS_PATH, default DATA_DIR/sleep_norms.json; made by training/sleep): the child's recent
+With a norms file (SLEEP_NORMS_PATH, else DATA_DIR/sleep_norms.json, else the bundled file; made by training/sleep): the child's recent
 wake windows for the same nap position are blended with the median of babies of the same age, and bedtime also
 uses the child's usual bedtime. The method and its measured error are in .planning/M7_SLEEP_RESULTS.md.
 Without the file: the wake-window table in data/wake_windows.json (the method before M7).
@@ -63,9 +63,11 @@ def _load(path: str, mtime: float) -> dict | None:
 
 
 def norms() -> dict | None:
-    """The optional norms file, or None (then the app uses the old wake-window table)."""
+    """The norms file, or None (then the app uses the old wake-window table)."""
     st = get_settings()
     path = st.sleep_norms_path or st.data_dir / "sleep_norms.json"
+    if not st.sleep_norms_path and not path.is_file():
+        path = st.bundled_data_dir / "sleep_norms.json"
     try:
         return _load(str(path), path.stat().st_mtime)
     except OSError:

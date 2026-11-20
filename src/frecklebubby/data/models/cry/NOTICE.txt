@@ -1,0 +1,11 @@
+Frecklebubby cry models v0.1
+
+cry_detector.onnx and cry_reason.onnx contain the EfficientAT mn10_as encoder
+(https://github.com/fschmid56/EfficientAT, MIT licence, Copyright (c) 2022 Florian Schmid).
+
+cry_detector.onnx: the head was trained on the ICSD dataset (Liu et al., arXiv:2408.10561,
+CC BY-NC-SA 4.0). Non-commercial use only, with attribution. Because the weights are derived from ICSD,
+share these weights only under the same terms.
+
+cry_reason.onnx: the head was trained on crowd-labelled clips from the DeepInfant / Donate-a-Cry lineage.
+The labels are parents' guesses. The model is experimental and is not a diagnosis.

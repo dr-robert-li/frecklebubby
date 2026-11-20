@@ -290,7 +290,10 @@ def suggestions(word: str) -> list[dict]:
 
 def model_dir() -> Path:
     st = get_settings()
-    return st.cry_model_dir or st.data_dir / "models" / "cry"
+    d = st.cry_model_dir or st.data_dir / "models" / "cry"
+    if st.cry_model_dir or (d / "model_card.json").is_file():
+        return d
+    return st.bundled_data_dir / "models" / "cry"
 
 
 _models: dict = {}

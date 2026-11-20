@@ -6,9 +6,11 @@ of Liu et al. (2019), "Time-Series Analysis via Low-Rank Matrix Factorization Ap
 
 ## Data and licence
 
-The data is not in this repository. The project page of the authors gives no licence. Do not copy the data file
-or any row for one infant into the repository. The scripts write only to the folders that you give as arguments.
-Keep these folders outside version control, for example `~/.cache/frecklebubby-research/sleep-model/`.
+The data file is `data/infant_sleep_preprocessed.mat` (18 MB), from Liu et al. (2019). It is open for
+non-commercial use, with attribution to the authors. The norms file made from it is bundled with the app
+(`src/frecklebubby/data/sleep_norms.json`) under the same terms. The scripts write only to the folders that you
+give as arguments. Keep the work folders outside version control, for example
+`~/.cache/frecklebubby-research/sleep-model/`.
 
 The data file is MATLAB v5, variable `data`, shape (730 days of age, 144 bins of 10 minutes, 700 infants).
 A value is the part of the bin that the infant was asleep (0 to 1). NaN means that the day is missing.
@@ -28,7 +30,7 @@ The kit installs the app (`../..`) as a dependency, because `replay_app_db.py` a
 Set two paths first:
 
 ```
-MAT=~/.cache/frecklebubby-research/liu2019/infant_sleep_preprocessed.mat
+MAT=data/infant_sleep_preprocessed.mat
 OUT=~/.cache/frecklebubby-research/sleep-model
 ```
 

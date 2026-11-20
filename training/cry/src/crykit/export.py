@@ -34,9 +34,8 @@ cry_detector.onnx and cry_reason.onnx contain the EfficientAT mn10_as encoder
 (https://github.com/fschmid56/EfficientAT, MIT licence, Copyright (c) 2022 Florian Schmid).
 
 cry_detector.onnx: the head was trained on the ICSD dataset (Liu et al., arXiv:2408.10561,
-CC BY-NC-SA 4.0 and gated terms). Used with the dataset authors' permission given to the project owner.
-Non-commercial use only. Do not redistribute the ICSD data. Because the weights are derived from ICSD,
-share these weights only under the same non-commercial terms.
+CC BY-NC-SA 4.0). Non-commercial use only, with attribution. Because the weights are derived from ICSD,
+share these weights only under the same terms.
 
 cry_reason.onnx: the head was trained on crowd-labelled clips from the DeepInfant / Donate-a-Cry lineage.
 The labels are parents' guesses. The model is experimental and is not a diagnosis.
@@ -101,8 +100,7 @@ def export(work: Path, out: Path) -> dict:
             "unfrozen_encoder": det_metrics["unfrozen_encoder"],
             "metrics": {k: det_metrics[k] for k in ("test_real", "test_synth")},
             "paper": PAPER,
-            "licence": "Head trained on ICSD (CC BY-NC-SA 4.0), used with the authors' permission given to the "
-                       "project owner; non-commercial.",
+            "licence": "Head trained on ICSD (CC BY-NC-SA 4.0); non-commercial use, with attribution.",
         },
         "reason": {
             "file": "cry_reason.onnx", "output": "reason_probs", "labels": REASON_CLASSES,

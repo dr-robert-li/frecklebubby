@@ -224,10 +224,7 @@ must support JSON schema output (`response_format`), as llama.cpp does.
 
 ## Sleep model
 
-The Home screen shows the next nap or bedtime. Without extra files it uses a table of common wake windows by age
-(`src/frecklebubby/data/wake_windows.json`).
-
-With the optional **sleep norms file** it uses your child's last 14 days and typical patterns of babies of the same
+The Home screen shows the next nap or bedtime. With the bundled **sleep norms file** it uses your child's last 14 days and typical patterns of babies of the same
 age, and it shows an 80 % range ("earliest" to "latest"). Insights then also show the current nap stage (for example
 "Mostly 3 naps a day"), compare total sleep with babies of the same age, and show a card when a nap change is common
 at this age. The recommended sleep ranges (AASM 2016, NSF 2015) stay the main reference.
@@ -239,11 +236,13 @@ at this age. The recommended sleep ranges (AASM 2016, NSF 2015) stay the main re
   (<https://arxiv.org/abs/1904.04780>): 700 babies whose parents logged sleep in the Baby Connect app. On babies
   not used to make the file, the start of the next sleep was within 30 minutes 53 % of the time (old table 49 %);
   the median error was 27 minutes (old table 32 minutes). How to make the file: `training/sleep/README.md`.
-- **Not shipped yet**: the dataset has no licence. The file is not in this repository until the dataset authors give
-  permission.
-- **Install**: copy `sleep_norms.json` to the data folder (`DATA_DIR/sleep_norms.json`; in the container `/data`, the
-  `data` volume), or set `SLEEP_NORMS_PATH` to its full path. Restart is not necessary.
-- **Fallback**: when the file is missing or not valid, or the child is older than 24 months, or no night sleep is
+- **Licence**: the data is open for non-commercial use with attribution to Liu et al. The norms file
+  (`src/frecklebubby/data/sleep_norms.json`) and the data file (`training/sleep/data/`) have the same terms.
+- **Your own file**: put `sleep_norms.json` in the data folder (`DATA_DIR/sleep_norms.json`; in the container
+  `/data`, the `data` volume), or set `SLEEP_NORMS_PATH` to its full path. It replaces the bundled file. Restart is
+  not necessary.
+- **Fallback**: a table of common wake windows by age (`src/frecklebubby/data/wake_windows.json`). The app uses it
+  when the file is missing or not valid, or the child is older than 24 months, or no night sleep is
   logged in the last 24 hours, the app uses the wake-window table as before.
 
 ## Cry helper
@@ -266,13 +265,14 @@ The **Crying?** tile on the Home screen answers "what do I check first?".
   time; "always hungry" is right 78 % of the time. Thus the logs decide the order of the list, and the sound guess
   is shown only as a hint. The app reads these numbers from `model_card.json` and shows them to the parent.
 
-The model files are **not in this repository** (dataset licence terms: non-commercial, see `training/cry/NOTICE.md`).
-Without them the app says "Sound analysis is not installed on this server." and the rest works.
+The model files are bundled in `src/frecklebubby/data/models/cry/`. They are for **non-commercial use, with
+attribution** (ICSD is CC BY-NC-SA 4.0; see `NOTICE.txt` in that folder). Without the files, or without the `cry`
+extra, the app says "Sound analysis is not installed on this server." and the rest works.
 
-- **Make the files**: `training/cry/README.md`. You need the ICSD dataset (permission from its authors) and the
-  DeepInfant clips.
-- **Install**: copy `cry_detector.onnx`, `cry_reason.onnx`, `model_card.json` and `NOTICE.txt` to
-  `DATA_DIR/models/cry` (in the container `/data/models/cry`, the `data` volume), or set `CRY_MODEL_DIR`.
+- **Make the files again**: `training/cry/README.md`. You need the ICSD dataset and the DeepInfant clips.
+- **Your own models**: put `cry_detector.onnx`, `cry_reason.onnx`, `model_card.json` and `NOTICE.txt` in
+  `DATA_DIR/models/cry` (in the container `/data/models/cry`, the `data` volume), or set `CRY_MODEL_DIR`. They
+  replace the bundled models.
 - **Without containers**: install the extra (`uv sync --extra cry`) and the `ffmpeg` program. The container image has
   both.
 - **Microphone**: browsers give the microphone only to HTTPS pages (or `localhost`). See [HTTPS](#https).
@@ -390,6 +390,8 @@ account.
 ## Licence
 
 MIT for the code. See [LICENSE](LICENSE). Data in `src/frecklebubby/data/` keeps its own licence (see
-[Knowledge library and licences](#knowledge-library-and-licences)).
+[Knowledge library and licences](#knowledge-library-and-licences)). The sleep norms file, the sleep data in
+`training/sleep/data/` and the cry models are for non-commercial use, with attribution (see [Sleep model](#sleep-model)
+and [Cry helper](#cry-helper)).
 
 This project is not affiliated with Huckleberry Labs Inc.

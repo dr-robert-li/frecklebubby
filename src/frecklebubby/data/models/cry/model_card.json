@@ -1,0 +1,200 @@
+{
+  "name": "frecklebubby-cry",
+  "version": "0.1",
+  "date": "2026-11-20",
+  "encoder": {
+    "name": "EfficientAT mn10_as (MobileNetV3, AudioSet tagger, 4.9 M parameters)",
+    "licence": "MIT (code and pretrained weights, published in the same repository's GitHub release)",
+    "source_url": "https://github.com/fschmid56/EfficientAT",
+    "weights_url": "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/mn10_as_mAP_471.pt",
+    "paper": "Schmid, Koutini, Widmer. Efficient Large-Scale Audio Tagging via Transformer-to-CNN Knowledge Distillation. ICASSP 2023. arXiv:2211.04772"
+  },
+  "input": {
+    "sample_rate": 16000,
+    "channels": 1,
+    "dtype": "float32",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "name": "audio",
+    "shape": [
+      1,
+      "samples"
+    ],
+    "preprocessing": "Decode to 16 kHz mono float32 PCM (for example ffmpeg -ac 1 -ar 16000 -f f32le). Nothing else: the 2x upsampling to 32 kHz, pre-emphasis, STFT (n_fft 1024, window 800, hop 320), 128 Kaldi mel bands (0-15000 Hz), log and (x + 4.5) / 5 normalisation are inside both ONNX graphs. cry_reason.onnx also has a 4 kHz low-pass in the graph.",
+    "min_seconds": 1.0,
+    "max_seconds": 60.0
+  },
+  "detector": {
+    "file": "cry_detector.onnx",
+    "output": "frame_probs",
+    "output_shape": [
+      "frames",
+      2
+    ],
+    "labels": [
+      "cry",
+      "snore"
+    ],
+    "other": "a frame where no label is on",
+    "frame_seconds": 0.32,
+    "threshold": 0.5,
+    "median_frames": 1,
+    "is_cry_min_seconds": 1.0,
+    "trained_on": "ICSD train (weak + real strong + synthetic strong), selected on ICSD validation",
+    "unfrozen_encoder": false,
+    "metrics": {
+      "test_real": {
+        "clips": 82,
+        "segment_f1_1s": {
+          "cry": 0.8605,
+          "snore": 0.8735
+        },
+        "intersection_f1": {
+          "cry": 0.8,
+          "snore": 0.7731,
+          "macro": 0.7866
+        },
+        "event_f1_collar_200ms": {
+          "cry": 0.2282,
+          "snore": 0.5783
+        },
+        "clip_contains_cry": {
+          "precision": 1.0,
+          "recall": 0.9302,
+          "tp": 40,
+          "fp": 0,
+          "fn": 3,
+          "tn": 39,
+          "rule": "detected cry >= 1.0 s"
+        }
+      },
+      "test_synth": {
+        "clips": 1000,
+        "segment_f1_1s": {
+          "cry": 0.9497,
+          "snore": 0.9356
+        },
+        "intersection_f1": {
+          "cry": 0.9602,
+          "snore": 0.9613,
+          "macro": 0.9607
+        },
+        "event_f1_collar_200ms": {
+          "cry": 0.7621,
+          "snore": 0.7647
+        },
+        "clip_contains_cry": {
+          "precision": 1.0,
+          "recall": 0.726,
+          "tp": 363,
+          "fp": 0,
+          "fn": 137,
+          "tn": 500,
+          "rule": "detected cry >= 1.0 s"
+        }
+      }
+    },
+    "paper": {
+      "source": "Liu et al., ICSD (arXiv:2408.10561), Tables 8 and 9, best row per column",
+      "test_real": {
+        "intersection_f1": {
+          "cry": 0.8805,
+          "snore": 0.8522
+        },
+        "segment_f1_1s": {
+          "cry": 0.9174,
+          "snore": 0.8765
+        }
+      },
+      "test_synth": {
+        "intersection_f1": {
+          "cry": 0.9878,
+          "snore": 0.9901
+        },
+        "segment_f1_1s": {
+          "cry": 0.9786,
+          "snore": 0.9722
+        }
+      }
+    },
+    "licence": "Head trained on ICSD (CC BY-NC-SA 4.0); non-commercial use, with attribution."
+  },
+  "reason": {
+    "file": "cry_reason.onnx",
+    "output": "reason_probs",
+    "labels": [
+      "belly_pain",
+      "burping",
+      "discomfort",
+      "hungry",
+      "scared",
+      "tired"
+    ],
+    "experimental": true,
+    "trained_on": "489 cleaned clips from 245 recorders (DeepInfant/Donate-a-Cry lineage, Data/v2)",
+    "class_counts": {
+      "belly_pain": 16,
+      "burping": 18,
+      "discomfort": 28,
+      "hungry": 382,
+      "scared": 17,
+      "tired": 28
+    },
+    "evaluation": "StratifiedGroupKFold(5) by recorder UUID x 5 repeats; C chosen inside each training fold",
+    "metrics": {
+      "accuracy": 0.7973,
+      "balanced_accuracy": 0.2599,
+      "macro_f1": 0.2658,
+      "macro_ovr_auc": 0.6743
+    },
+    "metrics_sd": {
+      "accuracy": 0.0174,
+      "balanced_accuracy": 0.0582,
+      "macro_f1": 0.0669,
+      "macro_ovr_auc": 0.05
+    },
+    "metrics_uncalibrated": {
+      "accuracy": 0.7683,
+      "balanced_accuracy": 0.4361,
+      "macro_f1": 0.4318,
+      "macro_ovr_auc": 0.6821
+    },
+    "baselines": {
+      "always_hungry": {
+        "accuracy": 0.7813,
+        "balanced_accuracy": 0.1667,
+        "macro_f1": 0.1462,
+        "macro_ovr_auc": 0.5
+      },
+      "prior_sampler": {
+        "accuracy": 0.6206,
+        "balanced_accuracy": 0.1643,
+        "macro_f1": 0.1601,
+        "macro_ovr_auc": 0.4967
+      },
+      "source_rate_only": {
+        "accuracy": 0.8068,
+        "balanced_accuracy": 0.2584,
+        "macro_f1": 0.2019,
+        "macro_ovr_auc": 0.7834
+      }
+    },
+    "confound": "All 'hungry' clips are 8 kHz recordings and all 'scared' clips are 44.1 kHz recordings. The model may learn the recording source, not the cry. 'source_rate_only' shows how far the sample rate alone gets.",
+    "calibration": {
+      "ece_raw_softmax": 0.073,
+      "ece_calibrated_in_sample": 0.045,
+      "temperature": 2.3546,
+      "bias": [
+        -0.3213,
+        -0.4046,
+        -0.1293,
+        1.3348,
+        -0.3777,
+        -0.1019
+      ]
+    },
+    "licence": "Reason model trained on crowd-labelled clips from the DeepInfant/Donate-a-Cry lineage; labels are parents' guesses. Experimental."
+  }
+}

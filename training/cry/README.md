@@ -15,12 +15,13 @@ This kit is a separate uv project. Torch and the other training packages are onl
 ## Data and licence rules
 
 - **ICSD** (detector): Liu et al., "An Open-source Dataset for Infant Cry and Snoring Detection",
-  arXiv:2408.10561. Licence CC BY-NC-SA 4.0 with gated terms. The authors gave the project owner permission to
-  use it. Non-commercial use only. Do not copy the audio, or files made from single recordings, into the repository.
-  Do not share the data. Share the detector weights only under the same non-commercial terms.
+  arXiv:2408.10561. Licence CC BY-NC-SA 4.0: non-commercial use, with attribution. The audio (7.4 GB) is too large
+  for the repository; get it from <https://huggingface.co/datasets/QingyuLiu1/ICSD>. Share the detector weights
+  under the same non-commercial terms.
 - **Cry-reason clips**: the `Data/v2` folder of the DeepInfant project (Donate-a-Cry lineage). The labels are
   parents' own guesses. Do not copy the audio into the repository.
-- Never commit model weights or embeddings. The work folder and the output folder must be outside the repository.
+- The work folder (embeddings, checkpoints) must be outside the repository. The exported models that the app
+  uses are in `src/frecklebubby/data/models/cry/`.
 
 ## Install
 

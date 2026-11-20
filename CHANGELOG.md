@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The sleep norms file and the cry models are now bundled, so the sleep model and the cry sound guess work with no
+  setup. The sleep data of Liu et al. (2019) is in `training/sleep/data/`. These files are for non-commercial use,
+  with attribution.
+
 ## [0.1.0] - 2026-11-20
 
 ### Added

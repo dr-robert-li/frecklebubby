@@ -325,7 +325,8 @@ async def test_mcp_cry_tools(client):
 
 # --- real model (only on a machine with the exported files) -------------------------------------------------------
 
-MODEL_DIR = Path(os.environ.get("CRY_TEST_MODEL_DIR", Path.home() / ".cache/frecklebubby-research/cry-models/v0.1"))
+MODEL_DIR = Path(os.environ.get("CRY_TEST_MODEL_DIR",
+                                Path(__file__).parents[1] / "src/frecklebubby/data/models/cry"))
 CRY_CLIP = os.environ.get("CRY_TEST_CLIP", "")
 
 

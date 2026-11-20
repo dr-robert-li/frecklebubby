@@ -16,22 +16,22 @@ const server = [
 	'set -e',
 	'cd ../frontend && npm run build',
 	'cd .. && D=$(mktemp -d -t frecklebubby-e2e-XXXXXX)',
-	`AUTH_MODE=dev DATA_DIR="$D" PORT=${PORT} exec uv run frecklebubby`
+	`AUTH_MODE=dev DATA_DIR="$D" SLEEP_NORMS_PATH="$D/none.json" CRY_MODEL_DIR="$D/none" PORT=${PORT} exec uv run frecklebubby`
 ].join('\n');
 // Second backend for the AI, reminder and import journeys: real model, fake Huckleberry. Web servers start
 // one after the other, so this one uses the frontend that the first one built.
 const llmServer = [
 	'set -e',
 	'cd .. && D=$(mktemp -d -t frecklebubby-e2e-llm-XXXXXX)',
-	`AUTH_MODE=dev HUCKLEBERRY_FAKE=1 LLM_BASE_URL=${LLM_BASE_URL} DATA_DIR="$D" PORT=${LLM_PORT} exec uv run --extra import frecklebubby`
+	`AUTH_MODE=dev HUCKLEBERRY_FAKE=1 LLM_BASE_URL=${LLM_BASE_URL} DATA_DIR="$D" SLEEP_NORMS_PATH="$D/none.json" PORT=${LLM_PORT} exec uv run --extra import frecklebubby`
 ].join('\n');
 
-// Cry helper (M8): a third backend with the exported cry models (never in the repo) and a real cry clip as the fake
+// Cry helper (M8): a third backend with the bundled cry models and a real cry clip as the fake
 // microphone. CRY_E2E_CLIP: any audio file with a baby crying; default: a DeepInfant "hungry" clip. The WAV that
 // Chromium plays is made here, in a temp folder, each run.
 const CRY_PORT = Number(process.env.E2E_CRY_PORT ?? 8013);
 const cryURL = `http://127.0.0.1:${CRY_PORT}`;
-export const CRY_MODEL_DIR = process.env.CRY_MODEL_DIR ?? join(homedir(), '.cache/frecklebubby-research/cry-models/v0.1');
+export const CRY_MODEL_DIR = process.env.CRY_MODEL_DIR ?? join(__dirname, '../src/frecklebubby/data/models/cry');
 function cryClip(): string {
 	const dir = join(homedir(), 'Desktop/projects/DeepInfant/Data/v2/hungry');
 	const src = process.env.CRY_E2E_CLIP ?? (existsSync(dir) ? join(dir, readdirSync(dir).filter((f) => f.endsWith('.wav')).sort()[0] ?? '') : '');
