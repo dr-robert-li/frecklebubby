@@ -67,7 +67,8 @@ services:
 
   # Optional: a Cloudflare Tunnel gives a public HTTPS address with no open port (README "HTTPS").
   # It starts only with the profile "tunnel": put COMPOSE_PROFILES=tunnel in .env.
-  # In the Cloudflare dashboard, route the public hostname to http://app:8000.
+  # A tunnel made with the cloudflared command line sends all requests to TUNNEL_URL.
+  # A tunnel made in the Cloudflare dashboard uses the dashboard route: set it to http://app:8000.
   cloudflared:
     image: cloudflare/cloudflared:2026.11.1
     profiles: ["tunnel"]
@@ -75,6 +76,7 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      TUNNEL_URL: http://app:8000
     depends_on:
       - app
 
