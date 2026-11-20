@@ -1,6 +1,6 @@
 """Children of a family."""
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,8 +29,18 @@ def _check_birthdate(value: date) -> None:
         raise Invalid("birthdate: must not be in the future")
 
 
+EARLY_MAX = timedelta(weeks=20)  # a due date more than 20 weeks after the birth is a typing error
+
+
+def _check_due(birthdate: date, due: date | None) -> None:
+    if due is not None and not birthdate < due <= birthdate + EARLY_MAX:
+        raise Invalid("due_date: give the due date of a baby born early: after the birth date, at most 20 weeks "
+                      "after it")
+
+
 def create_child(s: Session, ctx: Ctx, body: ChildIn) -> Child:
     _check_birthdate(body.birthdate)
+    _check_due(body.birthdate, body.due_date)
     child = Child(family_id=ctx.fam.id, **body.model_dump())
     s.add(child)
     s.commit()
@@ -45,6 +55,7 @@ def update_child(s: Session, ctx: Ctx, child_id: int, body: ChildPatch) -> Child
             raise Invalid(f"{key}: must not be null")
     if changes.get("birthdate"):
         _check_birthdate(changes["birthdate"])
+    _check_due(changes.get("birthdate") or child.birthdate, changes.get("due_date", child.due_date))
     for key, value in changes.items():
         setattr(child, key, value)
     s.commit()
@@ -84,3 +95,20 @@ def is_night(child: Child, local: datetime, early_minutes: int = 60) -> bool:
     end = cutoff.hour * 60 + cutoff.minute
     t = local.hour * 60 + local.minute
     return (begin <= t or t < end) if begin > end else begin <= t < end
+
+
+def corrected(child: Child, day: date) -> bool:
+    """True when development uses the corrected age: a due date is set and the child is under 2 years (NHS and AAP:
+    library file corrected-age-premature)."""
+    b = child.birthdate
+    return child.due_date is not None and (day.year, day.month, day.day) < (b.year + 2, b.month, b.day)
+
+
+def dev_age_days(child: Child, day: date) -> int:
+    """Age in days for development windows, milestone bands and the band notification: from the due date (the
+    corrected age) until 2 years when a due date is set; else from the birth date. Never below 0."""
+    return max(0, (day - (child.due_date if corrected(child, day) else child.birthdate)).days)
+
+
+def dev_age_months(child: Child, at: datetime) -> float:
+    return dev_age_days(child, at.date()) / 30.4375

@@ -172,7 +172,15 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
             "Logs and reads baby-care data in Frecklebubby. Times are ISO 8601; a time without an offset is in the "
             "family time zone; an omitted time means now. Timers (sleep, nursing, pump, activity, play, confined) are "
             "live; log_* "
-            "tools save events that are over. To fix or remove an entry: call list_entries, confirm the entry with "
+            "tools save events that are over. Which tool logs what: sleep = sleep_timer / log_sleep; breastfeed = "
+            "nursing_timer / log_nursing; bottle (formula or expressed milk) = log_bottle; food = log_solids; nappy "
+            "or diaper change = log_nappy; potty or toilet = log_potty; the parent's pumping = pump_timer / log_pump; "
+            "play and tummy time = play_timer / log_play; car seat, pram, bouncer, swing, carrier or high chair = "
+            "confined_timer / log_confined; crying = log_cry; bath, story, screen time, skin to skin, teeth = "
+            "activity_timer / log_activity; weight, length, head = log_growth; temperature = log_temperature; "
+            "medicine = log_medicine; a first (smiled, sat, walked) = log_milestone; anything else = log_note. "
+            "log_in_plain_words reads the parent's own words with the server model and saves what it is sure of. "
+            "To fix or remove an entry: call list_entries, confirm the entry with "
             "the user, then call update_entry or delete_entry with its id. get_status shows running timers, the "
             "last entry of each type, today's totals and the next sleep window."
         ),
@@ -246,7 +254,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Control the live breastfeeding timer. It counts seconds per side. Use log_nursing for a feed that is over."""
+        """Control the live breastfeeding (nursing) timer. It counts seconds per side. Use log_nursing for a feed that
+        is over, log_bottle for a bottle."""
         return timer(child, "nursing", action, start_time, end_time, side=side, notes=notes)
 
     @mcp.tool
@@ -259,7 +268,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save a breastfeed that is over."""
+        """Save a breastfeed (nursing) that is over. For a bottle of expressed milk use log_bottle."""
         return log_entry(child, "nursing", start_time, {"left_seconds": left_seconds, "right_seconds": right_seconds,
                                                          "last_side": last_side}, notes, end_time, end_required=True)
 
@@ -272,7 +281,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Log a bottle feed."""
+        """Log a bottle feed: formula, expressed breast milk or another milk. For breastfeeding use log_nursing."""
         return log_entry(child, "bottle", start_time, {"amount_ml": _ml(amount, units), "milk_type": milk_type}, notes)
 
     @mcp.tool
@@ -283,7 +292,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Log a solid-food meal."""
+        """Log a solid-food meal (food, not milk), with how the child liked it."""
         return log_entry(child, "solids", start_time,
                          {"foods": [f.model_dump(exclude_none=True) for f in foods], "reaction": reaction}, notes)
 
@@ -303,7 +312,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Control the live breast-pumping timer. Use log_pump for a session that is over."""
+        """Control the live breast-pumping timer (the parent pumps milk). Use log_pump for a session that is over."""
         data = {k: _ml(v, units) for k, v in {"left_ml": left_amount, "right_ml": right_amount,
                                               "total_ml": total_amount}.items() if v is not None}
         return timer(child, "pump", action, start_time, end_time, data=data or None, notes=notes)
@@ -319,7 +328,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save a breast-pumping session that is over."""
+        """Save a breast-pumping session (the parent pumps milk) that is over."""
         return log_entry(child, "pump", start_time, {"left_ml": _ml(left_amount, units),
                                                       "right_ml": _ml(right_amount, units),
                                                       "total_ml": _ml(total_amount, units)}, notes, end_time)
@@ -337,7 +346,9 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Control the live activity timer (bath, tummy time, story time, play and so on)."""
+        """Control the live activity timer: bath, story time, screen time, skin to skin, brushing teeth (and the
+        older kinds tummy time, indoor and outdoor play). For play with tummy time use play_timer; for a car seat,
+        pram or bouncer use confined_timer."""
         return timer(child, "activity", action, start_time, end_time, kind=kind, notes=notes)
 
     @mcp.tool
@@ -348,7 +359,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save an activity that is over."""
+        """Save an activity that is over: bath, story time, screen time, skin to skin, brushing teeth. For play and
+        tummy time use log_play; for a car seat, pram or bouncer use log_confined."""
         return log_entry(child, "activity", start_time, {"kind": kind}, notes, end_time)
 
     @mcp.tool(annotations=DESTRUCTIVE)
@@ -362,7 +374,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Control the live play timer. During play, switch starts and stops the tummy time part."""
+        """Control the live play timer (floor play, indoor or outdoor). During play, switch starts and stops the
+        tummy time part. Use log_play for play that is over."""
         if kind and action != "complete":
             raise ToolError("kind: use it only with complete")
         return timer(child, "play", action, start_time, end_time, data={"kind": kind} if kind else None, notes=notes)
@@ -377,7 +390,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save play time that is over, with the minutes of tummy time in it."""
+        """Save play time that is over (indoor or outdoor), with the minutes of tummy time in it. Use this for tummy
+        time too."""
         return log_entry(child, "play", start_time, {"kind": kind, "tummy_seconds": round(tummy_minutes * 60)
                                                       if tummy_minutes is not None else None}, notes, end_time)
 
@@ -406,7 +420,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save confined time that is over (car seat, bouncer, swing, pram, carrier, high chair)."""
+        """Save confined time that is over: time strapped in a car seat, bouncer, swing, pram, carrier or high chair.
+        Use confined_timer while it goes on."""
         return log_entry(child, "confined", start_time, {"device": device}, notes, end_time)
 
     # --- nappy and potty --------------------------------------------------------------------------
@@ -428,7 +443,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Log a nappy (diaper) change."""
+        """Log a nappy (diaper) change: wet (pee), dirty (poo), both or dry, with poo colour and texture, rash, air
+        time and pee details. For a potty or toilet attempt use log_potty."""
         return log_entry(child, "nappy", start_time, {"mode": mode, "pee_amount": pee_amount, "poo_amount": poo_amount,
                                                        "color": color, "consistency": consistency, "rash": rash,
                                                        "rash_severity": rash_severity, "air_minutes": air_minutes,
@@ -508,7 +524,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Log a development milestone."""
+        """Log a development milestone: the first time the child did something new (smiled, rolled, sat, crawled,
+        walked, a first word or tooth)."""
         return log_entry(child, "milestone", start_time, {"title": title, "key": key}, notes)
 
     @mcp.tool
@@ -517,7 +534,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         start_time: Time = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Save a free-text note."""
+        """Save a free-text note, for something no other log_* tool fits."""
         return log_entry(child, "note", start_time, {}, text)
 
     @mcp.tool
@@ -529,7 +546,8 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         notes: Notes = None,
         child: ChildArg = None,
     ) -> dict[str, Any]:
-        """Log a crying episode."""
+        """Log a crying episode (when it started and stopped, what soothed the child). get_cry_help ranks things to
+        check."""
         return log_entry(child, "cry", start_time, {"soothed_by": soothed_by}, notes, end_time)
 
     @mcp.tool(annotations=READ)
@@ -542,6 +560,26 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
             out = cry.help(s, ctx, c.id)
             out.pop("sound")  # sound analysis needs a recording; it is in the app only
             return out
+
+    @mcp.tool
+    async def log_in_plain_words(
+        text: Annotated[str, Field(description="What happened, in the parent's own words, for example 'she had 120 ml "
+                                               "formula at 2 and a wet nappy just now'.", min_length=1, max_length=2000)],
+        save: Annotated[bool, Field(description="true = save what is sure now and return the rest as proposals. "
+                                                "false = save nothing and return all as proposals.")] = True,
+        child: ChildArg = None,
+    ) -> dict[str, Any]:
+        """Log events from plain words with the server's AI model (the same parser as the app's assistant). It
+        saves only what it is sure of. An item that may be a guess (an amount or time that is not in the words, a
+        time more than 24 hours back, an entry of the same type within 10 minutes, a note) is not saved: it comes
+        back in `proposals` with the reason in `unsure` (times in UTC). Check a proposal with the user, then save it
+        with the typed log_* or *_timer tool. Not for questions. Slow on a CPU model (about 5 to 30 s)."""
+        from .ai import nl_log
+
+        with call() as (s, ctx):
+            c = child_of(s, ctx, child)
+            out = await nl_log.log_words(s, ctx, c.id, text, save)
+            return {"saved": out["items"], "proposals": out["proposals"], "message": out["message"]}
 
     # --- history ----------------------------------------------------------------------------------
 

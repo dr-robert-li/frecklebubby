@@ -17,7 +17,7 @@
 
 	function open(c?: Child) {
 		error = '';
-		form = c ? { ...c, sex: c.sex ?? '' } : { name: '', birthdate: '', sex: '', color: COLOURS[list.length % COLOURS.length], night_start: '19:00', morning_cutoff: '07:00' };
+		form = c ? { ...c, sex: c.sex ?? '', due_date: c.due_date ?? '' } : { name: '', birthdate: '', due_date: '', sex: '', color: COLOURS[list.length % COLOURS.length], night_start: '19:00', morning_cutoff: '07:00' };
 	}
 
 	async function save(e: SubmitEvent) {
@@ -25,7 +25,7 @@
 		const f = form!;
 		busy = true;
 		error = '';
-		const body = { name: f.name, birthdate: f.birthdate, sex: f.sex || null, color: f.color, night_start: f.night_start, morning_cutoff: f.morning_cutoff };
+		const body = { name: f.name, birthdate: f.birthdate, due_date: f.due_date || null, sex: f.sex || null, color: f.color, night_start: f.night_start, morning_cutoff: f.morning_cutoff };
 		try {
 			const saved = f.id ? await api<Child>(`/children/${f.id}`, { method: 'PATCH', body }) : await api<Child>('/children', { method: 'POST', body });
 			await Promise.all([load(), loadMe()]);
@@ -79,6 +79,8 @@
 		<form class="stack" onsubmit={save}>
 			<label class="field"><span>Name</span><input bind:value={form.name} required maxlength="100" /></label>
 			<label class="field"><span>Date of birth</span><input type="date" bind:value={form.birthdate} required max={localDay()} /></label>
+			<label class="field"><span>Born early? Due date</span><input type="date" bind:value={form.due_date} min={form.birthdate || undefined} /></label>
+			<p class="muted small">Leave it empty if your baby was born at term. With a due date, milestones and development use the corrected age (from the due date) until 2 years, as the NHS and the AAP advise.</p>
 			<fieldset>
 				<legend class="field-label">Sex (for growth charts)</legend>
 				<div class="chips">

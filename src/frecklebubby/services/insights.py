@@ -12,12 +12,12 @@ from sqlalchemy.orm import Session
 from ..config import PACKAGE_DATA
 from ..db import utcnow
 from ..models import Child, Entry
-from . import Ctx, day_bounds, sleep
-from .children import age_months, get_child
+from . import Ctx, day_bounds, development, sleep
+from .children import age_months, corrected, dev_age_months, get_child
 from .confined import merge, under
 from .families import wording
 from .growth import growth
-from .library import cite, source
+from .library import cite, cite_files, source
 from .milestones import catalog
 from .reports import daily
 
@@ -184,7 +184,8 @@ def _milestone_cards(s: Session, ctx: Ctx, child: Child, now: datetime) -> list[
     items = catalog()
     if not items:
         return []
-    age = _age(child, now.astimezone(ctx.tz))
+    local = now.astimezone(ctx.tz)
+    age = dev_age_months(child, local)  # corrected age until 2 years for a baby born early (M13)
     achieved = {e.data.get("key") for e in s.scalars(select(Entry).where(Entry.child_id == child.id,
                                                                          Entry.type == "milestone"))}
     bands = sorted({i["age_months"] for i in items})
@@ -205,6 +206,12 @@ def _milestone_cards(s: Session, ctx: Ctx, child: Child, now: datetime) -> list[
             body += " " + act_early()[band]["text"]
             cite = [act_early()[band]["source"]]
         out.append(card("milestones", "info", title, body, cite, m=band))
+        tips = development.tips(band)
+        if tips:  # M13: CDC tips for this age, from the library file (exact CDC sentences)
+            out[-1]["body"] += "\nCDC tips for this age: " + " ".join(tips)
+            out[-1]["citations"] += cite_files(development.tips_file(band), start=len(out[-1]["citations"]) + 1)
+        if corrected(child, local.date()):
+            out[-1]["body"] += "\n" + development.CORRECTED_NOTE
     return out
 
 
@@ -403,6 +410,7 @@ def insights(s: Session, ctx: Ctx, child_id: int, now: datetime | None = None) -
     w = {"nappy": word, "nappies": "nappies" if word == "nappy" else "diapers"}
     cards = (red_flags(s, child, ctx.tz, now, word) + _wet_nappy_card(s, ctx, child, now, w)
              + _rash_card(s, ctx, child, now, w) + _confined_card(s, ctx, child, now)
-             + _sleep_card(s, ctx, child, now) + sleep_model_cards(s, ctx, child, now) + _growth_card(s, ctx, child) + _milestone_cards(s, ctx, child, now))
+             + _sleep_card(s, ctx, child, now) + sleep_model_cards(s, ctx, child, now) + _growth_card(s, ctx, child) + _milestone_cards(s, ctx, child, now)
+             + development.cards(child, now.astimezone(ctx.tz)))
     order = {"urgent": 0, "attention": 1, "info": 2}
     return sorted(cards, key=lambda c: order[c["severity"]])

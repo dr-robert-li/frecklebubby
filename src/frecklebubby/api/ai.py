@@ -41,12 +41,36 @@ class ChatIn(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
 
 
+class LoggedItem(BaseModel):
+    action: Literal["entry", "timer"]
+    type: str
+    summary: str
+    entry_id: int | None = None
+    timer_action: str | None = None
+    undone: bool = False
+
+
+class LoggedOut(BaseModel):
+    items: list[LoggedItem]
+    proposals: list[nl_log.Proposal]
+    message: str
+
+
 class MessageOut(BaseModel):
     id: int
     role: Literal["user", "assistant"]
     content: str
     citations: list[CitationOut]
+    logged: LoggedOut | None = None
     created_at: datetime
+
+
+class UndoIn(BaseModel):
+    item: int = Field(ge=0, description="Index of the item in logged.items.")
+
+
+class ProposalsIn(BaseModel):
+    proposals: list[nl_log.Proposal] = Field(max_length=20, description="The proposals to save; [] dismisses them.")
 
 
 class ScheduleRow(BaseModel):
@@ -149,6 +173,19 @@ def nl_commit(cid: int, body: nl_log.CommitIn, ctx: Ctx = Depends(get_ctx), s: S
 @router.get("/children/{cid}/assistant/messages", response_model=list[MessageOut])
 def messages(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     return assistant.list_messages(s, ctx, cid)
+
+
+@router.post("/children/{cid}/assistant/messages/{mid}/undo", response_model=MessageOut,
+             summary="Undo one item of a chat turn's Logged block")
+def undo_logged(cid: int, mid: int, body: UndoIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    return assistant.undo(s, ctx, cid, mid, body.item)
+
+
+@router.post("/children/{cid}/assistant/messages/{mid}/proposals", response_model=MessageOut,
+             summary="Save (or with [] dismiss) the proposals of a chat turn")
+def save_logged(cid: int, mid: int, body: ProposalsIn, ctx: Ctx = Depends(get_ctx),
+                s: Session = Depends(get_session)):
+    return assistant.save_proposals(s, ctx, cid, mid, body.proposals)
 
 
 @router.delete("/children/{cid}/assistant/messages", status_code=204)

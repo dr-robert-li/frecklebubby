@@ -6,6 +6,29 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-20
+
+### Added
+
+- Play: a Play tile with a timer and a tummy-time part. Reports show play and tummy minutes per day with the WHO
+  30-minute line for babies under 12 months.
+- Confined time: a timer for car seat, bouncer, swing, pram, carrier and high chair. A note at 1 hour for children
+  under 5 years (WHO) and a break warning at 2 hours for children under 12 months (AAP advice for car seats), in
+  the app and as push notifications.
+- Nappy details: rash severity, time with the nappy off, pee colour, look and smell. Rash advice card. New warning
+  rules for dark pee in a newborn and for pink or red pee.
+- Support report on the Reports page: sleep, feeds, nappies, play and tummy time, confined time, crying, growth and
+  milestones for the last 7 days, with cited references and suggestions. Works without the model (standard tips).
+- Development guidance: 33 new library files (CDC tips and activities for each age, WHO motor milestones, NHS
+  pages) and 69 development items. "Around now" cards, tips on milestone cards, a notification at each new age
+  band (switch in Settings > Reminders), and corrected age for babies born early (optional due date).
+- The assistant chat logs what you tell it in plain words and shows a "Logged" block with Undo and Edit. When it is
+  not sure, it asks before it saves.
+- MCP: `log_play`, `play_timer`, `log_confined`, `confined_timer`, `get_support_report`, `log_in_plain_words`, and
+  the new nappy fields. Clearer tool descriptions.
+- Knowledge: WHO activity guidelines for children under 5, car seat time, NHS nappy rash, jaundice and bleeding
+  pages.
+
 ### Changed
 
 - The sleep norms file and the cry models are now bundled, so the sleep model and the cry sound guess work with no

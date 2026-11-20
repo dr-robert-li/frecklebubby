@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { api } from '#lib/api.ts';
-	import { app, toast, wording } from '#lib/app.svelte.ts';
+	import { app, toast, wording, type Settings } from '#lib/app.svelte.ts';
 	import Back from '#lib/Back.svelte';
 	import Icon from '#lib/Icon.svelte';
 	import Sheet from '#lib/Sheet.svelte';
@@ -62,6 +62,15 @@
 		}
 	}
 
+	async function milestoneAlerts(on: boolean) {
+		try {
+			app.settings = await api<Settings>('/family/settings', { method: 'PATCH', body: { milestone_alerts: on } });
+			toast(on ? 'Milestone messages on' : 'Milestone messages off');
+		} catch (err) {
+			error = (err as Error).message;
+		}
+	}
+
 	async function toggle(r: Reminder) {
 		await api(`/reminders/${r.id}`, { method: 'PATCH', body: { enabled: !r.enabled } }).catch((e) => (error = e.message));
 		load();
@@ -107,6 +116,13 @@
 		<p class="empty">No reminders yet.</p>
 	{/if}
 	<button class="ghost wide" onclick={openAdd}><Icon name="plus" /> Add a reminder</button>
+</section>
+
+<section class="card">
+	<div class="rem">
+		<span class="txt"><strong>Milestone age bands</strong><span class="muted small">A message when a child reaches a new age band of the CDC milestones checklist, with 2 or 3 things to look for. Daytime only. For all children.</span></span>
+		<label class="switch"><input type="checkbox" checked={app.settings?.milestone_alerts ?? true} onchange={(e) => milestoneAlerts(e.currentTarget.checked)} aria-label="Milestone age band messages on" /></label>
+	</div>
 </section>
 
 {#if adding}

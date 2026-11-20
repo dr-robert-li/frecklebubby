@@ -16,8 +16,8 @@ from sqlalchemy.orm import Session
 from ..db import utcnow
 from ..knowledge.store import search
 from ..models import SupportReport
-from ..services import Ctx, support
-from ..services.children import get_child
+from ..services import Ctx, development, support
+from ..services.children import dev_age_months, get_child
 from ..services.families import wording
 from . import llm
 from .assistant import SOURCE_CHARS, child_context
@@ -102,8 +102,11 @@ async def _suggest(s: Session, ctx: Ctx, child, now: datetime, rep: dict) -> boo
     ok = [b for b in rep["blocks"] if b["status"] == "ok"]
     in_range = [b for b in ok if b["compared"]]
     hits, seen = [], set()
+    age = dev_age_months(child, now.astimezone(ctx.tz))
     for b in watch + [b for b in ok if "_well" in b]:
-        for h in search(s, ctx.fam, QUERIES.get(b["area"], b["title"]), limit=3 if b in watch else 1):
+        # M13: only passages for the child's age (a 4-month-old got screen-time tips for 2-year-olds).
+        found = search(s, ctx.fam, QUERIES.get(b["area"], b["title"]), limit=12)
+        for h in development.age_fit(found, age, 3 if b in watch else 1):
             if (h["id"], h["heading"]) not in seen and len(hits) < MAX_PASSAGES:
                 seen.add((h["id"], h["heading"]))
                 hits.append(h)

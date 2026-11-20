@@ -2,25 +2,38 @@
 
 A baby tracker that you host yourself.
 
-Version 0.1.0. See [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.0. See [CHANGELOG.md](CHANGELOG.md).
 
 ## What it does
 
 - Tracks sleep, nursing, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities,
-  milestones and notes.
+  play with tummy time, time in a car seat or other seat, crying, milestones and notes.
 - Supports more than one child and more than one carer. Carers join by invite.
-- Has live timers for sleep, nursing, pumping and activities. A timer keeps running when you close the app.
+- Has live timers for sleep, nursing, pumping, activities, play (with a tummy-time part) and confined time. A timer
+  keeps running when you close the app.
+- Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a
+  note at 1 hour (children under 5 years) and a break warning at 2 hours (children under 12 months), with sources.
+- Records nappy details: rash, time with the nappy off, poo colour and texture, pee colour, look and smell.
 - Shows reports: sleep, feeds and nappies per day, and growth on WHO percentile curves. Exports CSV.
 - Sends reminders in the app and as push notifications.
 - Has a REST API and an MCP server, so scripts and AI assistants such as Claude can read and write the data.
 - Has an AI assistant that runs on an open model on your own server. It logs from plain words
-  ("120 ml formula 20 minutes ago"), answers questions with citations to medical sources, makes a sleep plan,
-  and shows insights and development milestones.
+  ("120 ml formula 20 minutes ago") on the Home screen and in the chat, answers questions with citations to
+  medical sources, makes a sleep plan, and shows insights.
+- Gives development guidance from birth to 5 years: what most children do by each age (CDC), movement, behaviour
+  and body changes to expect around now, cited tips on how to help, and a notification at each new age band.
+  For a baby born early, give the due date and the app uses the corrected age until 2 years.
+- Makes a support report: the last 7 days by area, compared with cited references, with suggestions on where you
+  can support your child.
 - Copies your data out of the Huckleberry app, once or as often as you like.
 
-| Home | Log by plain words | Assistant with sources | Insights | Sleep plan |
+| Home with timers | Log by plain words | Assistant with sources | Assistant logs for you | Development guidance |
 |---|---|---|---|---|
-| ![Home](docs/screenshots/home.png) | ![Plain words](docs/screenshots/plain-words.png) | ![Assistant](docs/screenshots/assistant.png) | ![Insights](docs/screenshots/insights.png) | ![Sleep plan](docs/screenshots/sleep-plan.png) |
+| ![Home](docs/screenshots/home.png) | ![Plain words](docs/screenshots/plain-words.png) | ![Assistant](docs/screenshots/assistant.png) | ![Logged](docs/screenshots/assistant-logged.png) | ![Insights](docs/screenshots/insights.png) |
+
+| Sleep plan | Reports | Support report | Cry helper | Confined-time warning |
+|---|---|---|---|---|
+| ![Sleep plan](docs/screenshots/sleep-plan.png) | ![Reports](docs/screenshots/reports.png) | ![Support report](docs/screenshots/support-report.png) | ![Cry helper](docs/screenshots/cry-helper.png) | ![Confined](docs/screenshots/confined.png) |
 
 ## Not medical advice
 
@@ -159,6 +172,9 @@ buffer responses: the assistant streams its answers (Server-Sent Events). Set `B
 
 Frecklebubby has an MCP server at `<BASE_URL>/mcp`. Claude can then log entries, start timers, read reports and
 search the knowledge library for you.
+
+You can say it in plain words ("she had 120 ml at 2 and I put her in the car seat"): Claude uses one tool per kind
+of entry, or the `log_in_plain_words` tool, and the entry is saved, not only read.
 
 1. On claude.ai, open **Settings > Connectors > Add custom connector**.
 2. Enter `<BASE_URL>/mcp` and add it.

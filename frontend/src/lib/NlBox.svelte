@@ -3,8 +3,8 @@
 	import { api, softMessage } from './api';
 	import { refresh, toast } from './app.svelte';
 	import Icon from './Icon.svelte';
+	import Proposals, { type Proposal } from './Proposals.svelte';
 
-	type Proposal = Record<string, any> & { summary: string };
 	let { childId }: { childId: number } = $props();
 	let text = $state('');
 	let proposals = $state<Proposal[] | null>(null);
@@ -55,25 +55,7 @@
 	{#if busy && !proposals}<p class="muted small" aria-live="polite">Reading…</p>{/if}
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	{#if proposals}
-		<div class="preview" aria-live="polite">
-			{#if message}<p class="small">{message}</p>{/if}
-			{#if proposals.length}
-				<ul class="list">
-					{#each proposals as p, i (i)}
-						<li class="spread">
-							<span>{p.summary}</span>
-							<button class="icon" aria-label="Remove {p.summary}" onclick={() => proposals!.splice(i, 1)}><Icon name="close" size={20} /></button>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-			<div class="row">
-				<button class="ghost" onclick={() => (proposals = null)}>Cancel</button>
-				{#if proposals.length}
-					<button class="grow" disabled={busy} onclick={commit}><Icon name="check" /> Save {proposals.length === 1 ? 'this' : `these ${proposals.length}`}</button>
-				{/if}
-			</div>
-		</div>
+		<Proposals bind:proposals {message} {busy} oncancel={() => (proposals = null)} onsave={commit} />
 	{/if}
 </section>
 
@@ -88,11 +70,5 @@
 	}
 	.send {
 		background: var(--lavender);
-	}
-	.preview {
-		padding: 8px 6px 0;
-	}
-	.grow {
-		flex: 1;
 	}
 </style>

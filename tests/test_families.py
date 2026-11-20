@@ -51,7 +51,7 @@ async def test_settings(client):
     st = (await client.get(f"{API}/family/settings", headers=h)).json()
     assert st == {"units": {"volume": "ml", "weight": "kg", "length": "cm", "temperature": "C"}, "wording": "nappy",
                   "llm": {"base_url": "http://llama:8080/v1", "model": "", "has_api_key": False},
-                  "web_lookup": False}
+                  "web_lookup": False, "milestone_alerts": True}
     r = await client.patch(f"{API}/family/settings", headers=h, json={
         "units": {"volume": "oz"}, "wording": "diaper", "web_lookup": True,
         "llm": {"base_url": "https://llm.example/v1", "model": "qwen", "api_key": "sk-secret"}})

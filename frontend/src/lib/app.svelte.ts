@@ -7,6 +7,8 @@ export type Child = {
 	id: number;
 	name: string;
 	birthdate: string;
+	/** Due date of a baby born early (M13): development uses the corrected age until 2 years. */
+	due_date?: string | null;
 	sex: 'F' | 'M' | null;
 	color: string;
 	night_start: string;
@@ -37,6 +39,7 @@ export type Settings = {
 	wording: Wording;
 	llm: { base_url: string; model: string; has_api_key: boolean };
 	web_lookup: boolean;
+	milestone_alerts: boolean;
 };
 type Me = {
 	user: { id: number; email: string; name: string };

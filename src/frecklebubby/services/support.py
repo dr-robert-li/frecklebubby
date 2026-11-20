@@ -17,9 +17,9 @@ from sqlalchemy.orm import Session
 
 from ..models import Child, Entry
 from ..schemas import DayReport
-from . import Ctx
+from . import Ctx, development
 from . import insights as ins
-from .children import age_months
+from .children import age_months, corrected, dev_age_days, dev_age_months
 from .confined import under
 from .families import wording
 from .growth import growth
@@ -279,12 +279,17 @@ def growth_block(p: Period) -> dict:
 
 def milestones_block(p: Period) -> dict:
     items = catalog()
-    age = age_months(p.child, p.now)
+    local = p.now.astimezone(p.ctx.tz)
+    age = dev_age_months(p.child, local)  # M13: corrected age until 2 years for a baby born early
     bands = sorted({i["age_months"] for i in items})
     band = max((b for b in bands if b <= age), default=None)
+    # M13: development items around this age, each in the source's words and naming its source.
+    dev = [f"Around now: {i['text']} ({i['source']['publisher'].split(' (')[0]})"
+           for i in development.around(dev_age_days(p.child, local.date()))[:3]]
+    note = development.CORRECTED_NOTE if corrected(p.child, local.date()) else None
     if band is None:
-        return block("milestones", "Milestones", "no_data", [],
-                     note="The checklist starts at 2 months." if bands else None)
+        return block("milestones", "Milestones", "no_data", [], details=dev,
+                     note=note or ("The checklist starts at 2 months." if bands else None))
     done = {e.data.get("key") for e in p.s.scalars(select(Entry).where(Entry.child_id == p.child.id,
                                                                        Entry.type == "milestone"))}
     in_band = [i for i in items if i["age_months"] == band]
@@ -293,8 +298,8 @@ def milestones_block(p: Period) -> dict:
                  [num("Marked", len(in_band) - len(open_items)), num("Not yet marked", len(open_items))],
                  ref=('CDC "Learn the Signs. Act Early." checklist. Every child grows at their own pace. Mark items in '
                       "the milestones checklist when you see them.", [1]),
-                 sources=[in_band[0]["source"]], details=open_items[:6]
-                 + ([f"and {len(open_items) - 6} more"] if len(open_items) > 6 else []))
+                 sources=[in_band[0]["source"]], note=note, details=open_items[:6]
+                 + ([f"and {len(open_items) - 6} more"] if len(open_items) > 6 else []) + dev)
 
 
 AREAS = (sleep_block, feeds_block, nappies_block, play_block, confined_block, crying_block, growth_block,

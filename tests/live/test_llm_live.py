@@ -247,3 +247,92 @@ async def test_sleep_plan(live, client):
     naps = [row for row in plan["schedule"] if row["kind"] == "nap"]
     assert "05:00" <= wake <= "08:30" and "18:00" <= bed <= "21:00" and 1 <= len(naps) <= 4
     assert plan["advice"] and plan["citations"]
+
+
+# --- M14: log from the assistant chat ------------------------------------------------------------------------------
+
+# (message, expected: "logged" types, "proposal" = not saved, None = no Logged block; answer expected)
+CHAT_LOG = [
+    ("she had 120 ml of formula 10 minutes ago", ["bottle"], False),
+    ("start a nap", ["timer:sleep:start"], False),
+    ("she's awake", ["timer:sleep:complete"], False),
+    ("wet nappy with a rash, left it off for 10 minutes", ["nappy"], False),
+    ("nappy with a rash", "proposal", False),  # wet or dirty is not said: not saved
+    ("20 minutes of play with 5 of tummy time", ["play"], False),
+    ("she only slept 20 minutes, is that normal?", ["sleep"], True),
+    ("she had a bottle", "proposal", False),
+    ("how much milk does a baby this age need?", None, True),
+    ("what can I do about her nappy rash?", None, True),
+]
+
+
+async def test_chat_logging(live, client):
+    h, cid = await make_family(client, birthdate=(date.today() - timedelta(days=120)).isoformat())
+    REPORT["chat_log"] = []
+    failures = []
+    for message, expected, answers in CHAT_LOG:
+        t0 = time.monotonic()
+        r = await client.post(f"/api/v1/children/{cid}/assistant/chat", headers=h, json={"message": message})
+        secs = round(time.monotonic() - t0, 1)
+        assert r.status_code == 200, r.text
+        events = sse_events(r.text)
+        logged = next((d for e, d in events if e == "logged"), None)
+        text = "".join(d["text"] for e, d in events if e == "token")
+        report, asks = nl_log.split_question(message)
+        parse_secs = None
+        if report:  # the added model call: the same parse alone
+            t1 = time.monotonic()
+            await client.post(f"/api/v1/children/{cid}/nl/parse", headers=h, json={"text": report})
+            parse_secs = round(time.monotonic() - t1, 1)
+        got = None if logged is None else (
+            "proposal" if not logged["items"] and logged["proposals"] else
+            [i["type"] if i["action"] == "entry" else f"timer:{i['type']}:{i['timer_action']}"
+             for i in logged["items"]])
+        ok = got == expected and (bool(text.strip()) == answers) and events[-1][0] == "done"
+        REPORT["chat_log"].append({"message": message, "ok": ok, "seconds": secs, "parse_seconds": parse_secs,
+                                   "logged": logged, "answer": text})
+        print(f"{'OK  ' if ok else 'FAIL'} {secs:5.1f}s (parse {parse_secs}s) {message!r} -> {got} "
+              f"{[i['summary'] for i in (logged or {}).get('items', [])]} {(logged or {}).get('message')}"
+              f"\n     {text[:200]!r}")
+        if not ok:
+            failures.append(message)
+    REPORT["chat_log_failures"] = failures
+    assert not failures
+
+
+# --- M13: development questions -------------------------------------------------------------------------------------
+
+DEV_QUESTIONS = [
+    ("what should she be doing now?", "tips"),
+    ("how can I help her learn to sit?", "tips"),
+    ("when is the 4 month sleep regression?", "no_source"),
+    ("when are the growth spurts?", "no_source"),
+    ("what week does crying peak?", "no_source"),
+]
+
+
+async def test_development_questions(live, client):
+    h, cid = await make_family(client, birthdate=(date.today() - timedelta(days=150)).isoformat())
+    REPORT["development"] = []
+    failures = []
+    for q, check in DEV_QUESTIONS:
+        t0 = time.monotonic()
+        r = await client.post(f"/api/v1/children/{cid}/assistant/chat", headers=h, json={"message": q})
+        secs = round(time.monotonic() - t0, 1)
+        assert r.status_code == 200, r.text
+        events = sse_events(r.text)
+        text = "".join(d["text"] for e, d in events if e == "token")
+        cites = next((d["citations"] for e, d in events if e == "citations"), [])
+        if check == "tips":
+            # Cited, and at least one source is the CDC tips of her age or a development source.
+            ok = bool(cites) and any("cdc.gov/act-early" in (c.get("url") or "") or "who.int" in (c.get("url") or "")
+                                     or "Frecklebubby" in (c.get("publisher") or "") for c in cites)
+        else:
+            ok = "I have no source on" in text
+        ok = ok and "logged" not in [e for e, _ in events]
+        REPORT["development"].append({"question": q, "ok": ok, "seconds": secs, "answer": text, "citations": cites})
+        print(f"\n{'OK  ' if ok else 'FAIL'} --- {q} ({secs}s)\n{text}\n{[(c['n'], c['title']) for c in cites]}")
+        if not ok:
+            failures.append(q)
+    REPORT["development_failures"] = failures
+    assert not failures

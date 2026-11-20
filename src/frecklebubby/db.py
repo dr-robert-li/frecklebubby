@@ -31,6 +31,10 @@ class Base(DeclarativeBase):
     pass
 
 
+# (table, column, SQL type) of nullable columns added after a release; init_db adds them to old databases.
+NEW_COLUMNS = [("child", "due_date", "DATE"), ("chat_message", "logged", "JSON")]
+
+
 def init_db(data_dir: Path) -> None:
     from . import models  # noqa: F401  registers the tables
 
@@ -47,6 +51,10 @@ def init_db(data_dir: Path) -> None:
     # shortcut: no Alembic yet; add it before the first schema change after v0.1.0.
     Base.metadata.create_all(engine)
     with engine.begin() as conn:
+        # Columns added after 0.1.0: create_all does not add them to an existing table. All are nullable.
+        for table, column, kind in NEW_COLUMNS:
+            if column not in {r[1] for r in conn.execute(text(f'PRAGMA table_info("{table}")'))}:
+                conn.execute(text(f'ALTER TABLE "{table}" ADD COLUMN {column} {kind}'))
         conn.execute(text("CREATE VIRTUAL TABLE IF NOT EXISTS kb_chunk USING fts5(source_id UNINDEXED, heading, text, "
                           "tokenize='porter unicode61')"))
     SessionLocal.configure(bind=engine)

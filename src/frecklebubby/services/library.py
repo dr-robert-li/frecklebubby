@@ -23,6 +23,11 @@ def cite(*names: str) -> list[dict]:
     return out
 
 
+def cite_files(*names: str, start: int = 1) -> list[dict]:
+    """As cite(), numbered from `start` (to add to a card's citations)."""
+    return [c | {"n": c["n"] + start - 1} for c in cite(*names)]
+
+
 def source(name: str) -> dict:
     """{title, publisher, url, year} of a library file (the shape of insight rule citations)."""
     m = library(name)[0]

@@ -204,6 +204,8 @@ class FamilyOut(Out):
 class ChildIn(BaseModel):
     name: Text100
     birthdate: date
+    due_date: date | None = Field(None, description="Due date of a baby born early: development uses the corrected "
+                                                    "age until 2 years.")
     sex: Literal["F", "M"] | None = None
     color: Annotated[str, StringConstraints(pattern=r"^#[0-9A-Fa-f]{6}$")] = "#B9A8E8"
     night_start: HHMM = "19:00"
@@ -213,6 +215,7 @@ class ChildIn(BaseModel):
 class ChildPatch(BaseModel):
     name: Text100 | None = None
     birthdate: date | None = None
+    due_date: date | None = None  # null clears it
     sex: Literal["F", "M"] | None = None
     color: Annotated[str, StringConstraints(pattern=r"^#[0-9A-Fa-f]{6}$")] | None = None
     night_start: HHMM | None = None
@@ -224,6 +227,7 @@ class ChildOut(Out):
     id: int
     name: str
     birthdate: date
+    due_date: date | None = None
     sex: str | None
     color: str
     night_start: str
@@ -293,6 +297,7 @@ class SettingsOut(BaseModel):
     wording: Literal["nappy", "diaper"]
     llm: LlmOut
     web_lookup: bool
+    milestone_alerts: bool = True  # M13: a notification when a child reaches a new milestone band
 
 
 class SettingsPatch(BaseModel):
@@ -300,6 +305,7 @@ class SettingsPatch(BaseModel):
     wording: Literal["nappy", "diaper"] | None = None
     llm: LlmPatch | None = None
     web_lookup: bool | None = None
+    milestone_alerts: bool | None = None
 
 
 # --- entries and timers ---------------------------------------------------------------------------
@@ -533,7 +539,8 @@ class MilestoneBand(BaseModel):
 
 
 class MilestonesOut(BaseModel):
-    age_months: float
+    age_months: float = Field(description="Corrected age (from the due date) until 2 years when a due date is set.")
+    corrected: bool = False
     bands: list[MilestoneBand]
 
 

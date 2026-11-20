@@ -58,6 +58,7 @@ class Child(Base):
     family_id: Mapped[int] = mapped_column(ForeignKey("family.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String)
     birthdate: Mapped[date] = mapped_column(Date)
+    due_date: Mapped[date | None] = mapped_column(Date)  # set for a baby born early (corrected age)
     sex: Mapped[str | None] = mapped_column(String(1))
     color: Mapped[str] = mapped_column(String, default="#B9A8E8")
     night_start: Mapped[str] = mapped_column(String(5), default="19:00")
@@ -164,6 +165,8 @@ class ChatMessage(Base):
     role: Mapped[str] = mapped_column(String)
     content: Mapped[str] = mapped_column(Text)
     citations: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    # M14: what the chat turn saved ({items, proposals, message}); null for a plain answer.
+    logged: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     created_at: Mapped[datetime] = _created()
 
 

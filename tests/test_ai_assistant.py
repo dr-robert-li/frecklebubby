@@ -54,7 +54,8 @@ async def test_chat_streams_tokens_and_maps_citations(client, fake_llm):
 async def test_red_flag_first_from_question(client, fake_llm):
     born = (date.today() - timedelta(days=30)).isoformat()
     h, cid = await make_family(client, birthdate=born)
-    fake_llm.replies.append("Fever means 38C or above [3].")
+    # "baby has a fever 38.5" reports something: the parser reads it first (M14); here it finds nothing to log.
+    fake_llm.replies += [{"events": []}, "Fever means 38C or above [3]."]
     r, events = await ask(client, h, cid, "baby has a fever 38.5, what should I do?")
     text = "".join(d["text"] for e, d in events if e == "token")
     assert events[0][0] == "token" and events[0][1]["text"].startswith("Urgent: High temperature in a baby under 3 months")
@@ -88,9 +89,13 @@ async def test_model_down_503_and_trackers_work(client, fake_llm):
 
 async def test_no_sources_no_model_call(client, fake_llm):
     h, cid = await make_family(client)
+    fake_llm.replies.append({"events": []})  # M14: words that are not a question go to the parser first
     r, events = await ask(client, h, cid, "xylophone quasar")
     text = "".join(d["text"] for e, d in events if e == "token")
-    assert text.startswith("The sources I have do not cover this") and not fake_llm.requests
+    assert text.startswith("The sources I have do not cover this") and len(fake_llm.requests) == 1
+    assert fake_llm.requests[0]["response_format"]  # only the parse call, no answer call
+    r, events = await ask(client, h, cid, "what is a xylophone quasar?")  # a question: no parse call either
+    assert len(fake_llm.requests) == 1
 
 
 async def test_other_family_child_404(client, fake_llm):

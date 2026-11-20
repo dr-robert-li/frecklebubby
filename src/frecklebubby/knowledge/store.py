@@ -64,6 +64,18 @@ def search(s: Session, family: Family, question: str, limit: int = TOP, web: boo
     return [{**source_dict(sources[r[0]]), "heading": r[1], "text": r[2], "score": r[3]} for r in rows]
 
 
+def chunks_of(s: Session, title: str) -> list[dict]:
+    """All passages of one bundled library file (by its title), in file order, in the shape of search hits."""
+    ensure_bundled(s)
+    src = s.scalar(select(KbSource).where(KbSource.kind == "bundled", KbSource.family_id.is_(None),
+                                          KbSource.title == title).limit(1))
+    if src is None:
+        return []
+    rows = s.execute(text("SELECT heading, text FROM kb_chunk WHERE source_id = :id ORDER BY rowid"),
+                     {"id": src.id}).all()
+    return [{**source_dict(src), "heading": h, "text": t, "score": 0.0} for h, t in rows]
+
+
 def source_dict(src: KbSource) -> dict:
     return {"id": src.id, "kind": src.kind, **{k: getattr(src, k) for k in SOURCE_FIELDS}}
 

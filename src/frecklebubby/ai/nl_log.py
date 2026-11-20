@@ -9,11 +9,12 @@ import re
 from datetime import datetime, time, timedelta
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, TypeAdapter, ValidationError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import utcnow
-from ..models import Child
+from ..models import Child, Entry
 from ..schemas import (
     ActivityKind,
     ConfinedDevice,
@@ -92,7 +93,8 @@ EVENTS = [
                   "device": _enum(*DEVICES)}, ["timer", "action"]),
 ]
 SCHEMA = {"type": "object", "additionalProperties": False, "required": ["events"],
-          "properties": {"events": {"type": "array", "maxItems": 12, "items": {"anyOf": EVENTS}}}}
+          "properties": {"events": {"type": "array", "maxItems": 12, "items": {"anyOf": EVENTS}},
+                         "unclear": {"type": "boolean"}}}
 
 SYSTEM = """You turn a parent's note about their baby into log events. Answer with JSON only.
 
@@ -118,6 +120,8 @@ Words:
 - cried, was crying, screamed, was unsettled for a time = "cry"; what calmed the baby goes to soothed_by.
 - the first time the baby did something new (smiled, sat up, crawled, first tooth, first word, first steps) = "milestone".
 - Anything else the parent wants to record about the baby = "note". Chat, the weather or words that make no sense give {"events": []}.
+- A question or a request for advice is not an event.
+- If a part of the note can mean two different things, add "unclear": true.
 
 Example. Note: "3oz formula at 6:20 this morning then she napped from 7 for 40 min. dirty nappy 10 mins ago, a bit runny"
 {"events":[{"type":"bottle","at":"6:20 this morning","amount":3,"unit":"oz","milk_type":"Formula"},{"type":"sleep","start":"7","duration":"40 min"},{"type":"nappy","at":"10 mins ago","mode":"poo","consistency":"runny"}]}
@@ -140,6 +144,7 @@ class EntryProposal(BaseModel):
     data: dict[str, Any] = {}
     notes: str | None = Field(None, max_length=2000)
     summary: str | None = None
+    unsure: str | None = None  # why the server does not save it without a check (M14); ignored by commit
 
 
 class TimerProposal(BaseModel):
@@ -151,6 +156,7 @@ class TimerProposal(BaseModel):
     kind: ActivityKind | None = None
     device: ConfinedDevice | None = None
     summary: str | None = None
+    unsure: str | None = None  # why the server does not save it without a check (M14); ignored by commit
 
 
 Proposal = Annotated[EntryProposal | TimerProposal, Field(discriminator="action")]
@@ -438,6 +444,12 @@ def summary(p: dict, ctx: Ctx) -> str:
     return " – ".join(x for x in (labels.get(t, t.title()), detail, when) if x)
 
 
+def entry_summary(e, ctx: Ctx) -> str:
+    """Summary text of a saved entry (the data is canonical after validation)."""
+    return summary({"action": "entry", "type": e.type, "started_at": e.started_at, "ended_at": e.ended_at,
+                    "data": e.data, "notes": e.notes}, ctx)
+
+
 # --- parse and commit ---------------------------------------------------------------------------------------------
 
 
@@ -471,7 +483,55 @@ def check_timer(s: Session, child: Child, p: dict) -> None:
         raise Invalid(f"No {p['type']} timer is running.")
 
 
+# --- not sure: never save a guess (M14) --------------------------------------------------------------------------
+
+DOUBLE = timedelta(minutes=10)  # an entry of the same type this close may be the same event
+TOO_OLD = timedelta(hours=24)
+_NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
+# The parent said what was in the nappy (the model must choose a mode, so it can guess one).
+NAPPY_SAID = re.compile(r"\b(wet|wee\w*|pee\w*|urine|dirty|poo\w*|soiled|number (one|two)|stool|bm|dry|both)\b", re.I)
+
+
+def _numbers(text: str) -> set[float]:
+    found = {float(n.replace(",", ".")) for n in _NUMBER.findall(text)}
+    words = text.lower().replace("-", " ")
+    return found | {float(v) for w, v in NUMBER_WORDS.items() if len(w) > 2 and re.search(rf"\b{w}\b", words)}
+
+
+def doubt(s: Session, ctx: Ctx, child: Child, ev: dict, p: dict, text: str, now: datetime) -> str | None:
+    """Why this proposal may be a guess, or None. Checks: every number of the event is in the parent's words (a
+    missing amount or time is not invented); not more than 24 h back; no entry of the same type within 10 minutes;
+    no timer start on a running timer; a note is always checked (it is the catch-all type)."""
+    have = _numbers(text)
+    for k, v in ev.items():
+        if isinstance(v, bool) or k == "type":
+            continue
+        if isinstance(v, int | float) and float(v) not in have:
+            return f"the {k.replace('_', ' ')} is not in your words"
+        if isinstance(v, str) and k in ("at", "start", "end", "duration") and any(
+                n and n not in have for n in _numbers(v)):
+            return "the time is not in your words"
+    if ev.get("type") in ("nappy", "potty") and not NAPPY_SAID.search(text):
+        return "say if it was wet, dirty or dry"
+    when = p.get("started_at") or p.get("at")
+    if when and when < now - TOO_OLD:
+        return "it is more than 24 hours ago"
+    label = summary(p, ctx).split(" – ")[0]
+    if p["action"] == "entry":
+        near = s.scalar(select(Entry.started_at).where(
+            Entry.child_id == child.id, Entry.type == p["type"], Entry.started_at >= when - DOUBLE,
+            Entry.started_at <= when + DOUBLE).limit(1))
+        if near:
+            return f"a {label.lower()} at {_hm(near, ctx)} is already logged"
+        if p["type"] == "note":
+            return "check the note"
+    elif p["timer_action"] == "start" and p["type"] in {t.type for t in list_timers(s, child.id)}:
+        return f"the {label.lower()} already runs"
+    return None
+
+
 async def parse(s: Session, ctx: Ctx, child_id: int, text: str) -> dict:
+    """{"proposals", "message", "problems"}. A proposal that may be a guess has `unsure` (the reason)."""
     child = get_child(s, ctx, child_id)
     now = utcnow()
     now_local = now.astimezone(ctx.tz)
@@ -490,6 +550,8 @@ async def parse(s: Session, ctx: Ctx, child_id: int, text: str) -> dict:
                 p["at"] = to_utc(p["at"], ctx.tz) if p.get("at") else None
                 check_timer(s, child, p)
             p["summary"] = summary(p, ctx)
+            p["unsure"] = doubt(s, ctx, child, ev, p, text, now) or (
+                "your words can mean two things" if out.get("unclear") else None)
             proposals.append({k: v for k, v in p.items() if v is not None})
         except (ServiceError, KeyError, TypeError, ValueError) as err:
             problems.append(str(err) if isinstance(err, ServiceError) else "an item was not complete")
@@ -499,14 +561,14 @@ async def parse(s: Session, ctx: Ctx, child_id: int, text: str) -> dict:
         message = "I did not find anything to log. Say what happened and when, for example \"120 ml formula at 2pm\"."
     if problems:
         message += f" I could not use {len(problems)}: {'; '.join(p.rstrip('.') for p in problems)}."
-    return {"proposals": proposals, "message": message}
+    return {"proposals": proposals, "message": message, "problems": problems}
 
 
 def commit(s: Session, ctx: Ctx, child_id: int, proposals: list[EntryProposal | TimerProposal]) -> dict:
-    """Save all proposals or none."""
+    """Save all proposals or none. `items` (not in the API answer) has one row per proposal for the chat."""
     child = get_child(s, ctx, child_id)
     nl = dataclasses.replace(ctx, source="nl")
-    created, running = [], []
+    created, running, items = [], [], []
     # shortcut: the services commit after each change; turn those commits into flushes so that one bad proposal
     # rolls back all. Give the services a commit flag if more callers need this.
     s.commit = s.flush  # type: ignore[method-assign]
@@ -516,7 +578,10 @@ def commit(s: Session, ctx: Ctx, child_id: int, proposals: list[EntryProposal | 
                 if isinstance(p, EntryProposal):
                     body = EntryIn(type=p.type, started_at=p.started_at, ended_at=p.ended_at, data=p.data,
                                    notes=p.notes)
-                    created.append(EntryOut.model_validate(create_entry(s, nl, child.id, body)))
+                    e = create_entry(s, nl, child.id, body)
+                    created.append(EntryOut.model_validate(e))
+                    items.append({"action": "entry", "type": p.type, "summary": entry_summary(e, ctx),
+                                  "entry_id": e.id})
                 else:
                     t, e = act(s, nl, child.id, p.type, p.timer_action, TimerBody(at=p.at, side=p.side, kind=p.kind,
                                                                                         device=p.device))
@@ -524,6 +589,9 @@ def commit(s: Session, ctx: Ctx, child_id: int, proposals: list[EntryProposal | 
                         running.append(timer_out(t, utcnow()))
                     if e:
                         created.append(EntryOut.model_validate(e))
+                    items.append({"action": "timer", "type": p.type, "timer_action": p.timer_action,
+                                  "summary": entry_summary(e, ctx) if e else summary(p.model_dump(), ctx),
+                                  "entry_id": e.id if e else None})
             except ServiceError as err:
                 raise type(err)(f"Item {i}: {err}") from err
             except ValidationError as err:
@@ -534,4 +602,69 @@ def commit(s: Session, ctx: Ctx, child_id: int, proposals: list[EntryProposal | 
     finally:
         del s.commit
     s.commit()
-    return {"created": created, "timers": running}
+    return {"created": created, "timers": running, "items": [x | {"undone": False} for x in items]}
+
+
+# --- log in one step (assistant chat, MCP) --------------------------------------------------------------------------
+
+PROPOSAL = TypeAdapter(Proposal)
+# A clause that starts with one of these words asks something (unless it asks the app to log).
+ASKS = re.compile(r"^(is|are|am|can|could|should|shall|will|would|do|does|how|what|when|where|why|which|who|whose|"
+                  r"tell me|explain|any (tips|ideas)|tips|ideas|help me)\b", re.I)
+LOG_WORDS = re.compile(r"\b(log|record|save|track|add|start|stop)\b", re.I)
+_SENTENCE = re.compile(r"(?:[^.!?\n]|(?<=\d)\.(?=\d))+[.!?\n]*")
+
+
+def split_question(text: str) -> tuple[str, bool]:
+    """(the part that reports something, whether the text asks something). No model.
+
+    A sentence that ends with "?" is a question; when its first clause does not start like a question ("she slept
+    20 minutes, is that normal?"), only its last clause is. A clause that starts like a question is a question too,
+    unless it asks the app to log ("can you log 120 ml"). The rest is the report that the parser reads."""
+    report, asks = [], False
+    for m in _SENTENCE.finditer(text):
+        sentence = m.group(0)
+        q_mark = sentence.rstrip().endswith("?")
+        parts = [x.strip(" ?!.\n") for x in re.split(r"[,;]", sentence)]
+        parts = [x for x in parts if x]
+        if not parts:
+            continue
+        starts = [bool(ASKS.match(x)) and not LOG_WORDS.search(x) for x in parts]
+        whole = q_mark and starts[0]
+        for i, x in enumerate(parts):
+            if whole or starts[i] or (q_mark and i == len(parts) - 1):
+                asks = True
+            else:
+                report.append(x)
+    return ", ".join(report), asks
+
+
+def _json(p: dict) -> dict:
+    return PROPOSAL.dump_python(PROPOSAL.validate_python(p), mode="json", exclude_none=True)
+
+
+async def log_words(s: Session, ctx: Ctx, child_id: int, text: str, save: bool = True,
+                    drop_notes: bool = False) -> dict:
+    """Parse the words and save what is sure in one step. {"items": saved rows, "proposals": not saved (unsure, or
+    all when save is false; JSON form), "message"}. `drop_notes`: the text also asks something, so a note is not
+    what the parent wants to record."""
+    out = await parse(s, ctx, child_id, text)
+    props = [p for p in out["proposals"] if not (drop_notes and p["action"] == "entry" and p["type"] == "note")]
+    sure = [p for p in props if save and not p.get("unsure")]
+    later = [p for p in props if p not in sure]
+    items, failed = [], ""
+    if sure:
+        try:
+            items = commit(s, ctx, child_id, [PROPOSAL.validate_python(p) for p in sure])["items"]
+        except ServiceError as err:
+            later, failed = props, f" I could not save them: {err}"
+    parts = []
+    if items:
+        parts.append(f"Logged {len(items)} {'item' if len(items) == 1 else 'items'}.")
+    if later:
+        parts.append(f"Check {'this' if len(later) == 1 else f'these {len(later)}'} before I save.")  # why: per item
+    if out["problems"]:
+        parts.append(f"I could not use {len(out['problems'])}: "
+                     + "; ".join(x.rstrip(".") for x in out["problems"]) + ".")
+    message = " ".join(parts) + failed if parts or failed else out["message"]
+    return {"items": items, "proposals": [_json(p) for p in later], "message": message}

@@ -86,6 +86,7 @@ def get_family_settings(ctx: Ctx) -> SettingsOut:
         wording=st.get("wording", "nappy"),
         llm=LlmOut(base_url=base_url, model=model, has_api_key=bool(st.get("llm", {}).get("api_key"))),
         web_lookup=st.get("web_lookup", False),
+        milestone_alerts=st.get("milestone_alerts", True),
     )
 
 
@@ -97,6 +98,8 @@ def update_family_settings(s: Session, ctx: Ctx, body: SettingsPatch) -> Setting
         st["wording"] = body.wording
     if body.web_lookup is not None:
         st["web_lookup"] = body.web_lookup
+    if body.milestone_alerts is not None:
+        st["milestone_alerts"] = body.milestone_alerts
     if body.llm is not None:
         llm = dict(st.get("llm", {}))
         for key in body.llm.model_fields_set:

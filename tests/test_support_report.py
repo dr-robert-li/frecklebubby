@@ -131,7 +131,7 @@ async def test_model_suggestions_are_checked(client, fake_llm):
         "areas": [
             {"area": "sleep", "suggestions": [
                 {"text": "Try a calm bedtime routine.", "cites": [1]},
-                {"text": "Aim for 99 hours of sleep.", "cites": [1]},  # 99 is not in the input
+                {"text": "Aim for 987 hours of sleep.", "cites": [1]},  # 987 is not in the input
                 {"text": "Read a story [42].", "cites": []}]},  # citation that does not exist
             {"area": "play", "suggestions": [{"text": "You should do more tummy time.", "cites": [1]}]},
             {"area": "nappies", "suggestions": [{"text": "Offer feeds often.", "cites": []}]},  # no citation

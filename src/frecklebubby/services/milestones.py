@@ -11,7 +11,7 @@ from ..config import get_settings
 from ..db import utcnow
 from ..models import Entry
 from . import Ctx
-from .children import age_months, get_child
+from .children import corrected, dev_age_months, get_child
 
 
 @lru_cache
@@ -36,5 +36,7 @@ def milestones(s: Session, ctx: Ctx, child_id: int) -> dict:
             {**{k: item[k] for k in ("key", "domain", "text", "source")},
              "achieved": item["key"] in achieved, "achieved_at": achieved.get(item["key"])}
         )
-    return {"age_months": round(age_months(child, utcnow().astimezone(ctx.tz)), 1),
+    local = utcnow().astimezone(ctx.tz)
+    # M13: the corrected age (from the due date) until 2 years for a baby born early.
+    return {"age_months": round(dev_age_months(child, local), 1), "corrected": corrected(child, local.date()),
             "bands": [{"age_months": m, "items": items} for m, items in sorted(bands.items())]}

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..models import Child, Entry, Family, Reminder
 from ..schemas import ReminderIn, ReminderPatch
-from . import Ctx, Invalid, NotFound, confined, hm, zone
+from . import Ctx, Invalid, NotFound, confined, development, hm, zone
 from .children import get_child, is_night
 from .families import wording
 from .notifications import notify
@@ -114,7 +114,8 @@ def _due(s: Session, r: Reminder, child: Child, family: Family, now: datetime) -
 
 
 def tick(s: Session, now: datetime) -> int:
-    """Fire all due reminders and the confined-time note and warning once. Returns the number of new notifications."""
+    """Fire all due reminders, the confined-time note and warning, and the milestone band notification once.
+    Returns the number of new notifications."""
     fired = 0
     rows = s.execute(
         select(Reminder, Child, Family).join(Child, Reminder.child_id == Child.id)
@@ -129,4 +130,4 @@ def tick(s: Session, now: datetime) -> int:
         except Exception:
             s.rollback()
             log.exception("Reminder %s failed", r.id)
-    return fired + confined.tick(s, now)
+    return fired + confined.tick(s, now) + development.tick(s, now)
