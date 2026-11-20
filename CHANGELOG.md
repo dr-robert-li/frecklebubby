@@ -19,6 +19,7 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 - The same passage could show two times in the sources of one answer, and two questions at the same moment could
   store one web page two times.
+- The test of the nappy rash card failed each day from 02:00 to 06:00 Brisbane time.
 
 ## [0.4.2] - 2026-11-21
 

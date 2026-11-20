@@ -261,7 +261,8 @@ async def test_rash_card(client):
     assert "leave nappies off when possible" in c["body"] and "little tummy time" in c["body"]
     assert "10 min" in c["body"] and "health visitor" not in c["body"]
     assert [x["title"] for x in c["citations"]][0] == "Nappy rash"
-    add("nappy", 50, {"mode": "pee", "rash": True})
+    # 78 h, not 50 h: at 02:00 to 06:00 local time, 30 h ago and 50 h ago are the same calendar day.
+    add("nappy", 78, {"mode": "pee", "rash": True})
     c = cards_for()["nappy_rash"]
     assert c["severity"] == "attention" and "see a health visitor or GP" in c["body"]
 
