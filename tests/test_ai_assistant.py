@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from frecklebubby.ai.assistant import FOOTER, CiteFilter
 
-from .conftest import make_family
+from .conftest import make_family, run_job
 from .fake_llm import fake_llm_fixture, sse_events  # noqa: F401
 
 CHAT = "/api/v1/children/{}/assistant/chat"
@@ -124,16 +124,16 @@ async def test_sleep_plan(client, fake_llm):
                      {"time": "19:00", "kind": "bedtime", "label": "Bedtime", "note": "Same routine each night"}],
         "advice": [{"text": "Aim for 12 to 15 hours in 24 hours.", "cites": [1, 42]}],
     })
-    r = await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)
-    assert r.status_code == 200, r.text
-    plan = r.json()
+    status, plan = await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan")
+    assert status == "done", plan
     assert plan["advice"] == [{"text": "Aim for 12 to 15 hours in 24 hours.", "cites": [1]}]
     assert [c["n"] for c in plan["citations"]] == [1] and plan["schedule"][1]["note"]
     assert fake_llm.requests[0]["response_format"]["json_schema"]["schema"]["required"] == [
         "summary", "schedule", "advice"]
     assert (await client.get(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()["id"] == plan["id"]
     fake_llm.down = True
-    assert (await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)).status_code == 503
+    assert await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan") == ("failed", "The assistant is not available now.")
+    assert (await client.get(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()["id"] == plan["id"]  # the last saved plan stays
 
 
 async def test_sleep_plan_moves_marks_out_of_advice_text(client, fake_llm):
@@ -145,7 +145,7 @@ async def test_sleep_plan_moves_marks_out_of_advice_text(client, fake_llm):
                    {"text": "Dim the lights [1].", "cites": []},
                    {"text": "Keep it the same [1], [42]", "cites": []}],
     })
-    plan = (await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()
+    _, plan = await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan")
     assert plan["advice"] == [{"text": "Start a calm routine.", "cites": [1]},
                               {"text": "Dim the lights.", "cites": [1]},
                               {"text": "Keep it the same", "cites": [1]}]
@@ -156,7 +156,6 @@ async def test_sleep_plan_tries_again_after_invalid_json(client, fake_llm):
     plan = {"summary": "Plan.", "schedule": [{"time": "07:00", "kind": "wake", "label": "Wake up"}],
             "advice": [{"text": "Keep a routine.", "cites": []}]}
     fake_llm.replies += ['{"summary": "cut o', plan]
-    r = await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)
-    assert r.status_code == 200 and r.json()["summary"] == "Plan."
+    assert (await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan"))[1]["summary"] == "Plan."
     fake_llm.replies += ["not json", "still not json"]
-    assert (await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)).status_code == 503
+    assert (await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan"))[0] == "failed"

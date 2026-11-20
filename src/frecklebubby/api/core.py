@@ -10,6 +10,7 @@ from ..config import get_settings
 from ..db import get_session
 from ..schemas import (
     ConfigOut,
+    ConfirmIn,
     FamilyIn,
     FamilyOut,
     FamilyPatch,
@@ -37,7 +38,7 @@ def health() -> dict:
 @router.get("/config", response_model=ConfigOut)
 def config():
     st = get_settings()
-    return {"auth_mode": st.auth_mode, "clerk_publishable_key": st.clerk_publishable_key,
+    return {"auth_mode": st.auth_mode, "invite_only": bool(st.operators), "clerk_publishable_key": st.clerk_publishable_key,
             "vapid_public_key": vapid_public_key(), "version": version("frecklebubby")}
 
 
@@ -79,6 +80,25 @@ def members(ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
 @router.delete("/family/members/{user_id}", status_code=204)
 def remove_member(user_id: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     families.remove_member(s, ctx, user_id)
+
+
+@router.post("/family/members/{user_id}/owner", status_code=204, summary="Make this member the owner (you become a carer)")
+def make_owner(user_id: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    families.make_owner(s, ctx, user_id)
+
+
+@router.delete("/family", status_code=204, summary=(
+    "Delete the family and all its data for good (owner only). `confirm` is the family name. "
+    "Members stay as users without a family; their API tokens and push subscriptions are deleted."))
+def delete_family(body: ConfirmIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    families.delete_family(s, ctx, body.confirm)
+
+
+@router.delete("/me", status_code=204, summary=(
+    "Delete your account for good. `confirm` is your email. Entries you made stay without an author. "
+    "If you are the only member, the family is deleted too. The sign-in account at Clerk is separate."))
+def delete_me(body: ConfirmIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    families.delete_account(s, ctx, body.confirm)
 
 
 @router.get("/family/invites", response_model=list[InviteOut])

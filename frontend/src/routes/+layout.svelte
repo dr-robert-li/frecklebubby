@@ -7,7 +7,7 @@
 	import { dev } from '$app/env';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { devUser, initAuth, mountSignIn, setDevUser } from '#lib/api.ts';
+	import { ApiError, devUser, initAuth, mountSignIn, setDevUser, signOut } from '#lib/api.ts';
 	import { app, child, loadMe, refresh, selectChild } from '#lib/app.svelte.ts';
 	import { ageText, prefs } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
@@ -15,7 +15,7 @@
 	import { applyTheme } from '#lib/theme.ts';
 
 	let { children } = $props();
-	let phase = $state<'loading' | 'signin' | 'ready' | 'error'>('loading');
+	let phase = $state<'loading' | 'signin' | 'ready' | 'refused' | 'error'>('loading');
 	let error = $state('');
 	let signInNode = $state<HTMLDivElement>();
 	let switcher = $state(false);
@@ -53,7 +53,7 @@
 			refresh();
 		} catch (e) {
 			error = (e as Error).message;
-			phase = 'error';
+			phase = e instanceof ApiError && e.status === 403 ? 'refused' : 'error';
 		}
 	}
 
@@ -103,6 +103,10 @@
 
 {#if phase === 'loading'}
 	<p class="empty" aria-live="polite">Loading…</p>
+{:else if phase === 'refused'}
+	<!-- M17: an email with no way in. No retry: it gives the same answer. -->
+	<main><div class="card stack"><h1>No access</h1><p>{error}</p>
+		{#if app.config?.auth_mode === 'clerk'}<button onclick={signOut}>Sign out</button>{/if}</div></main>
 {:else if phase === 'error'}
 	<main><div class="card"><h1>Cannot load Frecklebubby</h1><p class="error">{error}</p><button onclick={() => location.reload()}>Try again</button></div></main>
 {:else if phase === 'signin'}

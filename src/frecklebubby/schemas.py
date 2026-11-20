@@ -235,6 +235,7 @@ class MeOut(BaseModel):
     family: FamilyOut | None
     role: Literal["owner", "carer"] | None
     children: list[ChildOut]
+    operator: bool = False
 
 
 class MemberOut(BaseModel):
@@ -242,6 +243,10 @@ class MemberOut(BaseModel):
     email: str
     name: str
     role: str
+
+
+class ConfirmIn(BaseModel):
+    confirm: str = Field(max_length=254, description="The family name (delete family) or your email (delete account).")
 
 
 class InviteIn(BaseModel):
@@ -252,6 +257,17 @@ class InviteOut(Out):
     id: int
     email: str
     created_at: datetime
+
+
+class ServerInviteOut(InviteOut):
+    used_at: datetime | None
+
+
+class ServerFamilyOut(BaseModel):
+    name: str
+    members: list[str]
+    created_at: datetime
+    last_activity: datetime
 
 
 # --- family settings ------------------------------------------------------------------------------
@@ -620,6 +636,7 @@ class TokenCreated(TokenOut):
 
 class ConfigOut(BaseModel):
     auth_mode: str
+    invite_only: bool = False
     clerk_publishable_key: str
     vapid_public_key: str
     version: str

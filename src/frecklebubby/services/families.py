@@ -1,12 +1,24 @@
 """Users, families, members, invites and family settings."""
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from ..config import get_settings
-from ..models import Child, Family, Invite, Membership, User
+from ..models import (
+    ApiToken,
+    Child,
+    Family,
+    ImportJob,
+    Invite,
+    KbSource,
+    Membership,
+    PushSubscription,
+    ServerInvite,
+    User,
+)
 from ..schemas import FamilyIn, FamilyPatch, LlmOut, SettingsOut, SettingsPatch, Units
 from . import Conflict, Ctx, Invalid, NotFound, zone
+from .access import is_operator, use_invite
 
 
 def sign_in(s: Session, email: str, name: str = "", clerk_sub: str | None = None) -> User:
@@ -41,13 +53,15 @@ def me(s: Session, ctx: Ctx) -> dict:
         children = s.scalars(
             select(Child).where(Child.family_id == ctx.family.id, Child.archived.is_(False)).order_by(Child.id)
         ).all()
-    return {"user": ctx.user, "family": ctx.family, "role": ctx.role, "children": children}
+    return {"user": ctx.user, "family": ctx.family, "role": ctx.role, "children": children,
+            "operator": is_operator(ctx)}
 
 
 def create_family(s: Session, ctx: Ctx, body: FamilyIn) -> Family:
     if ctx.family:
         raise Conflict("You are already in a family.")
     zone(body.timezone)
+    use_invite(s, ctx)
     family = Family(name=body.name, timezone=body.timezone, settings={})
     s.add(family)
     s.flush()
@@ -137,6 +151,69 @@ def remove_member(s: Session, ctx: Ctx, user_id: int) -> None:
     if user_id == ctx.user.id:
         raise Invalid("The owner cannot leave the family.")
     s.delete(m)
+    s.commit()
+
+
+def make_owner(s: Session, ctx: Ctx, user_id: int) -> None:
+    """Give the owner role to another member. The old owner becomes a carer."""
+    ctx.require_owner()
+    m = s.get(Membership, user_id)
+    if m is None or m.family_id != ctx.fam.id:
+        raise NotFound("Member not found.")
+    if user_id == ctx.user.id:
+        raise Invalid("You are the owner already.")
+    m.role = "owner"
+    s.get(Membership, ctx.user.id).role = "carer"
+    s.commit()
+
+
+# --- delete data (M16) ----------------------------------------------------------------------------
+
+
+def _purge_family(s: Session, family_id: int) -> None:
+    """Delete the family and all its rows. The foreign keys cascade from family and child; the search rows
+    (kb_chunk, no foreign key) and the members' tokens and push subscriptions go here. The caller commits.
+    The app keeps no family files on disk (uploads are stored as search rows only), so there is no file step."""
+    from ..importer.huckleberry import _recover
+    from ..knowledge.store import delete_sources
+
+    _recover(s)
+    if s.scalar(select(ImportJob.id).where(ImportJob.family_id == family_id,
+                                           ImportJob.status.in_(("pending", "running")))):
+        raise Conflict("An import is running. Wait until it is done, then try again.")
+    members = select(Membership.user_id).where(Membership.family_id == family_id)
+    delete_sources(s, list(s.scalars(select(KbSource.id).where(KbSource.family_id == family_id))))
+    s.execute(delete(ApiToken).where(ApiToken.user_id.in_(members)))
+    s.execute(delete(PushSubscription).where(PushSubscription.user_id.in_(members)))
+    # M17: the server invite of each member goes too; to use the server again, a member needs a new invite.
+    s.execute(delete(ServerInvite).where(ServerInvite.email.in_(select(User.email).where(User.id.in_(members)))))
+    s.execute(delete(Family).where(Family.id == family_id))
+
+
+def delete_family(s: Session, ctx: Ctx, confirm: str) -> None:
+    """The owner deletes the family for good. confirm must be the family name."""
+    ctx.require_owner()
+    if confirm.strip().casefold() != ctx.fam.name.strip().casefold():
+        raise Invalid("confirm: type the family name to delete the family.")
+    _purge_family(s, ctx.fam.id)
+    s.commit()
+
+
+def delete_account(s: Session, ctx: Ctx, confirm: str) -> None:
+    """The user deletes the account: membership, tokens, push subscriptions (foreign keys cascade). Entries keep
+    their data and lose the author. The only member of a family deletes the family too."""
+    if confirm.strip().lower() != ctx.user.email:
+        raise Invalid("confirm: type your email to delete your account.")
+    if ctx.family is not None:
+        others = s.scalar(select(func.count()).select_from(Membership).where(
+            Membership.family_id == ctx.family.id, Membership.user_id != ctx.user.id))
+        if others and ctx.role == "owner":
+            raise Conflict("You are the owner of a family with other carers. Make another carer the owner, "
+                           "or delete the family first.")
+        if not others:
+            _purge_family(s, ctx.family.id)
+    s.execute(delete(ServerInvite).where(ServerInvite.email == ctx.user.email))
+    s.execute(delete(User).where(User.id == ctx.user.id))
     s.commit()
 
 

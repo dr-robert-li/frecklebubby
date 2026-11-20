@@ -1,6 +1,6 @@
 <script lang="ts">
 	// "How can I support <name>?": the saved support report (M11), or make a new one. The model can take a minute.
-	import { api, softMessage } from './api.ts';
+	import { api, runJob, softMessage } from './api.ts';
 	import { child, units, wording } from './app.svelte.ts';
 	import Cites from './Cites.svelte';
 	import { fmtDay, fmtDur, fmtUnit, localDay } from './format.svelte.ts';
@@ -38,7 +38,7 @@
 		busy = true;
 		error = '';
 		try {
-			report = await api<Report>(`/children/${cid}/support-report`, { method: 'POST' });
+			report = await runJob<Report>(`/children/${cid}/support-report`);
 		} catch (e) {
 			error = softMessage(e);
 		} finally {

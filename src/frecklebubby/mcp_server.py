@@ -5,20 +5,22 @@ serves local clients as one user of the database.
 """
 
 import argparse
+import asyncio
 import logging
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from typing import Annotated, Any, Literal
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
 from fastmcp.server.auth import AuthProvider
-from fastmcp.server.dependencies import get_access_token, get_http_headers
+from fastmcp.server.dependencies import CurrentContext, get_access_token, get_http_headers
 from pydantic import Field, ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from . import ratelimit
 from .auth import DEV_USER
 from .config import get_settings
 from .db import SessionLocal, init_db, utcnow
@@ -64,6 +66,7 @@ from .services import (
     sleep,
     timers,
 )
+from .services.access import check_access
 from .services.families import context, sign_in
 
 log = logging.getLogger(__name__)
@@ -84,6 +87,7 @@ PeeLooks = Annotated[PeeLook | None, Field(description="Pee looks clear or cloud
 PeeSmell = Annotated[bool | None, Field(description="Pee has a strong smell (wet nappy only).")]
 
 READ = {"readOnlyHint": True}
+PROGRESS_SECONDS = 10  # a progress note this often while a slow tool waits
 DESTRUCTIVE = {"destructiveHint": True}
 OZ_ML, LB_KG, IN_CM = 29.5735, 0.45359237, 2.54
 
@@ -129,11 +133,9 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
     @contextmanager
     def call() -> Iterator[tuple[Session, Ctx]]:
         email = caller_email().strip().lower()
-        allowed = get_settings().allowed
-        if allowed and email not in allowed:
-            raise ToolError("This email is not allowed on this server.")
         with SessionLocal() as s:
             try:
+                check_access(s, email)
                 yield s, context(s, sign_in(s, email), "mcp")
             except ServiceError as err:
                 raise ToolError(str(err)) from err
@@ -551,6 +553,7 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
 
         with call() as (s, ctx):
             c = child_of(s, ctx, child)
+            ratelimit.hit("ai", ctx.user.id)
             out = await nl_log.log_words(s, ctx, c.id, text, save)
             return {"saved": out["items"], "proposals": out["proposals"], "message": out["message"]}
 
@@ -658,17 +661,33 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
         make: Annotated[bool, Field(description="true = make a new report (slow with the AI model: 30-120 s). "
                                                 "false = return the saved report, or null when there is none.")] = False,
         child: ChildArg = None,
+        progress: Context = CurrentContext(),
     ) -> dict[str, Any] | None:
         """"How can I support my child?": the last 7 days and today, one block per area (sleep, feeds, nappies,
         play and tummy time, time in a seat or pram, crying, growth, milestones). Each block has the numbers, the
         reference it is compared with, a status (ok, watch, no_data) from fixed rules, and cited suggestions for the
         watch areas. Urgent warning signs come first. General information, not medical advice."""
-        from .ai import support_report
+        from .ai import jobs, support_report
         from .api.ai import SupportReportOut
 
         with call() as (s, ctx):
             c = child_of(s, ctx, child)
-            out = await support_report.generate(s, ctx, c.id) if make else support_report.latest(s, ctx, c.id)
+            if make:
+                # The same job as the app (one at a time per child); wait here and send progress meanwhile.
+                ratelimit.hit("ai", ctx.user.id)
+                jobs.start("support_report", ctx, c.id, support_report.generate)
+                waited = 0
+                while jobs.get("support_report", c.id)["status"] == "running":
+                    await progress.report_progress(waited, None, "Making the support report")
+                    try:
+                        await asyncio.wait_for(jobs.wait("support_report", c.id), PROGRESS_SECONDS)
+                    except TimeoutError:
+                        waited += PROGRESS_SECONDS
+                job = jobs.get("support_report", c.id)
+                if job["status"] == "failed":
+                    raise ToolError(job["error"])
+                s.expire_all()
+            out = support_report.latest(s, ctx, c.id)
             return None if out is None else SupportReportOut.model_validate(out).model_dump(mode="json", by_alias=True)
 
     @mcp.tool(annotations=READ)

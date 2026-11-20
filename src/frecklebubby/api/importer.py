@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, StringConstraints
 from sqlalchemy.orm import Session
 
-from ..auth import get_ctx
+from ..auth import get_ctx, upload_limit
 from ..db import get_session
 from ..importer import huckleberry
 from ..schemas import Email
@@ -36,7 +36,8 @@ class JobOut(BaseModel):
     "Copy children and entries from Huckleberry. The import runs in the background; read its progress with "
     "GET /import/jobs/{id}. You can do the import again: it adds new entries and updates changed entries. "
     "It does not delete entries. If you changed an imported entry in Frecklebubby, the next import writes the "
-    "Huckleberry values over your change. The password is used for this import only. It is not stored."))
+    "Huckleberry values over your change. The password is used for this import only. It is not stored."),
+    dependencies=[Depends(upload_limit)])
 async def start_import(body: ImportIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     # async route: the job task needs the running event loop.
     return {"job_id": huckleberry.start_job(s, ctx, body.email, body.password, body.timezone).id}

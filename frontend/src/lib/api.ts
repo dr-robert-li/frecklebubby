@@ -3,6 +3,7 @@ import type { Clerk } from '@clerk/clerk-js';
 
 export type Config = {
 	auth_mode: 'dev' | 'clerk';
+	invite_only: boolean;
 	clerk_publishable_key: string;
 	vapid_public_key: string;
 	version: string;
@@ -93,6 +94,22 @@ export async function apiRaw(path: string, init: RequestInit = {}): Promise<Resp
 }
 
 export const AI_DOWN = 'The assistant is not available now.';
+
+/** Slow model work (sleep plan, support report): POST starts a job, poll path/job, then GET the saved result. */
+export async function runJob<T>(path: string): Promise<T> {
+	let job = await api<{ status: string; error: string | null }>(path, { method: 'POST' });
+	while (job.status === 'running') {
+		await new Promise((r) => setTimeout(r, 1500));
+		job = await api(`${path}/job`);
+	}
+	if (job.status === 'failed') throw new ApiError(503, job.error || AI_DOWN);
+	return api<T>(path);
+}
+
+/** Clerk mode: open the Clerk account window (there the user can delete the sign-in account). */
+export function openClerkAccount() {
+	clerk?.openUserProfile();
+}
 
 /** Message for features that may not exist yet on this server or whose model is down. */
 export function softMessage(e: unknown, fallback = AI_DOWN): string {

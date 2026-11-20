@@ -199,10 +199,14 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
     # 0. M14: save what the message reports (one parse call; none for a pure question), before the red flags so
     # that a logged temperature counts. A guess is not saved: it comes back as a proposal to confirm.
     report, asks = nl_log.split_question(message)
-    logged = None
+    logged, waited = None, False
     if report:
         try:
-            logged = await nl_log.log_words(s, ctx, child.id, report, drop_notes=asks)
+            if llm.QUEUE.busy:  # tell the page at once, so it can show that it waits (and the stream starts)
+                llm.QUEUE.check()
+                waited = True
+                yield sse("waiting", {})
+            logged = await nl_log.log_words(s, ctx, child.id, report, drop_notes=asks, limited=False)  # heartbeat
         except llm.LlmError:
             asks = True  # not read: answer it as a question (that fails too if the model is down)
         if logged and not (logged["items"] or logged["proposals"]):
@@ -319,6 +323,10 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
 
     answer, sent = warning, False
     try:
+        if llm.QUEUE.busy:
+            llm.QUEUE.check()
+            waited = True
+            yield sse("waiting", {})
         async with llm.stream(family, prompt, ANSWER_TOKENS) as tokens:
             if warning:
                 sent = True
@@ -330,13 +338,13 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
                     answer, sent = answer + text, True
                     yield sse("token", {"text": text})
             tail = filt.flush() + "\n\n" + FOOTER
-    except llm.LlmError:
+    except llm.LlmError as err:
         if not sent:
-            if not warning and not logged:
-                raise  # nothing sent yet: the endpoint answers 503
+            if not warning and not logged and not waited:
+                raise  # nothing sent yet: the endpoint answers 503 (or 429 when busy)
             yield sse("token", {"text": warning})
         yield sse("citations", {"citations": cited(warning)})
-        yield sse("error", {"detail": llm.UNAVAILABLE})
+        yield sse("error", {"detail": str(err)})
         return
     answer += tail
     yield sse("token", {"text": tail})

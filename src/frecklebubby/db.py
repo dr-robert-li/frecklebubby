@@ -46,6 +46,7 @@ def init_db(data_dir: Path) -> None:
         cur = conn.cursor()
         cur.execute("PRAGMA foreign_keys=ON")
         cur.execute("PRAGMA journal_mode=WAL")
+        cur.execute("PRAGMA secure_delete=ON")  # deleted data (M16) is overwritten in the file, not only unlinked
         cur.close()
 
     # shortcut: no Alembic yet; add it before the first schema change after v0.1.0.

@@ -6,6 +6,26 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Invite only server: `OPERATOR_EMAILS` names the operators. **Settings > Server access** lets an operator invite
+  an email, see invites and families, and remove an invite that is not used. An operator cannot read, change,
+  block or delete the data of another family.
+- Delete data: an owner can delete the family and all its data; a user can delete the account. An owner can make
+  another member the owner.
+- Rate limits for AI requests, uploads and wrong tokens (429 with `Retry-After`), and a queue so that the model
+  takes one request at a time. New settings: `LIMIT_AI`, `LIMIT_UPLOADS`, `LIMIT_BAD_TOKEN`, `LLM_QUEUE_MAX`,
+  `LLM_QUEUE_WAIT`, `BEHIND_CLOUDFLARE`.
+- The chat shows "Waiting for the assistant…" while it waits, and its stream sends a heartbeat.
+- An isolation test that covers every API route.
+
+### Changed
+
+- API: `POST /children/{id}/sleep/plan` and `POST /children/{id}/support-report` now start a job and answer 202.
+  Read the state with `GET …/sleep/plan/job` or `GET …/support-report/job`, then read the result as before.
+- Deleted rows are overwritten in the database file (`secure_delete`).
+- The logged block in the chat shows activity kinds in plain words ("tummy time").
+
 ## [0.2.2] - 2026-11-20
 
 ### Changed

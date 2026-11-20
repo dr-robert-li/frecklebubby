@@ -126,7 +126,8 @@ async def _suggest(s: Session, ctx: Ctx, child, now: datetime, rep: dict) -> boo
             + "\n\nWrite the suggestions for the areas to support" + (" and the goes_well line." if in_range else "."))
     out = await llm.complete_json(ctx.fam, [{"role": "system", "content": SYSTEM.format(nappy=wording(ctx.fam))},
                                             {"role": "user", "content": user}],
-                                  _schema([b["area"] for b in watch], bool(in_range)), max_tokens=1200)
+                                  _schema([b["area"] for b in watch], bool(in_range)), max_tokens=1200,
+                                  limited=False)  # a polled job: no wait limit
     valid, allowed = {c["n"] for c in citations}, set(NUMBER.findall(SYSTEM + user))
     for c in citations:
         c.pop("source_id")

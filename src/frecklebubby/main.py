@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastmcp.server.auth.providers.clerk import ClerkProvider
 from starlette.routing import Route
 
-from .api import ai, children, core, cry, importer, notify
+from .api import ai, children, core, cry, importer, notify, operator
 from .config import get_settings
 from .db import SessionLocal, init_db, utcnow
 from .mcp_server import create_mcp
@@ -92,7 +92,7 @@ def create_app(scheduler: bool = True) -> FastAPI:
 
     @app.exception_handler(ServiceError)
     async def _service_error(_request: Request, err: ServiceError):
-        return JSONResponse({"detail": str(err)}, err.status)
+        return JSONResponse({"detail": str(err)}, err.status, headers=getattr(err, "headers", None))
 
     @app.exception_handler(RequestValidationError)
     async def _request_invalid(_request: Request, err: RequestValidationError):
@@ -104,6 +104,7 @@ def create_app(scheduler: bool = True) -> FastAPI:
     app.include_router(ai.router, prefix=API)
     app.include_router(importer.router, prefix=API)
     app.include_router(cry.router, prefix=API)
+    app.include_router(operator.router, prefix=API)
     # Later milestones add their routers here, one line each, for example:
     # app.include_router(nl.router, prefix=API)
 

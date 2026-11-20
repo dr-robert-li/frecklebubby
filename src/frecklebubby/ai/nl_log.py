@@ -537,14 +537,14 @@ def doubt(s: Session, ctx: Ctx, child: Child, ev: dict, p: dict, text: str, now:
     return None
 
 
-async def parse(s: Session, ctx: Ctx, child_id: int, text: str) -> dict:
+async def parse(s: Session, ctx: Ctx, child_id: int, text: str, limited: bool = True) -> dict:
     """{"proposals", "message", "problems"}. A proposal that may be a guess has `unsure` (the reason)."""
     child = get_child(s, ctx, child_id)
     now = utcnow()
     now_local = now.astimezone(ctx.tz)
     messages = [{"role": "system", "content": SYSTEM},
                 {"role": "user", "content": f"{_context(s, ctx, child, now_local)}\n\nNote: {text.strip()}"}]
-    out = await llm.complete_json(ctx.fam, messages, SCHEMA, max_tokens=1500)
+    out = await llm.complete_json(ctx.fam, messages, SCHEMA, max_tokens=1500, limited=limited)
     proposals, problems = [], []
     for ev in out.get("events", []):
         try:
@@ -656,11 +656,11 @@ def _json(p: dict) -> dict:
 
 
 async def log_words(s: Session, ctx: Ctx, child_id: int, text: str, save: bool = True,
-                    drop_notes: bool = False) -> dict:
+                    drop_notes: bool = False, limited: bool = True) -> dict:
     """Parse the words and save what is sure in one step. {"items": saved rows, "proposals": not saved (unsure, or
     all when save is false; JSON form), "message"}. `drop_notes`: the text also asks something, so a note is not
     what the parent wants to record."""
-    out = await parse(s, ctx, child_id, text)
+    out = await parse(s, ctx, child_id, text, limited)
     props = [p for p in out["proposals"] if not (drop_notes and p["action"] == "entry" and p["type"] == "note")]
     sure = [p for p in props if save and not p.get("unsure")]
     later = [p for p in props if p not in sure]

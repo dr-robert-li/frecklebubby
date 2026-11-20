@@ -12,15 +12,17 @@
 		['knowledge', 'Knowledge sources', 'Library and your uploads', 'note'],
 		['tokens', 'API tokens and MCP', 'Connect scripts and AI apps', 'link'],
 		['import', 'Import from Huckleberry', 'Copy your old data once', 'download'],
-		['appearance', 'Appearance', 'Night theme, clock', 'sun']
+		['appearance', 'Appearance', 'Night theme, clock', 'sun'],
+		['delete', 'Delete data', 'The family or your account', 'trash']
 	];
+	const shown = $derived(app.me?.operator ? [['access', 'Server access', 'Invites and families', 'link'], ...items] : items);
 </script>
 
 <svelte:head><title>Settings · Frecklebubby</title></svelte:head>
 
 <h1>Settings</h1>
 <nav class="card menu" aria-label="Settings">
-	{#each items as [href, label, hint, icon] (href)}
+	{#each shown as [href, label, hint, icon] (href)}
 		<a href="/settings/{href}">
 			<span class="ic"><Icon name={icon} size={20} /></span>
 			<span class="txt"><strong>{label}</strong><span class="muted small">{hint}</span></span>

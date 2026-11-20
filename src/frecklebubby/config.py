@@ -2,8 +2,9 @@
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PACKAGE_DATA = Path(__file__).parent / "data"
@@ -19,6 +20,8 @@ class Settings(BaseSettings):
     clerk_oauth_client_secret: str = ""
     base_url: str = ""
     allowed_emails: str = ""
+    # M17: operators (comma list). Set = the server is invite only and the operators get Settings > Server access.
+    operator_emails: str = ""
     data_dir: Path = Path("./data")
     # Bundled data files (growth tables, milestones). Tests point this at small fixtures.
     bundled_data_dir: Path = PACKAGE_DATA
@@ -31,10 +34,24 @@ class Settings(BaseSettings):
     cry_model_dir: Path | None = None
     host: str = "0.0.0.0"
     port: int = 8000
+    # Rate limits as "count/seconds". AI and uploads: per user. Wrong tokens: per client address.
+    limit_ai: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "30/300"
+    limit_uploads: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "20/3600"
+    limit_bad_token: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "20/600"
+    # Model requests that can wait for the model at one time; one more gets "The assistant is busy" (429).
+    llm_queue_max: int = 8
+    # Seconds a request with no stream (plain words, model test) can wait for the model; then "busy" (429).
+    llm_queue_wait: float = 60
+    # True only behind Cloudflare Tunnel: then the client address comes from the CF-Connecting-IP header.
+    behind_cloudflare: bool = False
 
     @property
     def allowed(self) -> frozenset[str]:
         return frozenset(e.strip().lower() for e in self.allowed_emails.split(",") if e.strip())
+
+    @property
+    def operators(self) -> frozenset[str]:
+        return frozenset(e.strip().lower() for e in self.operator_emails.split(",") if e.strip())
 
     def check(self) -> None:
         """Refuse to start with an unsafe or incomplete auth setup."""

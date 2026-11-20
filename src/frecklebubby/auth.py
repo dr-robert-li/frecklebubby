@@ -9,9 +9,11 @@ import jwt
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
+from . import ratelimit
 from .config import get_settings
 from .db import get_session
 from .services import Ctx
+from .services.access import check_access
 from .services.families import context, sign_in
 from .services.tokens import PREFIX, user_for_token
 
@@ -70,29 +72,48 @@ def verify_clerk_jwt(token: str) -> dict:
     return claims
 
 
-def check_allowed(email: str) -> None:
-    allowed = get_settings().allowed
-    if allowed and email.strip().lower() not in allowed:
-        raise HTTPException(403, "This email is not allowed on this server.")
+def client_address(request: Request) -> str:
+    """Behind Cloudflare Tunnel the peer is the tunnel; the real client is in CF-Connecting-IP."""
+    if get_settings().behind_cloudflare and request.headers.get("cf-connecting-ip"):
+        return request.headers["cf-connecting-ip"]
+    return request.client.host if request.client else ""
 
 
 def get_ctx(request: Request, s: Session = Depends(get_session)) -> Ctx:
     settings = get_settings()
     header = request.headers.get("authorization", "")
     token = header[7:].strip() if header.lower().startswith("bearer ") else ""
+    address = client_address(request)
+    if token:
+        ratelimit.check("bad_token", address)
     if token.startswith(PREFIX):
         user = user_for_token(s, token)
         if user is None:
+            ratelimit.add("bad_token", address)
             raise _unauthorized("The API token is not valid.")
-        check_allowed(user.email)
+        check_access(s, user.email)
         return context(s, user, "api")
     if token and settings.auth_mode == "clerk":
-        claims = verify_clerk_jwt(token)
-        check_allowed(claims["email"])
+        try:
+            claims = verify_clerk_jwt(token)
+        except HTTPException:
+            ratelimit.add("bad_token", address)
+            raise
+        check_access(s, claims["email"])
         user = sign_in(s, claims["email"], claims.get("name") or "", claims["sub"])
         return context(s, user, "app")
     if settings.auth_mode == "dev" and not token:
         email = (request.headers.get("x-dev-user") or DEV_USER).strip().lower()
-        check_allowed(email)
+        check_access(s, email)
         return context(s, sign_in(s, email), "app")
     raise _unauthorized("Sign in first.")
+
+
+def ai_limit(ctx: Ctx = Depends(get_ctx)) -> None:
+    """Route dependency: requests to the AI model, per user."""
+    ratelimit.hit("ai", ctx.user.id)
+
+
+def upload_limit(ctx: Ctx = Depends(get_ctx)) -> None:
+    """Route dependency: file uploads and import starts, per user."""
+    ratelimit.hit("uploads", ctx.user.id)

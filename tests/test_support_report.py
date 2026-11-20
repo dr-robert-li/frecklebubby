@@ -15,7 +15,7 @@ from frecklebubby.models import SupportReport
 from frecklebubby.services import reports, support
 from frecklebubby.services.library import library
 
-from .conftest import ctx_for, make_family
+from .conftest import ctx_for, make_family, run_job
 from .fake_llm import fake_llm_fixture  # noqa: F401
 
 API = "/api/v1"
@@ -182,7 +182,7 @@ async def test_save_replace_and_red_flags_api(client, fake_llm):
     r = await client.get(url, headers=h)
     assert r.status_code == 200 and r.json() is None
     fake_llm.down = True
-    first = (await client.post(url, headers=h)).json()
+    _, first = await run_job(client, h, url)
     assert first["notice"] is None and first["urgent"] == []  # nothing logged: no model call
     # a red flag after the report: the saved report shows it (red flags are read again)
     now = datetime.now(BNE) - timedelta(minutes=5)
@@ -191,7 +191,7 @@ async def test_save_replace_and_red_flags_api(client, fake_llm):
     got = (await client.get(url, headers=h)).json()
     assert got["id"] == first["id"] and got["created_at"] == first["created_at"]
     assert got["urgent"][0]["severity"] == "urgent" and got["urgent"][0]["kind"] == "fever_under_3m"
-    second = (await client.post(url, headers=h)).json()
+    _, second = await run_job(client, h, url)
     assert second["id"] == first["id"]
     s, _ = ctx_for("a@example.com")
     assert s.scalar(select(func.count()).select_from(SupportReport)) == 1

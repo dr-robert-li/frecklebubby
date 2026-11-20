@@ -45,6 +45,7 @@ type Me = {
 	user: { id: number; email: string; name: string };
 	family: { id: number; name: string; timezone: string } | null;
 	role: 'owner' | 'carer' | null;
+	operator: boolean;
 	children: Child[];
 };
 

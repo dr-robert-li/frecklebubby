@@ -13,7 +13,7 @@ import pytest
 
 from frecklebubby.ai import nl_log
 
-from ..conftest import make_family
+from ..conftest import make_family, run_job
 from ..fake_llm import sse_events
 
 URL = os.environ.get("LLM_LIVE_URL")
@@ -243,10 +243,9 @@ async def test_sleep_plan(live, client):
     h, cid = await make_family(client, birthdate=(date.today() - timedelta(days=245)).isoformat())
     await _seed(client, h, cid, datetime.now(UTC).replace(minute=0, second=0, microsecond=0))
     t0 = time.monotonic()
-    r = await client.post(f"/api/v1/children/{cid}/sleep/plan", headers=h)
+    status, plan = await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan")
     secs = round(time.monotonic() - t0, 1)
-    assert r.status_code == 200, r.text
-    plan = r.json()
+    assert status == "done", plan
     REPORT["sleep_plan"] = {"seconds": secs, "plan": plan}
     print(json.dumps(plan, indent=1))
     times = [row["time"] for row in plan["schedule"]]

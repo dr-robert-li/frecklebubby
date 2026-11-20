@@ -91,7 +91,7 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
             + f"Sleep in the last 7 days:\n{_recent_days(s, ctx, child, now)}\n\nSources:\n" + "\n\n".join(blocks)
             + "\n\nMake the sleep plan for a typical day.")
     out = await llm.complete_json(ctx.fam, [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
-                                  SCHEMA, max_tokens=2000)
+                                  SCHEMA, max_tokens=2000, limited=False)  # a polled job: no wait limit
     valid = {c["n"] for c in citations}
     advice = [_advice(a, valid) for a in out.get("advice", [])]
     used = {n for a in advice for n in a["cites"]}

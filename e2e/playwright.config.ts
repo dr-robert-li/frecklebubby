@@ -47,6 +47,23 @@ const cryServer = [
 	`AUTH_MODE=dev CRY_MODEL_DIR="${CRY_MODEL_DIR}" DATA_DIR="$D" PORT=${CRY_PORT} exec uv run --extra cry frecklebubby`
 ].join('\n');
 
+// M15: the real model with a short wait list (one request may wait), to show the waiting and busy states.
+const M15_PORT = Number(process.env.E2E_M15_PORT ?? 8014);
+const m15URL = `http://127.0.0.1:${M15_PORT}`;
+const m15Server = [
+	'set -e',
+	'cd .. && D=$(mktemp -d -t frecklebubby-e2e-m15-XXXXXX)',
+	`AUTH_MODE=dev LLM_QUEUE_MAX=1 LLM_BASE_URL=${LLM_BASE_URL} DATA_DIR="$D" SLEEP_NORMS_PATH="$D/none.json" PORT=${M15_PORT} exec uv run frecklebubby`
+].join('\n');
+// M17: an invite-only server (OPERATOR_EMAILS set). The other servers keep the 0.2.2 behaviour.
+const M17_PORT = Number(process.env.E2E_M17_PORT ?? 8015);
+const m17URL = `http://127.0.0.1:${M17_PORT}`;
+const m17Server = [
+	'set -e',
+	'cd .. && D=$(mktemp -d -t frecklebubby-e2e-m17-XXXXXX)',
+	`AUTH_MODE=dev OPERATOR_EMAILS=operator@example.com DATA_DIR="$D" SLEEP_NORMS_PATH="$D/none.json" PORT=${M17_PORT} exec uv run frecklebubby`
+].join('\n');
+
 const phone = { ...devices['Pixel 7'], browserName: 'chromium' as const };
 // Real-model journeys: one at a time (one CPU model), long timeouts.
 const slow = { testDir: './tests', timeout: 600_000, workers: 1, use: { ...phone, baseURL: llmURL } };
@@ -68,7 +85,7 @@ export default defineConfig({
 		screenshot: 'on'
 	},
 	projects: [
-		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9|m11|m13|m14)\.spec\.ts$/ },
+		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9|m11|m13|m14|m15|m17)\.spec\.ts$/ },
 		{ name: 'llm', ...slow, testMatch: /\.llm\.spec\.ts$/, outputDir: './recordings/m3/results' },
 		{ name: 'm4', ...slow, testMatch: /\.m4\.spec\.ts$/, outputDir: './recordings/m4/results' },
 		{ name: 'm5', ...slow, testMatch: /\.m5\.spec\.ts$/, outputDir: './recordings/m5/results' },
@@ -77,6 +94,9 @@ export default defineConfig({
 		// M13 development guidance and M14 logging from the assistant: the real model on the second server.
 		{ name: 'm13', ...slow, testMatch: /\.m13\.spec\.ts$/, outputDir: './recordings/m13/results' },
 		{ name: 'm14', ...slow, testMatch: /\.m14\.spec\.ts$/, outputDir: './recordings/m14/results' },
+		// M15 delete family and the assistant's waiting and busy states (real model, wait list of 1); M17 invite only.
+		{ name: 'm15', ...slow, use: { ...phone, baseURL: m15URL }, testMatch: /\.m15\.spec\.ts$/, outputDir: './recordings/m15/results' },
+		{ name: 'm17', use: { ...phone, baseURL: m17URL }, testMatch: /\.m17\.spec\.ts$/, outputDir: './recordings/m17/results', workers: 1 },
 		// M9 new logging: the main server (no model); the confined notification waits for the 60 s server tick.
 		{ name: 'm9', use: phone, testMatch: /\.m9\.spec\.ts$/, outputDir: './recordings/m9/results', timeout: 240_000 },
 		{
@@ -98,6 +118,8 @@ export default defineConfig({
 	webServer: [
 		{ command: `bash -c '${server}'`, url: `${baseURL}/api/v1/health`, timeout: 300_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
 		{ command: `bash -c '${llmServer}'`, url: `${llmURL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
+		{ command: `bash -c '${m15Server}'`, url: `${m15URL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
+		{ command: `bash -c '${m17Server}'`, url: `${m17URL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
 		{ command: `bash -c '${cryServer}'`, url: `${cryURL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' }
 	]
 });

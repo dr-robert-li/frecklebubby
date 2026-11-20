@@ -30,6 +30,7 @@
 	const saveFamily = (e: SubmitEvent) => (e.preventDefault(), run(async () => (await api('/family', { method: 'PATCH', body: { name, timezone } }), await loadMe()), 'Family saved'));
 	const invite = (e: SubmitEvent) => (e.preventDefault(), run(async () => (await api('/family/invites', { method: 'POST', body: { email } }), (email = ''), await load()), 'Invite saved'));
 	const dropInvite = (i: Invite) => run(async () => (await api(`/family/invites/${i.id}`, { method: 'DELETE' }), await load()), 'Invite removed');
+	const makeOwner = (m: Member) => run(async () => (await api(`/family/members/${m.user_id}/owner`, { method: 'POST' }), await loadMe(), await load()), `${m.email} is now the owner`);
 	const dropMember = (m: Member) => run(async () => (await api(`/family/members/${m.user_id}`, { method: 'DELETE' }), await load()), `${m.email} removed`);
 </script>
 
@@ -49,7 +50,8 @@
 		{#each members as m (m.user_id)}
 			<li class="spread">
 				<span class="who"><strong>{m.name || m.email}</strong><span class="muted small">{m.email} · {m.role === 'owner' ? 'Owner' : 'Carer'}</span></span>
-				{#if owner && m.role !== 'owner'}<button class="icon" aria-label="Remove {m.email}" onclick={() => dropMember(m)}><Icon name="trash" size={20} /></button>{/if}
+				{#if owner && m.role !== 'owner'}<span class="row"><button class="ghost small" aria-label="Make {m.email} the owner" onclick={() => makeOwner(m)}>Make owner</button>
+					<button class="icon" aria-label="Remove {m.email}" onclick={() => dropMember(m)}><Icon name="trash" size={20} /></button></span>{/if}
 			</li>
 		{/each}
 	</ul>

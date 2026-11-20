@@ -181,6 +181,23 @@ The server does not start in Clerk mode if a value is missing. The log names the
 
 > Not yet tested with a real Clerk account. The sign-in code is tested with test tokens only.
 
+### A server for more than one family (invite only)
+
+Put your email in `OPERATOR_EMAILS` (comma list). Then the server is invite only and you are an operator:
+
+- **Settings > Server access** lets you invite an email. That person can sign in and start one family. The app
+  sends no email; tell the person yourself. You can remove an invite that is not used yet.
+- A family invites its own carers, as before. They get in without a change from you.
+- An operator sees family names, member emails and dates. An operator cannot read, change, block or delete the
+  data of another family.
+- A family owner can delete the family in **Settings > Delete data**. A user can delete the account there.
+  After that the person needs a new invite.
+- `ALLOWED_EMAILS` stays optional: with `OPERATOR_EMAILS` set, it is a fixed list of more emails that can sign in.
+
+Protection for a public server: requests to the AI model, uploads and wrong tokens have rate limits, and the model
+takes one request at a time (the others wait in order). The settings are in `.env.example`. Behind a Cloudflare
+Tunnel set `BEHIND_CLOUDFLARE=true`.
+
 ## HTTPS
 
 You need HTTPS for:

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AI_DOWN, api, apiRaw, softMessage } from '#lib/api.ts';
+	import { AI_DOWN, api, apiRaw, runJob, softMessage } from '#lib/api.ts';
 	import { child, refresh, toast, wording } from '#lib/app.svelte.ts';
 	import { fmtDay, localDay } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
@@ -13,7 +13,7 @@
 	// M14: what a chat turn saved ("Logged" block) and what it did not save without a check (proposals).
 	type Item = { action: 'entry' | 'timer'; type: string; summary: string; entry_id?: number | null; timer_action?: string | null; undone: boolean };
 	type Logged = { items: Item[]; proposals: Proposal[]; message: string };
-	type Msg = { id?: number; role: 'user' | 'assistant'; content: string; citations: Citation[]; logged?: Logged | null };
+	type Msg = { id?: number; role: 'user' | 'assistant'; content: string; citations: Citation[]; logged?: Logged | null; waiting?: boolean };
 	type Insight = { kind: string; severity: 'info' | 'attention' | 'urgent'; title: string; body: string; citations: Citation[] };
 
 	let tab = $state<'ask' | 'insights' | 'plan' | 'milestones'>('ask');
@@ -77,7 +77,7 @@
 			});
 			if (!res.ok || !res.body) {
 				const d = await res.json().catch(() => null);
-				throw new Error(res.status === 503 && d?.detail ? d.detail : AI_DOWN);
+				throw new Error((res.status === 503 || res.status === 429) && d?.detail ? d.detail : AI_DOWN);
 			}
 			const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
 			let buf = '';
@@ -91,7 +91,9 @@
 					buf = buf.slice(i + 2);
 					const ev = /^event: ?(.*)$/m.exec(block)?.[1].trim() ?? 'message';
 					const data = JSON.parse(/^data: ?(.*)$/m.exec(block)?.[1] ?? '{}');
-					if (ev === 'logged') {
+					if (ev !== 'waiting') answer.waiting = false;
+					if (ev === 'waiting') answer.waiting = true;
+					else if (ev === 'logged') {
 						answer.logged = { items: data.items, proposals: data.proposals, message: data.message };
 						answer.id = data.message_id;
 						refresh();
@@ -158,7 +160,7 @@
 		planBusy = true;
 		planError = '';
 		try {
-			plan = await api(`/children/${cid}/sleep/plan`, { method: 'POST' });
+			plan = await runJob(`/children/${cid}/sleep/plan`);
 		} catch (e) {
 			planError = softMessage(e);
 		} finally {
@@ -228,7 +230,8 @@
 						{#if m.logged?.proposals.length}
 							<Proposals bind:proposals={m.logged.proposals} message={m.logged.message} busy={busyMsg === m.id} oncancel={() => saveProposals(m, [])} onsave={() => saveProposals(m, m.logged!.proposals)} />
 						{/if}
-						{#each (m.content || (live && !m.logged ? '…' : '')).split(/\n\n+/).filter(Boolean) as para, k (k)}
+						{#if live && m.waiting}<p class="muted" role="status">Waiting for the assistant…</p>{/if}
+						{#each (m.content || (live && !m.logged && !m.waiting ? '…' : '')).split(/\n\n+/).filter(Boolean) as para, k (k)}
 							<p class:urgent={para.startsWith('Urgent:')}>
 								{#each pieces(para) as p, j (j)}
 									{#if typeof p === 'number' && cite(m.citations, p)}

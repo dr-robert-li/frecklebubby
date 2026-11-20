@@ -1,5 +1,7 @@
 """AI and knowledge routes: NL logging, assistant chat (SSE), sleep plan, insights, LLM test, knowledge sources."""
 
+import asyncio
+from collections.abc import AsyncIterator
 from datetime import date, datetime
 from typing import Literal
 
@@ -8,14 +10,34 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, ValidationError, field_validator
 from sqlalchemy.orm import Session
 
-from ..ai import assistant, llm, nl_log, sleep_plan, support_report
-from ..auth import get_ctx
+from ..ai import assistant, jobs, llm, nl_log, sleep_plan, support_report
+from ..auth import ai_limit, get_ctx, upload_limit
 from ..db import get_session
 from ..knowledge import uploads
 from ..services import Ctx, insights
 from ..services.children import get_child
 
 router = APIRouter()
+HEARTBEAT = 15.0  # seconds between ': ping' lines when a stream has nothing to send (a proxy cuts a quiet stream)
+
+
+async def heartbeat(events: AsyncIterator[str]) -> AsyncIterator[str]:
+    """The events, plus a comment line when no event came for HEARTBEAT seconds."""
+    nxt = asyncio.ensure_future(anext(events))
+    try:
+        while True:
+            done, _ = await asyncio.wait({nxt}, timeout=HEARTBEAT)
+            if not done:
+                yield ": ping\n\n"
+                continue
+            try:
+                event = nxt.result()
+            except StopAsyncIteration:
+                return
+            yield event
+            nxt = asyncio.ensure_future(anext(events))
+    finally:
+        nxt.cancel()
 
 
 class CitationOut(BaseModel):
@@ -165,6 +187,11 @@ class UploadOut(SourceOut):
     chunks: int
 
 
+class JobOut(BaseModel):
+    status: Literal["none", "running", "done", "failed"]
+    error: str | None
+
+
 class LlmTestOut(BaseModel):
     ok: bool
     detail: str
@@ -172,7 +199,7 @@ class LlmTestOut(BaseModel):
 
 
 @router.post("/children/{cid}/nl/parse", response_model=nl_log.ParseOut, response_model_exclude_none=True,
-             summary="Note in plain words → proposals")
+             summary="Note in plain words → proposals", dependencies=[Depends(ai_limit)])
 async def nl_parse(cid: int, body: nl_log.ParseIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     return await nl_log.parse(s, ctx, cid, body.text)
 
@@ -208,14 +235,17 @@ def clear_messages(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(g
 
 @router.post("/children/{cid}/assistant/chat", response_class=StreamingResponse,
              responses={200: {"content": {"text/event-stream": {}}}},
-             summary="Ask the assistant. Server-Sent Events: token, citations, done, error")
+             summary="Ask the assistant. Server-Sent Events: waiting, logged, token, citations, done, error. "
+                     "A comment line (': ping') comes at least every 15 s, also while the request waits for the model.",
+             dependencies=[Depends(ai_limit)])
 async def chat(cid: int, body: ChatIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     events = assistant.chat(s, ctx, cid, body.message)
-    first = await anext(events)  # child check, retrieval and the model connection; errors become JSON (404, 503)
+    # child check, retrieval and the model connection (or "waiting"); errors become JSON (404, 429, 503)
+    first = await anext(events)
 
     async def stream():
         yield first
-        async for e in events:
+        async for e in heartbeat(events):
             yield e
 
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
@@ -231,10 +261,17 @@ def get_sleep_plan(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(g
     return sleep_plan.latest(s, ctx, cid)
 
 
-@router.post("/children/{cid}/sleep/plan", response_model=SleepPlanOut, summary="Make a sleep plan (slow: 30-90 s)")
+@router.post("/children/{cid}/sleep/plan", response_model=JobOut, status_code=202, dependencies=[Depends(ai_limit)],
+             summary="Start a new sleep plan (30-90 s). Poll GET .../sleep/plan/job, then read GET .../sleep/plan")
 async def make_sleep_plan(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     get_child(s, ctx, cid)
-    return await sleep_plan.generate(s, ctx, cid)
+    return jobs.start("sleep_plan", ctx, cid, sleep_plan.generate)
+
+
+@router.get("/children/{cid}/sleep/plan/job", response_model=JobOut, summary="State of the last sleep plan job")
+def sleep_plan_job(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    get_child(s, ctx, cid)
+    return jobs.get("sleep_plan", cid)
 
 
 @router.get("/children/{cid}/support-report", response_model=SupportReportOut | None, response_model_by_alias=True)
@@ -242,13 +279,23 @@ def get_support_report(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depen
     return support_report.latest(s, ctx, cid)
 
 
-@router.post("/children/{cid}/support-report", response_model=SupportReportOut, response_model_by_alias=True,
-             summary="Make a support report (slow with the model: 30-120 s)")
+@router.post("/children/{cid}/support-report", response_model=JobOut, status_code=202,
+             dependencies=[Depends(ai_limit)], summary=(
+                 "Start a new support report (with the model: 30-120 s). Poll GET .../support-report/job, then read "
+                 "GET .../support-report"))
 async def make_support_report(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
-    return await support_report.generate(s, ctx, cid)
+    get_child(s, ctx, cid)
+    return jobs.start("support_report", ctx, cid, support_report.generate)
 
 
-@router.post("/family/settings/llm-test", response_model=LlmTestOut, summary="Test the model server connection")
+@router.get("/children/{cid}/support-report/job", response_model=JobOut, summary="State of the last support report job")
+def support_report_job(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    get_child(s, ctx, cid)
+    return jobs.get("support_report", cid)
+
+
+@router.post("/family/settings/llm-test", response_model=LlmTestOut, summary="Test the model server connection",
+             dependencies=[Depends(ai_limit)])
 async def llm_test(ctx: Ctx = Depends(get_ctx)):
     return await llm.test(ctx.fam)
 
@@ -259,7 +306,8 @@ def sources(ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
 
 
 @router.post("/knowledge/uploads", response_model=UploadOut, status_code=201,
-             summary="Upload a PDF, EPUB, TXT or MD file (max 50 MB). Private to the family.")
+             summary="Upload a PDF, EPUB, TXT or MD file (max 50 MB). Private to the family.",
+             dependencies=[Depends(upload_limit)])
 async def upload(file: UploadFile = File(...), ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     ctx.fam  # noqa: B018  409 before reading a large body when the user has no family
     data = await file.read(uploads.MAX_BYTES + 1)

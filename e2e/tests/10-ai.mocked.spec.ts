@@ -40,8 +40,10 @@ async function mockAll(page: Page) {
 				advice: [{ text: 'Keep the room dark for naps.', cites: [1] }],
 				citations: [NHS]
 			};
-		await json(r, plan);
+		// M15: POST starts a job (202); the page polls .../job, then reads the plan.
+		await (r.request().method() === 'POST' ? json(r, { status: 'running', error: null }, 202) : json(r, plan));
 	});
+	await page.route('**/api/v1/children/*/sleep/plan/job', (r) => json(r, { status: 'done', error: null }));
 }
 
 test('the parent asks the assistant and opens a source', async ({ page, family }) => {

@@ -52,6 +52,16 @@ class Invite(Base):
     created_at: Mapped[datetime] = _created()
 
 
+class ServerInvite(Base):
+    """M17: an email that the operator lets in. It can start one family (then used_at is set)."""
+
+    __tablename__ = "server_invite"
+    id: Mapped[int] = _id()
+    email: Mapped[str] = mapped_column(String, unique=True)
+    created_at: Mapped[datetime] = _created()
+    used_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+
 class Child(Base):
     __tablename__ = "child"
     id: Mapped[int] = _id()
