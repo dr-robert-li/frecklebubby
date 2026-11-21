@@ -6,6 +6,22 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-21
+
+### Added
+
+- Home: you can change the size and the place of each card. Hold a card to start. Then select Small, Large or
+  Wide, and drag the card to a new place (or use "Move earlier" and "Move later"). A tap outside the cards ends
+  the mode. "Reset" gives the first layout back. The layout is kept on the device.
+- Home: a large card shows when the last entry was. A wide card shows a short description and when the last
+  entry was. All cards can have each size.
+
+### Changed
+
+- The README is shorter. The guides for sign-in, HTTPS, the API and MCP, the AI parts, operations and development
+  are in `docs/`.
+- New screenshots, with the voice commands and the card layout.
+
 ## [0.5.0] - 2026-11-21
 
 ### Added

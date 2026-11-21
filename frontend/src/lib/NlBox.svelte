@@ -5,6 +5,7 @@
 	import Icon from './Icon.svelte';
 	import Proposals, { type Proposal } from './Proposals.svelte';
 	import VoiceButtons from './VoiceButtons.svelte';
+	import { canVoice } from './voice.svelte';
 
 	let { childId }: { childId: number } = $props();
 	let text = $state('');
@@ -50,7 +51,7 @@
 <section class="card nl" aria-label="Tell me what happened">
 	<form class="row" onsubmit={parse}>
 		<label for="nl-text" class="sr-only">Tell me what happened</label>
-		<input id="nl-text" placeholder="Tell me what happened…" bind:value={text} autocomplete="off" />
+		<input id="nl-text" placeholder={canVoice() ? 'What happened?' : 'Tell me what happened…'} bind:value={text} autocomplete="off" />
 		<button class="icon send" type="submit" disabled={busy || !text.trim()} aria-label="Read my words"><Icon name="sparkle" /></button>
 		<VoiceButtons />
 	</form>

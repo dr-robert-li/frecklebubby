@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { api, runJob, softMessage } from '#lib/api.ts';
 	import { streamChat, type Item, type Msg } from '#lib/chat.ts';
-	import { onCommand } from '#lib/voice.svelte.ts';
+	import { canVoice, onCommand } from '#lib/voice.svelte.ts';
 	import VoiceButtons from '#lib/VoiceButtons.svelte';
 	import { child, refresh, toast, wording } from '#lib/app.svelte.ts';
 	import { fmtDay, localDay } from '#lib/format.svelte.ts';
@@ -228,7 +228,7 @@
 		{#if chatError}<p class="error" role="alert">{chatError}</p>{/if}
 		<form class="row ask" onsubmit={ask}>
 			<label for="q" class="sr-only">Your question</label>
-			<input id="q" placeholder="Ask, or tell me what happened…" bind:value={question} autocomplete="off" />
+			<input id="q" placeholder={canVoice() ? 'Ask or tell me…' : 'Ask, or tell me what happened…'} bind:value={question} autocomplete="off" />
 			<button class="icon send" type="submit" disabled={streaming || !question.trim()} aria-label="Send"><Icon name="send" /></button>
 			<VoiceButtons />
 		</form>

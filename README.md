@@ -10,11 +10,11 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.5.0-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.5.1-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
-[Quick start](#quick-start) · [Connect Claude](#connect-claude-mcp) · [Screenshots](#what-it-does) · [Changelog](CHANGELOG.md)
+[Quick start](#quick-start) · [Connect Claude](docs/api-and-mcp.md#connect-claude-mcp) · [Screenshots](#what-it-does) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -25,6 +25,8 @@ Your data stays on your server.
 - Tracks sleep, breastfeeding, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
   (bath, tummy time, indoor and outdoor play, story time, screen time, skin to skin, brushing teeth), time in a
   car seat or other seat, crying, milestones and notes.
+- Lets you set up the Home screen: hold a card, then change its size (small, large with the time of the last
+  entry, wide with a description) and drag it to a new place.
 - Supports more than one child and more than one carer. Carers join by invite.
 - Can serve more than one family from one server, invite only. Each family sees only its own data. An owner can
   delete the family and all its data.
@@ -92,6 +94,15 @@ Your data stays on your server.
   <a href="docs/screenshots/assistant-waiting.png"><img src="docs/screenshots/assistant-waiting.png" alt="Waiting for the assistant" title="Waiting for the assistant" width="23%"></a>
 </p>
 
+**Hands free and your own layout**<br>
+<sub>Voice command · Voice settings · Change the Home cards</sub>
+
+<p>
+  <a href="docs/screenshots/voice.png"><img src="docs/screenshots/voice.png" alt="Voice command" title="Voice command" width="23%"></a>
+  <a href="docs/screenshots/voice-settings.png"><img src="docs/screenshots/voice-settings.png" alt="Voice settings" title="Voice settings" width="23%"></a>
+  <a href="docs/screenshots/home-cards.png"><img src="docs/screenshots/home-cards.png" alt="Change the Home cards" title="Change the Home cards" width="23%"></a>
+</p>
+
 <sub>Select a picture to see it in full size.</sub>
 
 </div>
@@ -100,25 +111,6 @@ Your data stays on your server.
 
 Frecklebubby gives general information only. It is not a medical device. If you are worried about your child, speak
 to a doctor or nurse. In an emergency, call your local emergency number.
-
-## Contents
-
-- [Quick start](#quick-start)
-- [Clerk sign-in](#clerk-sign-in)
-- [HTTPS](#https)
-- [Install on a phone](#install-on-a-phone)
-- [Connect Claude (MCP)](#connect-claude-mcp)
-- [REST API](#rest-api)
-- [The AI model](#the-ai-model)
-- [Sleep model](#sleep-model)
-- [Voice commands](#voice-commands)
-- [Cry helper](#cry-helper)
-- [Knowledge library and licences](#knowledge-library-and-licences)
-- [Move from Huckleberry](#move-from-huckleberry)
-- [Backup](#backup)
-- [Development](#development)
-- [Troubleshooting](#troubleshooting)
-- [Licence](#licence)
 
 ## Quick start
 
@@ -138,7 +130,7 @@ You need Docker with Compose, or Podman with `podman compose`. You need about 6 
    cp .env.example .env
    ```
 
-   For normal use you need the Clerk values (see [Clerk sign-in](#clerk-sign-in)) and `BASE_URL`.
+   For normal use you need the Clerk values (see [Clerk sign-in](docs/sign-in.md#clerk-sign-in)) and `BASE_URL`.
 
 3. Start:
 
@@ -160,417 +152,16 @@ To stop: `docker compose down`. Your data stays in the volume `data`.
 Put `AUTH_MODE=dev` in `.env`. Then there is no sign-in. **Anyone who can reach the server can act as any user.**
 Use this only on your own computer, never on a server that other people can reach.
 
-## Clerk sign-in
-
-Frecklebubby uses [Clerk](https://clerk.com) for sign-in with Google or GitHub. Clerk is also the OAuth provider for
-Claude connectors. A free Clerk development instance is enough for a family.
-
-In the Clerk dashboard:
-
-1. Make an application. Turn on **Google** and **GitHub** under **SSO connections > Add connection > For all
-   users**. Development instances need no Google or GitHub setup.
-2. **User authentication > Access mode**: select **Invite-only**. Invite each family member under **Users**.
-   (Also invite them in Frecklebubby: **Settings > Family > Invite**.)
-3. **Sessions > Customize session token**: add the email claim. Frecklebubby needs it to know who signed in:
-
-   ```json
-   {
-     "email": "{{user.primary_email_address}}",
-     "name": "{{user.full_name}}"
-   }
-   ```
-
-4. **OAuth applications > Add application** (for Claude and other MCP clients): scopes `openid email profile`,
-   redirect URI `<BASE_URL>/auth/callback`, entered exactly, with no `/` at the end. Copy the client ID and the
-   client secret. Clerk shows the secret only once.
-5. Copy these values to `.env`:
-
-   | `.env` | Where in Clerk |
-   |---|---|
-   | `CLERK_PUBLISHABLE_KEY` | **API keys > Publishable key** (`pk_...`) |
-   | `CLERK_DOMAIN` | The instance host, for example `your-instance.clerk.accounts.dev` (no `https://`) |
-   | `CLERK_OAUTH_CLIENT_ID`, `CLERK_OAUTH_CLIENT_SECRET` | The OAuth application from step 4 |
-
-Optional: put a comma list of emails in `ALLOWED_EMAILS`. Then other emails cannot sign in, even with an invite.
-
-The server does not start in Clerk mode if a value is missing. The log names the missing value.
-
-> Tested with a real Clerk development instance (0.3.1): sign-in and the email claim. A carer invite and a
-> refused email are not yet tested with a real account.
-
-### A server for more than one family (invite only)
-
-Put your email in `OPERATOR_EMAILS` (comma list). Then the server is invite only and you are an operator:
-
-- **Settings > Server access** lets you invite an email. That person can sign in and start one family. The app
-  sends no email; tell the person yourself. You can remove an invite that is not used yet.
-- A family invites its own carers, as before. They get in without a change from you.
-- An operator sees family names, member emails and dates. An operator cannot read, change, block or delete the
-  data of another family.
-- A family owner can delete the family in **Settings > Delete data**. A user can delete the account there.
-  After that the person needs a new invite.
-- `ALLOWED_EMAILS` stays optional: with `OPERATOR_EMAILS` set, it is a fixed list of more emails that can sign in.
-
-Protection for a public server: requests to the AI model, uploads and wrong tokens have rate limits, and the model
-takes one request at a time (the others wait in order). The settings are in `.env.example`. Behind a Cloudflare
-Tunnel set `BEHIND_CLOUDFLARE=true`.
-
-## HTTPS
-
-You need HTTPS for:
-
-- push notifications (browsers allow them only on HTTPS),
-- Claude connectors (Claude connects only to HTTPS servers),
-- install on a phone as an app.
-
-Two ways:
-
-**Tailscale Funnel** gives you a public HTTPS address with no domain and no open port:
-
-```bash
-tailscale funnel --bg 8000      # https://<machine>.<tailnet>.ts.net -> 127.0.0.1:8000
-```
-
-Funnel must be on for your tailnet. The first `tailscale funnel` run prints a link to turn it on. Put the
-`https://<machine>.<tailnet>.ts.net` address in `BASE_URL` and restart: `docker compose up -d`.
-
-**Cloudflare Tunnel** gives your own domain (at Cloudflare) a public HTTPS address with no open port. In the
-Cloudflare dashboard go to **Zero Trust > Networks > Tunnels**, make a tunnel, and add a public hostname with
-the service `http://app:8000`. Put the tunnel token and the profile in `.env`, then start:
-
-```bash
-# .env
-COMPOSE_PROFILES=tunnel
-CLOUDFLARE_TUNNEL_TOKEN=<the token>
-BASE_URL=https://<your hostname>
-```
-
-```bash
-docker compose up -d
-```
-
-Set `OPERATOR_EMAILS` (or `ALLOWED_EMAILS`) first: the app is public when the tunnel runs. See
-[A server for more than one family](#a-server-for-more-than-one-family-invite-only). Also set
-`BEHIND_CLOUDFLARE=true`, so the rate limits see the address of each visitor.
-
-Cloudflare stops a request that sends no data for 125 seconds. The app allows for this: the sleep plan and the
-support report run as a job that the page asks about, the chat sends a heartbeat, and other requests that wait
-for the model get "The assistant is busy" after 60 seconds.
-
-**NVIDIA GPU**: to run the model server on the GPU, put `COMPOSE_FILE=compose.yaml:compose.gpu.yaml` in `.env`.
-You need the NVIDIA Container Toolkit with CDI. Tested on arm64.
-
-**A reverse proxy** (Caddy, nginx, Traefik) with your own domain also works. Send all paths to port 8000. Do not
-buffer responses: the assistant streams its answers (Server-Sent Events). Set `BASE_URL` to the public address.
-
-## Install on a phone
-
-1. Open your `BASE_URL` in the phone browser and sign in.
-2. iPhone (Safari): **Share > Add to Home Screen**. Android (Chrome): **menu > Install app** (or **Add to Home
-   screen**).
-3. Open Frecklebubby from the Home Screen. Go to **Settings > Notifications** and select
-   **Turn on notifications**. On iPhone, push works only in the app that you added to the Home Screen.
-
-> Push on a real phone is not yet tested. The tests prove the reminder and the in-app notification, and the
-> server's push sending code. See [Development](#development).
-
-## Connect Claude (MCP)
-
-Frecklebubby has an MCP server at `<BASE_URL>/mcp`. Claude can then log entries, start timers, read reports and
-search the knowledge library for you.
-
-You can say it in plain words ("she had 120 ml at 2 and I put her in the car seat"): Claude uses one tool per kind
-of entry, or the `log_in_plain_words` tool, and the entry is saved, not only read.
-
-1. On claude.ai, open **Settings > Connectors > Add custom connector**.
-2. Enter `<BASE_URL>/mcp` and add it.
-3. Select **Connect** and sign in with Google or GitHub (the same account as in Frecklebubby).
-
-The connector then also shows in the Claude mobile app for the same account. Each family member does these steps
-in their own Claude account.
-
-**Local MCP clients** (for example Claude Desktop or Claude Code on the same computer) can use stdio. No sign-in
-applies; the tools act as one user:
-
-```bash
-docker compose exec app frecklebubby-mcp --stdio --user you@example.com
-# without containers:
-uv run frecklebubby-mcp --stdio --user you@example.com
-```
-
-`--user` can be left out when the database has only one user.
-
-> Tested with a real Clerk development instance through a Cloudflare Tunnel (0.3.1).
-
-## REST API
-
-All functions of the app are in the REST API at `<BASE_URL>/api/v1`. The API reference (OpenAPI) is at
-`<BASE_URL>/api/docs`, and the machine-readable file at `<BASE_URL>/api/openapi.json`.
-
-For scripts, make a personal access token in **Settings > API tokens**. The app shows the token only once.
-
-```bash
-TOKEN=fb_pat_...
-# list children
-curl -H "Authorization: Bearer $TOKEN" https://frecklebubby.example.com/api/v1/children
-# log a 120 ml formula bottle now for child 1
-curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d "{\"type\":\"bottle\",\"started_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"data\":{\"amount_ml\":120,\"milk_type\":\"Formula\"}}" \
-  https://frecklebubby.example.com/api/v1/children/1/entries
-```
-
-A time without an offset is read in the family time zone. Errors come back as `{"detail": "plain message"}`.
-
-## The AI model
-
-The `llama` container runs [llama.cpp](https://github.com/ggml-org/llama.cpp) with one fixed model:
-**Gemma 4 E4B** (`unsloth/gemma-4-E4B-it-GGUF`, Q4_K_M, about 5 GB), licence Apache-2.0. It runs on the CPU. No GPU
-is necessary.
-
-Speed measured on a 16-thread CPU with no GPU (about 29 tokens, or word parts, per second):
-
-| Task | Time |
-|---|---|
-| Log from plain words | 2 to 5 s |
-| Assistant answer | 4 to 10 s |
-| Sleep plan | about 1 minute |
-
-A slower computer takes longer. When the model is not available, all trackers still work. Only the AI functions
-say "The assistant is not available now".
-
-**Use another model server.** Any server with an OpenAI-compatible `/v1/chat/completions` endpoint works (for
-example a llama.cpp or vLLM server with a GPU). Open **Settings > AI model**, enter the server URL (ending in
-`/v1`), the model name and the key if the server needs one. Select **Save**, then **Test connection**. These
-settings are per family. The defaults come from `LLM_BASE_URL`, `LLM_MODEL` and `LLM_API_KEY` in `.env`. The model
-must support JSON schema output (`response_format`), as llama.cpp does.
-
-## Sleep model
-
-The Home screen shows the next nap or bedtime. With the bundled **sleep norms file** it uses your child's last 14 days and typical patterns of babies of the same
-age, and it shows an 80 % range ("earliest" to "latest"). Insights then also show the current nap stage (for example
-"Mostly 3 naps a day"), compare total sleep with babies of the same age, and show a card when a nap change is common
-at this age. The recommended sleep ranges (AASM 2016, NSF 2015) stay the main reference.
-
-- **What it is**: a JSON file with sleep percentiles by age (0 to 24 months) and the settings of the predictor. It
-  has no data about single babies.
-- **Where it comes from**: made with `training/sleep/` from the infant-sleep data of Liu et al. (2019),
-  "Time-Series Analysis via Low-Rank Matrix Factorization Applied to Infant-Sleep Data"
-  (<https://arxiv.org/abs/1904.04780>): 700 babies whose parents logged sleep in the Baby Connect app. On babies
-  not used to make the file, the start of the next sleep was within 30 minutes 53 % of the time (old table 49 %);
-  the median error was 27 minutes (old table 32 minutes). How to make the file: `training/sleep/README.md`.
-- **Licence**: the data is open for non-commercial use with attribution to Liu et al. The norms file
-  (`src/frecklebubby/data/sleep_norms.json`) and the data file (`training/sleep/data/`) have the same terms.
-- **Your own file**: put `sleep_norms.json` in the data folder (`DATA_DIR/sleep_norms.json`; in the container
-  `/data`, the `data` volume), or set `SLEEP_NORMS_PATH` to its full path. It replaces the bundled file. Restart is
-  not necessary.
-- **Fallback**: a table of common wake windows by age (`src/frecklebubby/data/wake_windows.json`). The app uses it
-  when the file is missing or not valid, or the child is older than 24 months, or no night sleep is
-  logged in the last 24 hours, the app uses the wake-window table as before.
-
-## Voice commands
-
-You can log things and ask questions with your voice. The words go to the assistant, the same as typed words:
-"wet nappy", "she had 120 ml of formula", "start a nap", "how long can she stay awake?".
-
-- **Talk button** (microphone, next to "Tell me what happened" on Home and next to the question box in the
-  Assistant): tap, say your words, tap again.
-- **Hands free** (wave button, next to the microphone): the app listens. Say **"Hey Bubby"** or **"OK Bubby"** and
-  then your words. A short sound tells you that the app heard the keyword. You can also say the keyword, wait for
-  the sound, and then say your words.
-- **Hold-to-talk button on the side** (Settings > Voice): a large see-through button on the left or right side of
-  the screen, at the height you select, on all pages. Hold it down, say your words, and let go. It is for use with
-  one hand.
-- **Read the answer aloud** (Settings > Voice): off, for hands free only, or for all voice commands. The answer
-  always shows on the screen too. The voice is the voice of your phone or browser.
-
-A voice command **saves the entries immediately**, because you have no hand free to confirm. When the app is not
-sure (for example the amount was not in your words), the entry is saved with the text "Not sure: …". You can undo
-it in the voice card or in the Assistant, and you can change or delete each entry in the timeline. An exact copy
-of another item in the same command is not saved.
-
-**Limits of hands free.** A web app can listen only while the app is open and the screen is on. With hands free on,
-the app keeps the screen on, so connect the phone to power for long use. Hands free stops when you lock the phone
-or go to another app.
-
-**Privacy.** The speech-to-text model (Whisper) runs on your own server, on the CPU. No audio goes to a third
-party. With hands free on, the phone finds each spoken phrase and sends it to your server for the keyword check.
-When the phrase does not start with the keyword, the server gives back no text. The server does not store or log
-the sound or the text. Read aloud uses the speech voice of the device; some browsers use an online voice.
-
-**Server settings** (`.env`):
-
-- `VOICE=false` removes the voice buttons.
-- `WHISPER_MODEL` (default `small.en`, about 500 MB, about 1 second for a command on a modern CPU). The first start
-  downloads the model to `DATA_DIR/models/whisper`. `base.en` is faster and makes more errors.
-- Other languages: `WHISPER_MODEL=small` and `WHISPER_LANGUAGE=` (empty). The keyword and the assistant are English.
-- `LIMIT_VOICE` (default `300/300`): recordings per user in a time window.
-- **Without containers**: install the extra (`uv sync --extra voice`).
-- **Microphone**: browsers give the microphone only to HTTPS pages (or `localhost`). See [HTTPS](#https).
-
-API: `POST /api/v1/voice/transcribe` (a WAV file: one channel, 16 bit, 16 kHz, 30 seconds maximum; form field
-`wake=true` for the keyword check) gives `{"heard", "text"}`. `POST .../assistant/chat` takes `"voice": true`.
-
-## Cry helper
-
-The **Crying?** tile on the Home screen answers "what do I check first?".
-
-- **Just tell me what to check**: uses only the logs (last feed, last sleep, last nappy, age). It ranks the likely
-  needs, gives things to try and says when to get medical help. Each fact has a source from the built-in NHS and CDC
-  library. This part needs no model and no microphone.
-- **Listen**: records up to 60 seconds and adds a guess from the sound. The audio is analysed on your server and is
-  not stored.
-- You can save the crying time and what helped to the timeline. Reports show crying per day.
-
-**The sound guess is experimental. It is a guess, not a diagnosis.** There are two models:
-
-- **Cry detector**: finds crying and snoring in the recording. On the test recordings of its dataset it found 40 of
-  43 clips with a cry and gave no false alarm on 39 clips without one.
-- **Cry reason** (hungry, tired, burping, belly pain, discomfort, scared): trained on 489 clips where the label is
-  the parent's own guess, and 382 of them say "hungry". On babies the model had not heard it was right 80 % of the
-  time; "always hungry" is right 78 % of the time. Thus the logs decide the order of the list, and the sound guess
-  is shown only as a hint. The app reads these numbers from `model_card.json` and shows them to the parent.
-
-The model files are bundled in `src/frecklebubby/data/models/cry/`. They are for **non-commercial use, with
-attribution** (ICSD is CC BY-NC-SA 4.0; see `NOTICE.txt` in that folder). Without the files, or without the `cry`
-extra, the app says "Sound analysis is not installed on this server." and the rest works.
-
-- **Make the files again**: `training/cry/README.md`. You need the ICSD dataset and the DeepInfant clips.
-- **Your own models**: put `cry_detector.onnx`, `cry_reason.onnx`, `model_card.json` and `NOTICE.txt` in
-  `DATA_DIR/models/cry` (in the container `/data/models/cry`, the `data` volume), or set `CRY_MODEL_DIR`. They
-  replace the bundled models.
-- **Without containers**: install the extra (`uv sync --extra cry`) and the `ffmpeg` program. The container image has
-  both.
-- **Microphone**: browsers give the microphone only to HTTPS pages (or `localhost`). See [HTTPS](#https).
-
-## Knowledge library and licences
-
-The assistant answers from these sources and shows each source it used:
-
-- **Built-in library** (`src/frecklebubby/data/library/`): pages from the NHS and the CDC.
-  - NHS pages: Contains public sector information licensed under the Open Government Licence v3.0.
-  - CDC pages: Material developed by CDC. Public domain; reference does not imply endorsement by CDC or the U.S.
-    Government. Available free at cdc.gov.
-  - CDC "Learn the Signs. Act Early." milestone checklists (public domain), with the same notice.
-  - The app changed gendered pronouns for the child to they, them and their in this text. It made no other change.
-- **Trusted sources (links only)**: for example Raising Children Network, Red Nose, healthdirect, AAP and
-  well-known sleep books. Frecklebubby stores only the title and the link, not their text.
-- **WHO growth data** (`src/frecklebubby/data/growth/`): WHO Child Growth Standards, World Health Organization,
-  2006. WHO allows use for non-commercial purposes with acknowledgment of WHO as the source. If you use
-  Frecklebubby commercially, get written permission from WHO. WHO does not endorse Frecklebubby. See
-  `src/frecklebubby/data/growth/NOTICE.md`.
-- **Your uploads**: in **Settings > Knowledge sources** you can add PDF, EPUB, text or Markdown files (up to
-  50 MB), for example notes from your doctor. Only your family can use them. You can delete them.
-- **Web lookup** (off by default): in **Settings > AI model** you can let the assistant read pages from an approved
-  list of medical websites. The same page shows the list. Pages are kept for 7 days.
-
-#### Change the approved websites
-
-The person who runs the server sets the list. A user cannot change it in the app. The assistant does not search the
-web: it reads only the pages in a fixed list, and only from the approved websites.
-
-1. Add or remove the website in `src/frecklebubby/data/web_allowlist.txt`. Write one host name on each line,
-   for example `www.rch.org.au`. Do not write `https://` or a path. `example.org` and `www.example.org` are two
-   different hosts.
-2. Add or remove the pages in `src/frecklebubby/data/sources.yaml`. Each page is one item with `kind: web`:
-
-   ```yaml
-   - id: rch-fever
-     title: Fever in children
-     publisher: The Royal Children's Hospital Melbourne
-     year: 2025
-     url: https://www.rch.org.au/kidsinfo/fact_sheets/Fever_in_children/
-     kind: web
-     topics:
-     - fever
-     summary: One or two sentences that say what the page tells a parent.
-   ```
-
-   The `id` must be new. The `url` must start with `https://` and its host must be in `web_allowlist.txt`.
-   The assistant selects a page when the question shares words with its `topics`, `title` or `summary`.
-3. Build the app again and restart it: `docker compose build app && docker compose up -d`.
-
-Add only websites you trust for medical facts, such as a health department or a children's hospital. The assistant
-gives the text of these pages to parents as a source.
-
-If a question is not covered by the sources, the assistant says so. It then lists up to three trusted pages on the
-topic as links. This list comes from the source list by fixed rules, not from the model. Urgent warnings (for
-example a fever in a baby under 3 months) come from fixed rules, not from the model, and always show first.
-
-## Move from Huckleberry
-
-**Settings > Import from Huckleberry** copies your children and their full history (sleep, feeds, nappies, potty,
-pumping, growth, temperature, medicine, activities) from your Huckleberry account.
-
-- Enter your Huckleberry email and password. The password is used only during the import. It is not stored or
-  logged.
-- The import runs in the background and shows its progress. You can leave the page.
-- Select where the data goes. The default: each Huckleberry child becomes a new child in Frecklebubby, also when
-  you already have a child with that name. Or select a child you have now: then the data of the Huckleberry
-  child goes into that child, which keeps its name and birth date. This is only for a Huckleberry account with
-  one child.
-- You can run it again at any time. It does not make copies twice. A new run updates the rows that it imported
-  before, so changes you made in Frecklebubby to imported rows are overwritten. Rows that you logged in
-  Frecklebubby are not changed.
-- Rows that are not valid (for example a time in the future or a bottle over 500 ml) are skipped. The result
-  lists them.
-- It is a copy, not a sync. Huckleberry is not changed.
-
-> Tested with a built-in fake Huckleberry account. Not yet tested with a real Huckleberry account.
-
-This project is not affiliated with Huckleberry Labs Inc.
-
-## Backup
-
-All data is in one SQLite database in the data folder (`/data` in the container, the volume `data`). The same folder
-has the key for push notifications (`vapid_private.pem`). Keep the two together.
-
-```bash
-# copy the database out of the running container (safe while it runs)
-docker compose exec app python -c "import sqlite3; sqlite3.connect('/data/frecklebubby.db').backup(sqlite3.connect('/data/backup.db'))"
-docker compose cp app:/data/backup.db ./frecklebubby-backup.db
-# podman compose has no "cp": use the container name from "podman ps", for example
-podman cp frecklebubby_app_1:/data/backup.db ./frecklebubby-backup.db
-```
-
-To restore: stop the app, copy the file back to `/data/frecklebubby.db`, delete `frecklebubby.db-wal` and
-`frecklebubby.db-shm` if they are in the folder (they belong to the old database), and start the app. You can also copy the whole
-volume with your normal volume backup tool. You can also export a CSV for each child in **Reports**.
-
-## Development
-
-Without containers you need Python 3.14 with [uv](https://docs.astral.sh/uv/), Node.js 22 or newer, and a
-llama.cpp `llama-server` for the AI functions.
-
-```bash
-uv sync --extra import                         # Python packages (with the Huckleberry import)
-(cd frontend && npm ci && npm run build)       # web app, built into src/frecklebubby/static
-AUTH_MODE=dev LLM_BASE_URL=http://127.0.0.1:8082/v1 uv run frecklebubby   # http://127.0.0.1:8000
-
-llama-server -hf unsloth/gemma-4-E4B-it-GGUF:Q4_K_M --no-mmproj --jinja --reasoning-budget 0 \
-  --chat-template-kwargs '{"enable_thinking":false}' -c 8192 --host 127.0.0.1 --port 8082
-```
-
-For frontend work with hot reload: `cd frontend && BACKEND=http://127.0.0.1:8000 npm run dev`.
-
-Tests:
-
-```bash
-uv run pytest                  # backend: services, API, isolation, timers, reminders, AI with a fake model, import
-uv run ruff check
-cd frontend && npm run check   # type check the web app
-cd e2e && npm ci && npx playwright install chromium
-npx playwright test --project phone             # app journeys, AI mocked
-npx playwright test --project llm               # AI journeys with the real model at LLM_BASE_URL
-npx playwright test --project m4 --project m5   # reminders and push; Huckleberry import (fake account)
-```
-
-The e2e tests act as a parent on a phone screen. They start the real backend with an empty database. The `llm`,
-`m4` and `m5` projects use a second backend with `LLM_BASE_URL` (default `http://127.0.0.1:8082/v1`) and the fake
-Huckleberry account. Videos, traces and screenshots go to `e2e/recordings/<milestone>/` (not in git).
-Open a trace with `npx playwright show-trace <file>/trace.zip`.
-
-What the tests do not prove yet: a carer invite and a refused email with a real Clerk account, push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
-account.
+## Guides
+
+The long sections are in the `docs/` folder:
+
+- [Sign-in](docs/sign-in.md): how to set up Clerk sign-in, and how to run an invite-only server for more than one family.
+- [HTTPS and phone install](docs/https.md): how to get an HTTPS address (Tailscale Funnel, Cloudflare Tunnel or a reverse proxy), and how to install the app on a phone.
+- [API and MCP](docs/api-and-mcp.md): how to connect Claude to the MCP server, and how to use the REST API with a token.
+- [AI functions](docs/ai.md): the AI model and the GPU setting, the sleep model, voice commands, the cry helper, and the knowledge library with its licences.
+- [Operations](docs/operations.md): how to move your data from Huckleberry, and how to back up and restore the database.
+- [Development](docs/development.md): how to run the app without containers, and how to run the tests.
 
 ## Troubleshooting
 
@@ -578,7 +169,7 @@ account.
 |---|---|
 | The app container stops with "Refusing to start: AUTH_MODE=clerk needs ..." | A value is missing in `.env`. The message names it. Fill it in and run `docker compose up -d` |
 | "The assistant is not available now" | The model server is still downloading or starting. See `docker compose logs -f llama`. Or check the URL in **Settings > AI model** and select **Test connection** |
-| Sign-in works but the app says you are not signed in | The Clerk session token has no `email` claim. Do step 3 of [Clerk sign-in](#clerk-sign-in) |
+| Sign-in works but the app says you are not signed in | The Clerk session token has no `email` claim. Do step 3 of [Clerk sign-in](docs/sign-in.md#clerk-sign-in) |
 | Claude sign-in fails with "redirect_uri ... does not match" | The Clerk OAuth application must list `<BASE_URL>/auth/callback` exactly |
 | "Turn on notifications" fails, or there is no push | Push needs HTTPS. On iPhone, add the app to the Home Screen first. Check that the browser allows notifications |
 | The assistant answers stop part-way through a proxy | Turn off response buffering in the proxy for `/api/` |
@@ -589,8 +180,8 @@ account.
 ## Licence
 
 MIT for the code. See [LICENSE](LICENSE). Data in `src/frecklebubby/data/` keeps its own licence (see
-[Knowledge library and licences](#knowledge-library-and-licences)). The sleep norms file, the sleep data in
-`training/sleep/data/` and the cry models are for non-commercial use, with attribution (see [Sleep model](#sleep-model)
-and [Cry helper](#cry-helper)).
+[Knowledge library and licences](docs/ai.md#knowledge-library-and-licences)). The sleep norms file, the sleep data in
+`training/sleep/data/` and the cry models are for non-commercial use, with attribution (see [Sleep model](docs/ai.md#sleep-model)
+and [Cry helper](docs/ai.md#cry-helper)).
 
 This project is not affiliated with Huckleberry Labs Inc.
