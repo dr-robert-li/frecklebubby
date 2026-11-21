@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.7.1-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.2-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -27,6 +27,7 @@ Your data stays on your server.
   car seat or other seat, crying, milestones and notes.
 - Lets you set up the Home screen: hold a card, then change its size (small, large with the time of the last
   entry, wide with a description) and drag it to a new place.
+- Shows the totals of today on the Home screen (sleep, breastfeeding, wee, poo, bottle) and the entries of the day.
 - Supports more than one child and more than one carer. Carers join by invite.
 - Can serve more than one family from one server, invite only. Each family sees only its own data. An owner can
   delete the family and all its data.
@@ -36,15 +37,17 @@ Your data stays on your server.
 - Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a
   note at 1 hour (children under 5 years) and a break warning at 2 hours (children under 12 months), with sources.
 - Records nappy details: rash, time with the nappy off, poo colour and texture, pee colour, look and smell.
+- Shows the history by day, from the morning to the evening, or as a list. You select the types to show, and
+  you can put the list in the order of time or of a logged amount (duration, volume, weight, length, temperature).
 - Shows reports: sleep, feeds and nappies per day, and growth on WHO percentile curves. Exports CSV.
 - Sends reminders in the app and as push notifications.
 - Has a REST API and an MCP server, so scripts and AI assistants such as Claude can read and write the data.
 - Has an AI assistant that runs on an open model on your own server. It logs from plain words
   ("120 ml formula 20 minutes ago") on the Home screen and in the chat, answers questions with citations to
-  medical sources, makes a sleep plan, and shows insights.
+  medical sources, writes a sleep plan in words, and shows insights.
 - Takes voice commands, so you can log and ask with no hand or one hand free: a talk button, hands free with the
   keyword "Hey Bubby" or "OK Bubby", an optional large hold-to-talk button on the side of the screen, and an option
-  to read the answer aloud. Your own server changes the speech into text.
+  to read the answer aloud. Your own server changes the speech into text. The app shows the progress while you wait.
 - Calculates a day and night plan for each child: a timeline of sleep blocks and feeds. It starts from your
   child's own logs of the last 14 days. When the logs are outside a recommended range, it moves toward the range
   in small steps and says what it changed.
@@ -70,13 +73,13 @@ Your data stays on your server.
 </p>
 
 **Ask and plan**<br>
-<sub>Assistant with sources · Insights · Development guidance · Sleep plan</sub>
+<sub>Assistant with sources · Insights · Development guidance · Sleep plan in words</sub>
 
 <p>
   <a href="docs/screenshots/assistant.png"><img src="docs/screenshots/assistant.png" alt="Assistant with sources" title="Assistant with sources" width="23%"></a>
   <a href="docs/screenshots/insights.png"><img src="docs/screenshots/insights.png" alt="Insights" title="Insights" width="23%"></a>
   <a href="docs/screenshots/development.png"><img src="docs/screenshots/development.png" alt="Development guidance" title="Development guidance" width="23%"></a>
-  <a href="docs/screenshots/sleep-plan.png"><img src="docs/screenshots/sleep-plan.png" alt="Sleep plan" title="Sleep plan" width="23%"></a>
+  <a href="docs/screenshots/sleep-plan.png"><img src="docs/screenshots/sleep-plan.png" alt="Sleep plan in words" title="Sleep plan in words" width="23%"></a>
 </p>
 
 **See the patterns**<br>
@@ -107,6 +110,15 @@ Your data stays on your server.
   <a href="docs/screenshots/voice-settings.png"><img src="docs/screenshots/voice-settings.png" alt="Voice settings" title="Voice settings" width="23%"></a>
   <a href="docs/screenshots/home-cards.png"><img src="docs/screenshots/home-cards.png" alt="Change the Home cards" title="Change the Home cards" width="23%"></a>
   <a href="docs/screenshots/day-night-plan.png"><img src="docs/screenshots/day-night-plan.png" alt="Day and night plan" title="Day and night plan" width="23%"></a>
+</p>
+
+**History and sleep training**<br>
+<sub>History by day · History list, in order of amount · Sleep training</sub>
+
+<p>
+  <a href="docs/screenshots/history.png"><img src="docs/screenshots/history.png" alt="History by day" title="History by day" width="23%"></a>
+  <a href="docs/screenshots/history-list.png"><img src="docs/screenshots/history-list.png" alt="History list, in order of amount" title="History list, in order of amount" width="23%"></a>
+  <a href="docs/screenshots/sleep-training.png"><img src="docs/screenshots/sleep-training.png" alt="Sleep training" title="Sleep training" width="23%"></a>
 </p>
 
 <sub>Select a picture to see it in full size.</sub>

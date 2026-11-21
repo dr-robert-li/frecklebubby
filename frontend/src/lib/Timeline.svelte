@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { units, wording } from './app.svelte';
-	import { fmtTime } from './format.svelte';
+	import { fmtDay, fmtTime, localDay } from './format.svelte';
 	import Icon from './Icon.svelte';
 	import { entryDetail, tracker, type Entry } from './trackers';
 
-	let { entries, onpick, empty = 'Nothing logged yet.' }: { entries: Entry[]; onpick: (e: Entry) => void; empty?: string } = $props();
+	// dated: each row shows its day too (for a list that is not in the order of time)
+	let { entries, onpick, empty = 'Nothing logged yet.', dated = false }: { entries: Entry[]; onpick: (e: Entry) => void; empty?: string; dated?: boolean } = $props();
 </script>
 
 {#if entries.length}
@@ -13,7 +14,7 @@
 			{@const t = tracker(e.type, wording())}
 			<li>
 				<button class="item" onclick={() => onpick(e)} aria-label="Edit {t.label} at {fmtTime(e.started_at)}">
-					<span class="time">{fmtTime(e.started_at)}{#if e.ended_at}<br /><span class="muted">{fmtTime(e.ended_at)}</span>{/if}</span>
+					<span class="time">{#if dated}<span class="muted">{fmtDay(localDay(e.started_at), { day: 'numeric', month: 'short' })}</span><br />{/if}{fmtTime(e.started_at)}{#if e.ended_at}<br /><span class="muted">{fmtTime(e.ended_at)}</span>{/if}</span>
 					<span class="bubble" style="background: var({t.color})"><Icon name={t.icon ?? e.type} size={20} /></span>
 					<span class="text">
 						<strong>{t.label}</strong>

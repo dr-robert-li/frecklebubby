@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Any, get_args
 
 from pydantic import ValidationError
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..db import utcnow
@@ -62,14 +62,34 @@ def get_entry(s: Session, ctx: Ctx, entry_id: int) -> Entry:
     return entry
 
 
-def list_entries(s: Session, ctx: Ctx, child_id: int, type_: str | None = None, start: datetime | None = None,
-                 end: datetime | None = None, limit: int = 50, before: datetime | None = None,
-                 newest_first: bool = True) -> list[Entry]:
-    """Entries that start in [start, end) and before `before` (page cursor)."""
+def _num(key: str):
+    return func.json_extract(Entry.data, f"$.{key}")
+
+
+# The logged amount of an entry, by name. The list can be in the order of one of these.
+MEASURES = {
+    "duration": lambda: func.coalesce(
+        (func.julianday(Entry.ended_at) - func.julianday(Entry.started_at)) * 86400,
+        _num("left_seconds") + _num("right_seconds"), _num("left_seconds"), _num("right_seconds")),
+    "volume": lambda: func.coalesce(_num("amount_ml"), _num("total_ml"), _num("left_ml") + _num("right_ml"),
+                                    _num("left_ml"), _num("right_ml")),
+    "weight": lambda: _num("weight_kg"),
+    "height": lambda: _num("height_cm"),
+    "head": lambda: _num("head_cm"),
+    "temperature": lambda: _num("celsius"),
+}
+
+
+def list_entries(s: Session, ctx: Ctx, child_id: int, type_: str | list[str] | None = None,
+                 start: datetime | None = None, end: datetime | None = None, limit: int = 50,
+                 before: datetime | None = None, newest_first: bool = True, sort: str = "time",
+                 offset: int = 0) -> list[Entry]:
+    """Entries that start in [start, end) and before `before` (page cursor). `sort` is "time" or a name in MEASURES;
+    with a measure, entries that do not have it are left out, and `newest_first` means largest first."""
     child = get_child(s, ctx, child_id)
     q = select(Entry).where(Entry.child_id == child.id)
-    if type_:
-        q = q.where(Entry.type == type_)
+    if type_ is not None:
+        q = q.where(Entry.type.in_([type_] if isinstance(type_, str) else type_))
     if start:
         q = q.where(Entry.started_at >= to_utc(start, ctx.tz))
     if end:
@@ -77,7 +97,11 @@ def list_entries(s: Session, ctx: Ctx, child_id: int, type_: str | None = None, 
     if before:
         q = q.where(Entry.started_at < to_utc(before, ctx.tz))
     order = (Entry.started_at.desc(), Entry.id.desc()) if newest_first else (Entry.started_at, Entry.id)
-    return list(s.scalars(q.order_by(*order).limit(max(1, min(limit, 1000)))))
+    if sort != "time":
+        m = MEASURES[sort]()
+        q = q.where(m.is_not(None))
+        order = (m.desc() if newest_first else m.asc(), Entry.started_at.desc(), Entry.id.desc())
+    return list(s.scalars(q.order_by(*order).offset(offset).limit(max(1, min(limit, 1000)))))
 
 
 def update_entry(s: Session, ctx: Ctx, entry_id: int, body: EntryPatch) -> Entry:

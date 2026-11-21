@@ -1,6 +1,7 @@
 # AI functions
 
-This guide describes the AI model, the sleep model, voice commands, the cry helper and the knowledge library.
+This guide describes the AI model, the day and night plan, sleep training, the sleep model, voice commands, the
+cry helper and the knowledge library.
 
 ## The AI model
 
@@ -14,7 +15,7 @@ Speed measured on a 16-thread CPU with no GPU (about 29 tokens, or word parts, p
 |---|---|
 | Log from plain words | 2 to 5 s |
 | Assistant answer | 4 to 10 s |
-| Sleep plan | about 1 minute |
+| Sleep plan in words | about 1 minute |
 
 A slower computer takes longer. When the model is not available, all trackers still work. Only the AI functions
 say "The assistant is not available now".
@@ -78,8 +79,9 @@ calculates the plan. The AI model does not make the times.
   only the recommended ranges of the guideline bodies.
 - **The rules change with the age**, in 7 age bands from birth to 5 years. For example: the change from 2 naps to
   1, and "nap on some days" from about 3 years.
-- **Advice from the assistant** is optional. The AI model gets the calculated plan and writes a short summary and
-  tips with sources. It cannot change the times.
+- **Sleep plan in words** is optional. Select **Write a sleep plan** below the plan (after the first time:
+  **Write new sleep plan**). The AI model gets the calculated plan and writes a short summary and tips with
+  sources. It cannot change the times.
 - **API and MCP**: `GET /api/v1/children/{id}/sleep/regime` and the MCP tool `get_day_and_night_plan`.
 
 Where the numbers for the age come from (the app stores the numbers and a link, not the text of the papers):
@@ -129,6 +131,9 @@ training holds, it shows in the logs of the last 14 days, and the plan follows t
   night ("too hard": gentler; "it can go faster": firmer). Off: the scale stays, and the parent moves it by hand.
 - **Changes are for the next night only.** The one risk that the sources document is a parent who goes in after
   long crying outside the plan: this teaches longer crying. So the steps of a night do not change in the night.
+- **Tonight and the report.** The page shows the steps for tonight. After each night the parent reports the
+  minutes from bed to asleep, the wakes in the night, the minutes of crying (optional), and how the night was
+  ("too hard", "all right", "it can go faster"). The parent can pause or end the training at any time.
 - **Review.** The goal holds when the child falls asleep in 10 minutes or less with 1 wake or none on 3 nights in
   a row. With no gain after 7 nights, the page says to try a gentler pace or to speak to a child health nurse.
   After 14 nights it says to speak to a nurse or doctor.
@@ -138,6 +143,9 @@ training holds, it shows in the logs of the last 14 days, and the plan follows t
   the night block shows the bedtime of the training.
 - **Safety.** Long-term follow-up found no harm (Price 2012, Gradisar 2016). The page says this, and also that
   sleep training is a choice.
+- **API**: `GET`, `PUT` and `DELETE /api/v1/children/{id}/sleep/training`, and
+  `POST /api/v1/children/{id}/sleep/training/nights` for the report of a night. There is no MCP tool for sleep
+  training.
 
 Sources of the numbers: Hiscock 2008, Mindell 2006 (AASM review), Price 2012, Gradisar 2016, Cooney 2018, France
 and Hudson 1990. The file is `src/frecklebubby/data/sleep_training.json`; the rules are in
@@ -165,8 +173,8 @@ at this age. The recommended sleep ranges (AASM 2016, NSF 2015) stay the main re
   `/data`, the `data` volume), or set `SLEEP_NORMS_PATH` to its full path. It replaces the bundled file. Restart is
   not necessary.
 - **Fallback**: a table of common wake windows by age (`src/frecklebubby/data/wake_windows.json`). The app uses it
-  when the file is missing or not valid, or the child is older than 24 months, or no night sleep is
-  logged in the last 24 hours, the app uses the wake-window table as before.
+  when the file is missing or not valid, when the child is older than 24 months, or when no night sleep is
+  logged in the last 24 hours.
 
 ## Voice commands
 
@@ -183,6 +191,10 @@ You can log things and ask questions with your voice. The words go to the assist
   one hand.
 - **Read the answer aloud** (Settings > Voice): off, for hands free only, or for all voice commands. The answer
   always shows on the screen too. The voice is the voice of your phone or browser.
+
+**Progress.** After you speak, the voice card shows a moving bar and a line of text while the server changes the
+speech into words ("I heard you. Changing speech to words…") and while the assistant works ("Working…"). Your
+words show as soon as the server has them ("You said: …").
 
 A voice command **saves the entries immediately**, because you have no hand free to confirm. When the app is not
 sure (for example the amount was not in your words), the entry is saved with the text "Not sure: …". You can undo

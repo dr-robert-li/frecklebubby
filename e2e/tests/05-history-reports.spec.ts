@@ -28,10 +28,33 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Bottle/ })).toHaveCount(5);
 	await shot(page, '06-history-day');
 
+	// the day reads from the morning to the evening
+	const times = await page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Bottle/ }).evaluateAll((l) => l.map((b) => b.getAttribute('aria-label')!.slice(-5)));
+	expect(times).toEqual([...times].sort());
+	expect(times.length).toBe(5);
+
 	await page.getByRole('button', { name: 'List', exact: true }).click();
-	await page.getByLabel('Show').selectOption('nappy');
+	await page.getByText(/^Types:/).click();
+	await page.getByRole('button', { name: 'Deselect all' }).click();
+	await expect(page.getByText('Select one type or more.')).toBeVisible();
+	await page.getByRole('checkbox', { name: 'Nappy' }).check();
 	await expect(page.getByRole('button', { name: /Edit Nappy/ }).first()).toBeVisible();
 	await expect(page.getByRole('button', { name: /Edit Bottle/ })).toHaveCount(0);
+	await page.getByRole('checkbox', { name: 'Bottle' }).check();
+	await expect(page.getByText('Types: 2 of')).toBeVisible();
+	await expect(page.getByRole('button', { name: /Edit Bottle/ }).first()).toBeVisible();
+
+	// order by the logged volume: the largest bottle is first, then the smallest is first
+	await page.getByLabel('Order by').selectOption('volume');
+	const first = page.getByRole('list', { name: 'Timeline' }).getByRole('listitem').first();
+	await expect(first).toContainText('145 ml');
+	await page.getByText(/^Types:/).click(); // close the type list
+	await shot(page, '06-history-list-volume');
+	await expect(page.getByRole('button', { name: /Edit Nappy/ })).toHaveCount(0);
+	await page.getByRole('button', { name: 'Smallest first' }).click();
+	await expect(first).toContainText('90 ml');
+	await page.getByLabel('Order by').selectOption('time');
+	await page.getByRole('button', { name: 'Newest first' }).click();
 	await shot(page, '06-history-list');
 
 	await page.getByRole('link', { name: 'Reports' }).click();

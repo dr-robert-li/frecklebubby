@@ -1,6 +1,7 @@
 """Children, entries, timers, status, reports, growth, export, milestones, sleep prediction."""
 
 from datetime import date, datetime
+from typing import Literal
 
 from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
@@ -74,15 +75,20 @@ def delete_child(cid: int, body: ConfirmIn, ctx: Ctx = Depends(get_ctx), s: Sess
 @router.get("/children/{cid}/entries", response_model=list[EntryOut], summary="List entries, newest first")
 def list_entries(
     cid: int,
-    type: EntryType | None = None,
+    type: list[EntryType] | None = Query(None, description="One type or more. Give the parameter again for each type"),
     start: datetime | None = Query(None, alias="from", description="Entries that start at or after this time"),
     end: datetime | None = Query(None, alias="to", description="Entries that start before this time"),
     limit: int = Query(50, ge=1, le=1000),
     before: datetime | None = Query(None, description="Page cursor: entries that start before this time"),
+    sort: Literal["time", "duration", "volume", "weight", "height", "head", "temperature"] = Query(
+        "time", description="Order by the start time or by a logged amount. With an amount, entries without it "
+                            "are left out"),
+    dir: Literal["desc", "asc"] = Query("desc", description="desc: newest or largest first. asc: oldest or smallest first"),
+    offset: int = Query(0, ge=0, description="Page cursor for all orders: skip this number of entries"),
     ctx: Ctx = Depends(get_ctx),
     s: Session = Depends(get_session),
 ):
-    return entries.list_entries(s, ctx, cid, type, start, end, limit, before)
+    return entries.list_entries(s, ctx, cid, type, start, end, limit, before, dir == "desc", sort, offset)
 
 
 @router.post("/children/{cid}/entries", response_model=EntryOut, status_code=201)

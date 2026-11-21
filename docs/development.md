@@ -35,5 +35,20 @@ The e2e tests act as a parent on a phone screen. They start the real backend wit
 Huckleberry account. Videos, traces and screenshots go to `e2e/recordings/<milestone>/` (not in git).
 Open a trace with `npx playwright show-trace <file>/trace.zip`.
 
+There is one more project for each of these areas. Run one with `--project <name>`, or run `npx playwright test`
+for all projects.
+
+| Project | Area | Needs |
+|---|---|---|
+| `m8` | Cry helper | The `cry` extra, `ffmpeg`, and a recording of a baby that cries (`CRY_E2E_CLIP`). Skipped without the recording |
+| `m9` | Activities, nappy details, confined time | No model |
+| `m11`, `m13`, `m14` | Support report, development guidance, logging from the chat | The real model |
+| `m15` | Delete data, and the waiting and busy states of the assistant | The real model |
+| `m17` | Invite-only server | No model |
+| `m18` | Voice commands | The real model, the `voice` extra, and a recording of the words (`VOICE_E2E_WAV`). Skipped without the recording |
+
+The pictures in `docs/screenshots/` are copies of files in `e2e/recordings/<milestone>/screens/`. They have the
+size of the phone screen in the tests (1082 x 2202).
+
 What the tests do not prove yet: a carer invite and a refused email with a real Clerk account, push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
 account.

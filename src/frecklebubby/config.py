@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     data_dir: Path = Path("./data")
     # Bundled data files (growth tables, milestones). Tests point this at small fixtures.
     bundled_data_dir: Path = PACKAGE_DATA
-    # Optional sleep norms file (see README "Sleep model"). Empty = DATA_DIR/sleep_norms.json, else the bundled file.
+    # Optional sleep norms file (see docs/ai.md "Sleep model"). Empty = DATA_DIR/sleep_norms.json, else the bundled file.
     sleep_norms_path: Path | None = None
     llm_base_url: str = "http://llama:8080/v1"
     llm_model: str = ""

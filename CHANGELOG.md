@@ -6,6 +6,18 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-22
+
+### Changed
+
+- History, Day view: the day now reads from the morning to the evening. Before, the newest entry was first.
+- History: the type filter is a list of checkboxes, so you can show one type or more. It has "Select all" and "Deselect all".
+
+### Added
+
+- History, List view: "Order by" time, duration, volume, weight, length or height, head, or temperature, each with the largest or the smallest first (for time: the newest or the oldest first). In the order of an amount, the list shows only the entries that have this amount, and each row shows its date.
+- API: `GET /children/{id}/entries` accepts `type` more than one time, `sort` (`time`, `duration`, `volume`, `weight`, `height`, `head`, `temperature`), `dir` (`desc`, `asc`) and `offset`.
+
 ## [0.7.1] - 2026-11-22
 
 ### Changed
