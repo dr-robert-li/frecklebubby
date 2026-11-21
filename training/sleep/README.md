@@ -79,7 +79,7 @@ only, so feeds are not replayed.
 - **Settings**: the days of logs that the plan reads and the days from which it uses only the infant's own values.
   Read the train column to select, and the test column to report.
 
-Results of 2026-11-21 (app 0.7.0, 13,823 plans, 678 infants, 140 test infants):
+Results of 2026-11-22 (app 0.7.1, 13,823 plans, 678 infants, 140 test infants):
 
 | Measure (test infants, all ages) | Plan | Same as yesterday | Typical for the age |
 |---|---|---|---|
@@ -92,10 +92,13 @@ Results of 2026-11-21 (app 0.7.0, 13,823 plans, 678 infants, 140 test infants):
 - No error and no rule fault in 13,823 plans.
 - Days of logs: 7 days is worse (bedtime 20.7 min); 14 and 21 days are the same (19.1 min). The days from which
   only the own values count (3, 5 or 7) make no difference. So 14 and 5 stay.
-- The plan takes a step up in 43 % of the plans at 0 to 3 months, 27 % at 3 to 6 months, 19 % at 6 to 12 months and
+- The plan takes a step up in 71 % of the plans at 0 to 3 months, 37 % at 3 to 6 months, 19 % at 6 to 12 months and
   6 % after that. Nearly all are the smallest step (15 minutes), because the logged sleep is inside "may be
-  appropriate" but below "recommended".
-- The plan says "rough guide" in 36 % of the plans at 0 to 3 months and 17 % at 3 to 6 months, nearly always
-  because the number of naps is different from day to day. After 12 months it is 1 % or less.
+  appropriate" but below "recommended". Parents do not log all sleep, so logged sleep is near the low edge.
+- The plan says "rough guide" in 0.1 % of the plans below 6 months, 4 % at 6 to 12 months and 1 % or less after
+  that. Before 0.7.1 it was 36 % at 0 to 3 months and 17 % at 3 to 6 months, nearly always because the number of
+  naps is different from day to day. That is normal for a young baby, so from 0.7.1 it is a doubt only from 6
+  months. With it, the steps at 0 to 3 months went from 43 % to 71 % of the plans, because a rough guide takes no
+  steps.
 - Limits: the norms file of the app was made from all infants of this data. Parents who log in an app are not all
   parents. The data has no feeds and stops at 24 months.

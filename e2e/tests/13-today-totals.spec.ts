@@ -2,10 +2,11 @@
 import { expect, local, shot, test } from './fixtures';
 
 test('the totals of today are in two rows and the times stay inside the cards', async ({ page, api, family }) => {
-	const day = local().slice(0, 10);
+	// Times in the last hour, so that the test works at each time of the day (also just after midnight).
+	const ago = (minutes: number) => local(Date.now() - minutes * 60_000);
 	for (const data of [
-		{ type: 'sleep', started_at: `${day}T00:05`, ended_at: `${day}T00:50`, data: {} },
-		{ type: 'nursing', started_at: `${day}T00:52`, ended_at: `${day}T00:59`, data: { left_seconds: 200, right_seconds: 220 } }
+		{ type: 'sleep', started_at: ago(55), ended_at: ago(10), data: {} },
+		{ type: 'nursing', started_at: ago(8), ended_at: ago(1), data: { left_seconds: 200, right_seconds: 220 } }
 	])
 		expect((await api.post(`children/${family.childId}/entries`, { data })).ok(), JSON.stringify(data)).toBeTruthy();
 	await page.goto('/');

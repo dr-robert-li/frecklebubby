@@ -303,6 +303,13 @@ async def test_logs_that_fit_no_known_pattern_give_a_rough_guide_and_no_steps(cl
     s.commit()
     r = regime(s, c, BNE, NOW)
     assert r["confidence"] == "low" and r["nudges"] == [] and "number of naps" in r["notes"][0]["text"]
+    # The same days for a baby of 4 months: a changing number of naps is normal there. Not a rough guide.
+    s, c, cid = await child3(client, birthdate="2026-07-10", email="e@example.com")
+    for d in range(4, 16):
+        day(s, cid, d, bed=(21, 30), naps=[(9 + 2 * i, 0, 30) for i in range(d % 5)], feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert r["confidence"] == "normal" and any("The number of naps is changing" in n["text"] for n in r["notes"])
 
 
 async def child3(client, birthdate="2026-01-10", email="c@example.com"):

@@ -6,6 +6,16 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-22
+
+### Changed
+
+- For a baby younger than 6 months, a different number of naps from day to day no longer makes the plan a "rough guide". It is normal at this age. In the replay on the research data, a third of the plans at 0 to 3 months were a rough guide, and a rough guide takes no steps.
+
+### Added
+
+- `training/sleep/replay_plan.py`: a replay of the day and night plan on the research data of Liu et al., with rule checks, the fit to the next 7 days and a test split. Results are in `training/sleep/README.md`.
+
 ## [0.7.0] - 2026-11-21
 
 ### Added

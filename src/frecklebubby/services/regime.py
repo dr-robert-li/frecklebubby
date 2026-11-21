@@ -160,6 +160,7 @@ STEP_MIN, STEP_MAX = 15, 60  # minutes of sleep that one plan adds: a quarter of
 BED_STEP = 20  # the most that one plan moves bedtime
 NAP_STEP = 15  # the most that one plan makes a nap longer
 NEW_SLEEP = (45, 90)  # length of a sleep block that one plan adds for a young baby
+NAP_DOUBT_MONTHS = 6
 LONG_AWAKE = 150  # a young baby: a gap between sleep blocks from which the plan can add a block
 
 
@@ -245,7 +246,7 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
     # --- does the plan fit the logs? ------------------------------------------------------------------------------------
     # The calculator knows two patterns: naps and a night, and (a young baby) sleeps round the clock. When the logs
     # do not fit, the plan must say so and take no steps. A confident wrong plan is worse than a rough guide.
-    doubts = _doubts(rhythm, blocks, days, eps, own_days, own_total)
+    doubts = _doubts(rhythm, blocks, days, eps, own_days, own_total, months)
     if doubts:
         notes.insert(0, {"text": f"{name}'s logs do not show one regular pattern that the app can use: {doubts[0]} "
                                  "Read this plan as a rough guide. It takes no steps until the pattern is clearer.",
@@ -362,7 +363,8 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
         or None})
 
 
-def _doubts(rhythm: bool, blocks: list[dict], days: list[dict], eps, own_days: int, own_total: float | None) -> list[str]:
+def _doubts(rhythm: bool, blocks: list[dict], days: list[dict], eps, own_days: int, own_total: float | None,
+            months: float) -> list[str]:
     """Reasons for which the plan does not fit the logs. Empty: the plan fits."""
     out = []
     logged = sum(1 for e in eps if e[0] >= -DAYS * DAY)
@@ -374,7 +376,9 @@ def _doubts(rhythm: bool, blocks: list[dict], days: list[dict], eps, own_days: i
     if not own_days and logged >= 6:
         out.append("the app does not find a night sleep in them. It looks for the main sleep between 19:00 and 07:00.")
     counts = [d["naps"] for d in days]
-    if len(counts) >= 4 and max(counts.count(c) for c in set(counts)) / len(counts) < 0.4:
+    # Below 6 months a different number of naps each day is normal (a third of the plans at 0 to 3 months in the
+    # replay on the research data), so it is not a doubt there.
+    if months >= NAP_DOUBT_MONTHS and len(counts) >= 4 and max(counts.count(c) for c in set(counts)) / len(counts) < 0.4:
         out.append("the number of naps is very different from day to day.")
     night = blocks[-1]["end"] - blocks[-1]["start"]
     if own_days and not 6 * 60 <= night <= 15 * 60:

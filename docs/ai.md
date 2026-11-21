@@ -69,7 +69,8 @@ calculates the plan. The AI model does not make the times.
   night of 8 hours or more gets naps and a night block.
 - **A fit check.** The calculator knows two patterns: naps with a night, and (a young baby) sleeps round the
   clock. When the logs do not fit (for example the app finds no night sleep, or the number of naps is different
-  each day), the page says so. The plan is then a rough guide, and it takes no steps.
+  each day), the page says so. The plan is then a rough guide, and it takes no steps. For a baby younger than
+  6 months a changing number of naps is normal, so it is not a reason for a rough guide.
 - **The app counts only what is logged.** If you do not log each sleep and each feed, the plan sees too little
   and makes steps that are not necessary. Log them, and the plan needs fewer changes.
 - **Your child's numbers** (sleep in 24 hours, sleep at night, wakes and feeds at night) show next to the range
