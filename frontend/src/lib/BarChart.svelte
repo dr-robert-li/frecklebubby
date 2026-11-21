@@ -1,5 +1,14 @@
+<script lang="ts" module>
+	/** The average of a day. Days before the first day with a value do not count: there were no logs then. */
+	export function average(values: number[]): number {
+		const first = values.findIndex((v) => v > 0);
+		const used = first < 0 ? [] : values.slice(first);
+		return used.length ? used.reduce((a, v) => a + v, 0) / used.length : 0;
+	}
+</script>
+
 <script lang="ts">
-	// Stacked bars per day. Native <title> tooltips per day; a hidden table for screen readers.
+	// Stacked bars per day, with a dotted line at the average. Native <title> tooltips per day; a hidden table for screen readers.
 	type Series = { label: string; color: string; values: number[] };
 	let {
 		title,
@@ -17,6 +26,9 @@
 	const W = 340, H = 170, L = 34, B = 22, T = 8;
 	const totals = $derived(labels.map((_, i) => series.reduce((a, s) => a + (s.values[i] || 0), 0)));
 	const max = $derived(niceMax(Math.max(1, ...totals, band?.[1] ?? 0, line?.value ?? 0)));
+	const avg = $derived(average(totals));
+	// with many days there is no room for each label: show each 5th
+	const every = $derived(labels.length > 10 ? 5 : 1);
 	const y = (v: number) => H - B - (v / max) * (H - B - T);
 	const step = $derived((W - L) / labels.length);
 	const bw = $derived(Math.min(28, step * 0.55));
@@ -40,10 +52,11 @@
 <figure>
 	<figcaption class="spread">
 		<h3>{title}</h3>
-		{#if series.length > 1 || line}
+		{#if series.length > 1 || line || avg}
 			<span class="legend">
-				{#each series as s (s.label)}<span><i style="background:{s.color}"></i>{s.label}</span>{/each}
+				{#if series.length > 1}{#each series as s (s.label)}<span><i style="background:{s.color}"></i>{s.label}</span>{/each}{/if}
 				{#if line}<span><i class="dash"></i>{line.label}</span>{/if}
+				{#if avg}<span><i class="dash dot"></i>Average {fmt(Math.round(avg * 10) / 10)}</span>{/if}
 			</span>
 		{/if}
 	</figcaption>
@@ -69,9 +82,10 @@
 						<rect x={cx - bw / 2} y={seg.y1} width={bw} height={Math.max(0, seg.y0 - seg.y1 - 2)} rx="4" fill={seg.s.color} />
 					{/if}
 				{/each}
-				<text x={cx} y={H - 6} class="tick" text-anchor="middle">{lab}</text>
+				{#if (labels.length - 1 - i) % every === 0}<text x={cx} y={H - 6} class="tick" text-anchor="middle">{lab}</text>{/if}
 			</g>
 		{/each}
+		{#if avg}<line x1={L} x2={W} y1={y(avg)} y2={y(avg)} class="avg" />{/if}
 	</svg>
 	<table class="sr-only">
 		<caption>{title}</caption>
@@ -81,6 +95,7 @@
 				<tr><td>{lab}</td>{#each series as s (s.label)}<td>{fmt(s.values[i] || 0)}</td>{/each}</tr>
 			{/each}
 		</tbody>
+		{#if avg}<tfoot><tr><td>Average</td><td colspan={series.length}>{fmt(Math.round(avg * 10) / 10)}</td></tr></tfoot>{/if}
 	</table>
 </figure>
 
@@ -110,6 +125,13 @@
 		stroke-width: 1.5;
 		stroke-dasharray: 5 4;
 	}
+	.avg {
+		stroke: var(--ink-strong);
+		stroke-width: 2;
+		stroke-dasharray: 0.1 5;
+		stroke-linecap: round;
+		pointer-events: none;
+	}
 	.band {
 		fill: var(--mint);
 		opacity: 0.45;
@@ -123,6 +145,9 @@
 		height: 0;
 		border-radius: 0;
 		border-top: 2px dashed var(--ink);
+	}
+	.legend .dot {
+		border-top-style: dotted;
 	}
 	.legend {
 		display: flex;

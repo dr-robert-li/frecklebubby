@@ -28,23 +28,23 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Bottle/ })).toHaveCount(5);
 	await shot(page, '06-history-day');
 
-	// the day reads from the morning to the evening
+	// the day shows the newest entry first
 	const times = await page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Bottle/ }).evaluateAll((l) => l.map((b) => b.getAttribute('aria-label')!.slice(-5)));
-	expect(times).toEqual([...times].sort());
+	expect(times).toEqual([...times].sort().reverse());
 	expect(times.length).toBe(5);
 
-	// Week: one row for each of the last 7 days to the selected day, with totals; a row opens its day
+	// Week: one row for each of the last 7 days to the selected day, the newest first, with totals; a row opens its day
 	await page.getByRole('button', { name: 'Week', exact: true }).click();
 	const week = page.getByRole('list', { name: 'Week' });
 	await expect(week.getByRole('listitem')).toHaveCount(7);
-	await expect(week.getByRole('listitem').last()).toContainText('Feeds 5 · Nappies 4');
-	await expect(week.getByRole('listitem').last()).toContainText(/Sleep \d+ h/);
+	await expect(week.getByRole('listitem').first()).toContainText('Feeds 5 · Nappies 4');
+	await expect(week.getByRole('listitem').first()).toContainText(/Sleep \d+ h/);
 	await shot(page, '06-history-week');
 	await page.getByRole('button', { name: 'Month', exact: true }).click();
 	const month = page.getByRole('list', { name: 'Month' });
 	await expect(month.getByRole('listitem')).toHaveCount(30);
-	await shot(page, '06-history-month', true);
-	await month.getByRole('listitem').nth(27).getByRole('button').click();
+	await shot(page, '06-history-month');
+	await month.getByRole('listitem').nth(2).getByRole('button').click();
 	await expect(page.getByRole('button', { name: 'Day', exact: true })).toHaveAttribute('aria-pressed', 'true');
 	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Bottle/ })).toHaveCount(5);
 
@@ -68,17 +68,24 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByRole('button', { name: /Edit Nappy/ })).toHaveCount(0);
 	await page.getByRole('button', { name: 'Smallest first' }).click();
 	await expect(first).toContainText('90 ml');
-	// days with a check mark: the list shows only these days together, with their total
+	// a range of days: the list shows only these days together, with their total
 	await page.getByText(/^Days:/).click();
-	await page.getByRole('checkbox', { name: 'Yesterday' }).check();
-	await page.getByRole('checkbox', { name: 'Today' }).check();
-	await expect(page.getByText('Days: 2 selected')).toBeVisible();
-	await expect(page.getByText('6 entries on 2 days. Total: 665 ml')).toBeVisible();
+	await page.getByLabel('First day').fill(day(1));
+	await expect(page.getByText('(1 day)')).toBeVisible();
+	await page.getByLabel('Last day').fill(day(0));
+	await expect(page.getByText('(2 days)')).toBeVisible();
+	await expect(page.getByText('6 entries in 2 days. Total: 665 ml')).toBeVisible();
 	await expect(page.getByRole('button', { name: /Edit Bottle/ })).toHaveCount(6);
+	// a range can have 180 days at most: the other day moves
+	await page.getByLabel('First day').fill(day(300));
+	await expect(page.getByText('(180 days)')).toBeVisible();
+	await expect(page.getByLabel('Last day')).toHaveValue(day(121));
+	await page.getByRole('button', { name: 'Last 7 days' }).click();
+	await expect(page.getByText('(7 days)')).toBeVisible();
 	await page.getByText(/^Days:/).click();
 	await shot(page, '06-history-list-days');
 	await page.getByText(/^Days:/).click();
-	await page.getByRole('button', { name: 'Deselect all' }).last().click();
+	await page.getByRole('button', { name: 'All days' }).click();
 	await expect(page.getByText('Days: all')).toBeVisible();
 	await page.getByLabel('Order by').selectOption('time');
 	await page.getByRole('button', { name: 'Newest first' }).click();
@@ -89,6 +96,13 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByRole('img', { name: /Feeds chart/ })).toBeVisible();
 	await expect(page.getByRole('img', { name: /Nappies chart/ })).toBeVisible();
 	await expect(page.getByText(/Common range for this age/)).toBeVisible();
+	await expect(page.getByText(/^Average \d+(\.\d)? h$/)).toBeVisible();
+	await expect(page.getByText('Average 4.4', { exact: true })).toBeVisible(); // feeds: 5 a day on 6 days and 1 today
+	await page.getByRole('button', { name: 'Month', exact: true }).click();
+	await expect(page.getByRole('button', { name: 'Earlier month' })).toBeVisible();
+	await expect(page.getByRole('img', { name: /Feeds chart/ })).toBeVisible();
+	await shot(page, '06-reports-month');
+	await page.getByRole('button', { name: 'Week', exact: true }).click();
 	await shot(page, '06-reports');
 
 	await expect(page.getByRole('img', { name: 'Growth chart with WHO percentile curves' })).toBeVisible();

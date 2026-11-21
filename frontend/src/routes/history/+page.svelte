@@ -11,9 +11,9 @@
 
 	const VIEWS = [['day', 'Day'], ['week', 'Week'], ['month', 'Month'], ['list', 'List']] as const;
 	let view = $state<(typeof VIEWS)[number][0]>('day');
-	// Week and Month: the 7 or 30 days that end on the selected day
+	// Week and Month: the 7 or 30 days that end on the selected day, with the newest day first
 	const span = $derived(view === 'week' ? 7 : view === 'month' ? 30 : 1);
-	const days = $derived(Array.from({ length: span }, (_, i) => addDays(day, i + 1 - span)));
+	const days = $derived(Array.from({ length: span }, (_, i) => addDays(day, -i)));
 	let day = $state(localDay());
 	// types: the selected entry types. All are selected at the start.
 	const all = $derived(trackers(wording()));
@@ -23,9 +23,24 @@
 		['time', 'Time'], ['duration', 'Duration'], ['volume', 'Volume'], ['weight', 'Weight'],
 		['height', 'Length or height'], ['head', 'Head'], ['temperature', 'Temperature']
 	];
-	// List: the days with a check mark. With none, the list shows all days.
-	const recent = $derived(Array.from({ length: 30 }, (_, i) => addDays(localDay(), -i)));
-	let picked = $state<string[]>([]);
+	// List: a range of days, MAX_DAYS at most. With no range, the list shows all days.
+	const MAX_DAYS = 180;
+	let range = $state({ from: '', to: '' });
+	const ranged = $derived(!!range.from && !!range.to);
+	const dayCount = $derived(ranged ? Math.round((Date.parse(range.to) - Date.parse(range.from)) / 86400_000) + 1 : 0);
+	let clamped = $state(false);
+	let shown = $state(200); // rows on the screen for a range; "Show more" adds rows
+	// Keep the range in order and not longer than MAX_DAYS: the end that you did not change moves.
+	function setRange(key: 'from' | 'to', v: string) {
+		const other = key === 'from' ? 'to' : 'from';
+		const r = { ...range, [key]: v };
+		if (v && !r[other]) r[other] = v;
+		if (r.from && r.to && r.from > r.to) r[other] = v;
+		clamped = !!v && Math.abs(Date.parse(r.to) - Date.parse(r.from)) / 86400_000 >= MAX_DAYS;
+		if (clamped) r[other] = addDays(v, key === 'from' ? MAX_DAYS - 1 : 1 - MAX_DAYS);
+		if (r.to > localDay()) r.to = localDay();
+		range = v ? r : { from: '', to: '' };
+	}
 	let sort = $state('time');
 	let dir = $state<'desc' | 'asc'>('desc');
 	let entries = $state<Entry[]>([]);
@@ -44,25 +59,23 @@
 		const q = new URLSearchParams();
 		if (off.length) for (const t of types) q.append('type', t.type);
 		if (view !== 'list') {
-			// a day reads from the morning to the evening. Week and Month start one day before, for a sleep that
-			// goes past midnight into the first day.
+			// Week and Month start one day before, for a sleep that goes past midnight into the first day.
 			q.set('from', `${addDays(day, span === 1 ? 0 : -span)}T00:00`);
 			q.set('to', `${addDays(day, 1)}T00:00`);
 			q.set('limit', '1000');
-			q.set('dir', 'asc');
 		} else {
-			q.set('limit', picked.length ? '1000' : '50');
+			q.set('limit', ranged ? '1000' : '50');
 			q.set('sort', sort);
 			q.set('dir', dir);
 			if (append) q.set('offset', String(entries.length));
-			if (picked.length) {
-				q.set('from', `${[...picked].sort()[0]}T00:00`);
-				q.set('to', `${addDays([...picked].sort().at(-1)!, 1)}T00:00`);
+			if (ranged) {
+				q.set('from', `${range.from}T00:00`);
+				q.set('to', `${addDays(range.to, 1)}T00:00`);
 			}
 		}
 		try {
 			let page = await api<Entry[]>(`/children/${c.id}/entries?${q}`);
-			if (view !== 'list' || picked.length) {
+			if (view !== 'list' || ranged) {
 				// a month of a newborn can have more than 1000 entries: read all pages
 				const all = [...page];
 				while (page.length === 1000) {
@@ -70,10 +83,11 @@
 					page = await api<Entry[]>(`/children/${c.id}/entries?${q}`);
 					all.push(...page);
 				}
-				page = view === 'list' ? all.filter((e) => picked.includes(localDay(e.started_at))) : all;
+				page = all;
+				shown = 200;
 			}
 			entries = append ? [...entries, ...page] : page;
-			more = view === 'list' && !picked.length && page.length === 50;
+			more = view === 'list' && !ranged && page.length === 50;
 		} catch (e) {
 			error = (e as Error).message;
 		} finally {
@@ -82,7 +96,7 @@
 	}
 
 	$effect(() => {
-		void [view, day, off, picked, sort, dir, version, child()];
+		void [view, day, off, range, sort, dir, version, child()];
 		load();
 	});
 
@@ -119,17 +133,18 @@
 
 {#if view === 'list'}
 	<details class="filters card">
-		<summary>Days: {picked.length ? `${picked.length} selected` : 'all'}</summary>
-		<p class="muted small">Select days to show only these days together. With no day selected, the list shows all days.</p>
-		<div class="row">
-			<button class="ghost" disabled={picked.length === recent.length} onclick={() => (picked = [...recent])}>Select all</button>
-			<button class="ghost" disabled={!picked.length} onclick={() => (picked = [])}>Deselect all</button>
+		<summary>Days: {ranged ? `${fmtDay(range.from, { day: 'numeric', month: 'short' })} to ${fmtDay(range.to, { day: 'numeric', month: 'short' })} (${dayCount} ${dayCount === 1 ? 'day' : 'days'})` : 'all'}</summary>
+		<p class="muted small">Select a first day and a last day to show only these days together. A range can have {MAX_DAYS} days at most.</p>
+		<div class="range">
+			<label class="field"><span>First day</span><input type="date" value={range.from} max={localDay()} onchange={(e) => setRange('from', e.currentTarget.value)} /></label>
+			<label class="field"><span>Last day</span><input type="date" value={range.to} max={localDay()} onchange={(e) => setRange('to', e.currentTarget.value)} /></label>
 		</div>
-		<div class="types">
-			{#each recent as d (d)}
-				<label class="pick"><input type="checkbox" checked={picked.includes(d)}
-					onchange={() => (picked = picked.includes(d) ? picked.filter((x) => x !== d) : [...picked, d])} /> {d >= addDays(localDay(), -1) ? fmtDayLabel(d) : fmtDay(d, { weekday: 'short', day: 'numeric', month: 'short' })}</label>
+		{#if clamped}<p class="notice small" role="status">The range was longer than {MAX_DAYS} days. The other day moved.</p>{/if}
+		<div class="row">
+			{#each [[7, 'Last 7 days'], [30, 'Last 30 days']] as [n, l] (n)}
+				<button class="ghost" onclick={() => ((clamped = false), (range = { from: addDays(localDay(), 1 - Number(n)), to: localDay() }))}>{l}</button>
 			{/each}
+			<button class="ghost" disabled={!ranged} onclick={() => ((clamped = false), (range = { from: '', to: '' }))}>All days</button>
 		</div>
 	</details>
 	<div class="order">
@@ -150,7 +165,7 @@
 	<div class="spread daynav">
 		<button class="icon" aria-label={span === 1 ? 'Day before' : `${span} days before`} onclick={() => (day = addDays(day, -span))}><Icon name="left" /></button>
 		<label class="daypick"><span class="sr-only">{span === 1 ? 'Day' : 'Last day'}</span>
-			<strong>{span === 1 ? fmtDayLabel(day) : `${fmtDay(days[0], { day: 'numeric', month: 'short' })} to ${fmtDay(day, { day: 'numeric', month: 'short' })}`}</strong>
+			<strong>{span === 1 ? fmtDayLabel(day) : `${fmtDay(days.at(-1)!, { day: 'numeric', month: 'short' })} to ${fmtDay(day, { day: 'numeric', month: 'short' })}`}</strong>
 			<input type="date" bind:value={day} max={localDay()} aria-label="Choose a day" />
 		</label>
 		<button class="icon" aria-label={span === 1 ? 'Next day' : `${span} days after`} disabled={day >= localDay()} onclick={() => (day = addDays(day, span) > localDay() ? localDay() : addDays(day, span))}><Icon name="right" /></button>
@@ -172,12 +187,13 @@
 		{#if !types.length}
 			<p class="empty">Select one type or more.</p>
 		{:else}
-			{#if picked.length && entries.length}
-				<p class="muted small sum" role="status">{entries.length} {entries.length === 1 ? 'entry' : 'entries'} on {picked.length} {picked.length === 1 ? 'day' : 'days'}{total ? `. Total: ${total}` : ''}</p>
+			{#if ranged && entries.length}
+				<p class="muted small sum">{entries.length} {entries.length === 1 ? 'entry' : 'entries'} in {dayCount} {dayCount === 1 ? 'day' : 'days'}{total ? `. Total: ${total}` : ''}</p>
 			{/if}
-			<Timeline {entries} dated onpick={(e) => (edit = e)} empty={loading ? 'Loading…' : sort === 'time' ? (picked.length ? 'Nothing logged on these days.' : 'Nothing logged yet.') : 'No entry has this amount.'} />
+			<Timeline entries={ranged ? entries.slice(0, shown) : entries} dated onpick={(e) => (edit = e)} empty={loading ? 'Loading…' : sort === 'time' ? (ranged ? 'Nothing logged on these days.' : 'Nothing logged yet.') : 'No entry has this amount.'} />
 		{/if}
 		{#if more}<button class="ghost wide" disabled={loading} onclick={() => load(true)}>Show older</button>{/if}
+		{#if ranged && entries.length > shown}<button class="ghost wide" onclick={() => (shown += 200)}>Show more</button>{/if}
 	{/if}
 </section>
 
@@ -233,6 +249,14 @@
 		min-height: 40px;
 		padding: 4px 10px;
 		margin-top: 4px;
+	}
+	.range {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+	}
+	.row {
+		flex-wrap: wrap;
 	}
 	.sum {
 		margin: 0 0 6px;

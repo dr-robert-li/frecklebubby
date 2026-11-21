@@ -6,6 +6,18 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-22
+
+### Changed
+
+- History, List view: "Days" is now a range with a first day and a last day, selected in the calendar of the device. A range can have 180 days at most. Buttons select the last 7 days, the last 30 days, or all days. Before, it was a list of 30 checkboxes.
+- History: Day, Week and Month show the newest first. In Day the newest entry is at the top. In Week and Month the newest day is at the top.
+
+### Added
+
+- Reports: you can show the charts for a week or for a month (the last 30 days).
+- Reports: each chart has a dotted line at the average of a day, and the key shows the value. Days before the first logged day do not count.
+
 ## [0.8.0] - 2026-11-22
 
 ### Added

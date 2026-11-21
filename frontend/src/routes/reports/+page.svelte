@@ -1,13 +1,16 @@
 <script lang="ts">
 	import { api, apiRaw } from '#lib/api.ts';
 	import { child, units, wording } from '#lib/app.svelte.ts';
-	import BarChart from '#lib/BarChart.svelte';
+	import BarChart, { average } from '#lib/BarChart.svelte';
 	import { addDays, fmtDay, fmtDur, localDay, round, toUnit, unitLabel, type UnitKind } from '#lib/format.svelte.ts';
 	import GrowthChart from '#lib/GrowthChart.svelte';
 	import Icon from '#lib/Icon.svelte';
 	import SupportReport from '#lib/SupportReport.svelte';
 
 	let end = $state(localDay());
+	// the charts show the 7 or 30 days that end on `end`
+	let span = $state<7 | 30>(7);
+	const period = $derived(span === 7 ? 'week' : 'month');
 	let report = $state<any>(null);
 	let growth = $state<any>(null);
 	let metric = $state<'weight' | 'height' | 'head'>('weight');
@@ -18,7 +21,7 @@
 		const c = child();
 		if (!c) return;
 		const to = end;
-		api(`/children/${c.id}/reports/daily?from=${addDays(to, -6)}&to=${to}`).then((r) => (report = r)).catch((e) => (error = e.message));
+		api(`/children/${c.id}/reports/daily?from=${addDays(to, 1 - span)}&to=${to}`).then((r) => (report = r)).catch((e) => (error = e.message));
 	});
 	$effect(() => {
 		const c = child();
@@ -26,10 +29,10 @@
 	});
 
 	const days = $derived(report?.days ?? []);
-	const labels = $derived(days.map((d: any) => fmtDay(d.date, { weekday: 'short' })));
+	const labels = $derived(days.map((d: any) => (span === 7 ? fmtDay(d.date, { weekday: 'short' }) : fmtDay(d.date, { day: 'numeric', month: 'short' }))));
 	const hours = (s: number) => Math.round((s / 3600) * 10) / 10;
 	const rec = $derived(report?.sleep_recommendations?.[0]);
-	const avgSleep = $derived(days.length ? days.reduce((a: number, d: any) => a + d.sleep.total_seconds, 0) / days.length : 0);
+	const avgSleep = $derived(average(days.map((d: any) => d.sleep.total_seconds)));
 
 	const KIND: Record<string, UnitKind> = { weight: 'weight', height: 'length', head: 'length' };
 	const KEY = { weight: 'weight_kg', height: 'height_cm', head: 'head_cm' } as const;
@@ -67,11 +70,16 @@
 
 <SupportReport />
 
-<div class="spread week">
-	<button class="icon" aria-label="Earlier week" onclick={() => (end = addDays(end, -7))}><Icon name="left" /></button>
-	<strong>{fmtDay(addDays(end, -6), { day: 'numeric', month: 'short' })} – {fmtDay(end, { day: 'numeric', month: 'short' })}</strong>
-	<button class="icon" aria-label="Later week" disabled={end >= localDay()} onclick={() => (end = addDays(end, 7))}><Icon name="right" /></button>
+<div class="seg" role="group" aria-label="Period">
+	<button aria-pressed={span === 7} onclick={() => (span = 7)}>Week</button>
+	<button aria-pressed={span === 30} onclick={() => (span = 30)}>Month</button>
 </div>
+<div class="spread week">
+	<button class="icon" aria-label="Earlier {period}" onclick={() => (end = addDays(end, -span))}><Icon name="left" /></button>
+	<strong>{fmtDay(addDays(end, 1 - span), { day: 'numeric', month: 'short' })} – {fmtDay(end, { day: 'numeric', month: 'short' })}</strong>
+	<button class="icon" aria-label="Later {period}" disabled={end >= localDay()} onclick={() => (end = addDays(end, span) > localDay() ? localDay() : addDays(end, span))}><Icon name="right" /></button>
+</div>
+<p class="small muted">The dotted line in each chart is the average of a day. Days before the first logged day do not count.</p>
 
 {#if report}
 	<section class="card">
@@ -112,14 +120,14 @@
 		<section class="card">
 			<BarChart title="Confined time per day (minutes)" {labels} fmt={(v) => `${Math.round(v)} min`}
 				series={[{ label: 'Confined', color: 'var(--s1)', values: days.map((d: any) => Math.round(d.confined.seconds / 60)) }]} />
-			<p class="small muted">Time in a car seat, pram, bouncer, swing, carrier or high chair. Longest without a break this week:
+			<p class="small muted">Time in a car seat, pram, bouncer, swing, carrier or high chair. Longest without a break in this {period}:
 				{fmtDur(Math.max(...days.map((d: any) => d.confined.longest_seconds)))}.</p>
 		</section>
 	{/if}
 	{#if days.some((d: any) => d.bath_count)}
 		<section class="card">
 			<BarChart title="Baths" counts {labels} series={[{ label: 'Baths', color: 'var(--s1)', values: days.map((d: any) => d.bath_count) }]} />
-			<p class="small muted">{days.reduce((a: number, d: any) => a + d.bath_count, 0)} baths this week.</p>
+			<p class="small muted">{days.reduce((a: number, d: any) => a + d.bath_count, 0)} baths in this {period}.</p>
 		</section>
 	{/if}
 	{#if days.some((d: any) => d.crying?.count)}
