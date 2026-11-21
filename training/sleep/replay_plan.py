@@ -25,10 +25,10 @@ from statistics import median
 
 import numpy as np
 import pandas as pd
+from predict import split
 
 from frecklebubby.services import regime
 from frecklebubby.services.sleep import DAY, nights, sleep_days
-from predict import split
 
 AGES = range(21, 716, 14)
 HIST, FUT = 23, 8  # days of history that each setting can read; days after the age for the comparison
