@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-11-21
+
+### Fixed
+
+- A sleep plan now shows a full day. It starts with the wake at the "Morning starts" time of the child. Before, the plan started after the time now.
+
 ## [0.5.1] - 2026-11-21
 
 ### Added

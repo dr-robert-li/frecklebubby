@@ -146,6 +146,8 @@ async def test_sleep_plan(client, fake_llm):
     assert [c["n"] for c in plan["citations"]] == [1] and plan["schedule"][1]["note"]
     assert fake_llm.requests[0]["response_format"]["json_schema"]["schema"]["required"] == [
         "summary", "schedule", "advice"]
+    asked = fake_llm.requests[0]["messages"][1]["content"]  # a full day from the morning, not from the time now
+    assert "Start with the wake at 07:00" in asked and "Now:" not in asked and "Today so far" not in asked
     assert (await client.get(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()["id"] == plan["id"]
     fake_llm.down = True
     assert await run_job(client, h, f"/api/v1/children/{cid}/sleep/plan") == ("failed", "The assistant is not available now.")

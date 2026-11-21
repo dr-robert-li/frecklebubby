@@ -11,7 +11,7 @@ from ..knowledge.store import search
 from ..models import Entry, SleepPlan
 from ..services import Ctx
 from ..services.children import get_child, is_night
-from ..services.sleep import age_summary, norms, predict, recommendations, stage, wake_range
+from ..services.sleep import age_summary, norms, recommendations, stage, wake_range
 from . import llm
 from .assistant import SOURCE_CHARS, child_context
 
@@ -35,7 +35,8 @@ SCHEMA = {
 SYSTEM = """You make a simple daily sleep plan for a baby, for parents in a baby-tracking app.
 Rules:
 - Use ONLY the child's data, the age ranges and the numbered sources given. Do not use your own knowledge.
-- The schedule is one typical day from morning wake to bedtime, in time order, 24-hour HH:MM.
+- The schedule is one full typical day, in time order, 24-hour HH:MM. It is not a plan for the rest of today.
+- The first row is the morning wake (kind "wake") at the given morning start time. The last row is bedtime.
 - Fit the recommended total sleep and the wake-window range. Start from the child's own recent times.
 - If typical values for the age are given, use them where the child's own days are few or irregular.
 - Advice: 2 to 4 short tips. Put the numbers of the sources that support each tip in "cites".
@@ -63,7 +64,6 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
     lo, hi = wake_range(months)
     recs = "; ".join(f"{r['min_hours']:g}-{r['max_hours']:g} h per 24 h ({r['citation']['publisher'].split(' /')[0]})"
                      for r in recommendations(months)) or "none for this age"
-    p = predict(s, child, ctx.tz, now, default=True)
     n = norms()
     st = stage(s, child, ctx.tz, now, n) if n else None
     typical = (age_summary(n, (now.astimezone(ctx.tz).date() - child.birthdate).days) + "\n") if n else ""
@@ -83,13 +83,16 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
             citations.append({"n": numbers[h["id"]], "kind": h["kind"],
                               **{k: h[k] for k in ("title", "publisher", "author", "url", "year", "licence") if h[k]}})
         blocks.append(f"[{numbers[h['id']]}] {h['title']}, {h['heading']}:\n{h['text'][:SOURCE_CHARS]}")
-    user = (f"Child data:\n{child_context(s, ctx, child, now)}\n"
-            f"Usual night: from {child.night_start} to {child.morning_cutoff}.\n"
+    # The plan is for a full day: the time now, today's totals and the next sleep make the model start from now.
+    data = "\n".join(x for x in child_context(s, ctx, child, now).splitlines()
+                     if not x.startswith(("Today so far", "Next sleep")))
+    data = re.sub(r"^Now: [^.]*\. ", "", data)
+    user = (f"Child data:\n{data}\n"
+            f"Morning starts at {child.morning_cutoff}. Night starts at {child.night_start}.\n"
             f"Wake-window range for this age (common practice, not a medical standard): {lo}-{hi} minutes.\n"
             f"Recommended total sleep: {recs}.\n" + typical
-            + (f"Next predicted sleep: {p['start'].astimezone(ctx.tz):%H:%M} ({p['kind']}).\n" if p else "")
             + f"Sleep in the last 7 days:\n{_recent_days(s, ctx, child, now)}\n\nSources:\n" + "\n\n".join(blocks)
-            + "\n\nMake the sleep plan for a typical day.")
+            + f"\n\nMake the sleep plan for a typical day. Start with the wake at {child.morning_cutoff}.")
     out = await llm.complete_json(ctx.fam, [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
                                   SCHEMA, max_tokens=2000, limited=False)  # a polled job: no wait limit
     valid = {c["n"] for c in citations}

@@ -257,7 +257,8 @@ async def test_sleep_plan(live, client):
     times = [row["time"] for row in plan["schedule"]]
     assert all(re.fullmatch(r"([01]\d|2[0-3]):[0-5]\d", t) for t in times)
     assert times == sorted(times), "schedule not in time order"
-    wake = next(row["time"] for row in plan["schedule"] if row["kind"] == "wake")
+    assert plan["schedule"][0]["kind"] == "wake" and times[0] == "07:00", "the plan does not start at the morning start"
+    wake = times[0]
     bed = next(row["time"] for row in plan["schedule"] if row["kind"] == "bedtime")
     naps = [row for row in plan["schedule"] if row["kind"] == "nap"]
     assert "05:00" <= wake <= "08:30" and "18:00" <= bed <= "21:00" and 1 <= len(naps) <= 4
