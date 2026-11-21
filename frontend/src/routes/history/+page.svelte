@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { api } from '#lib/api.ts';
+	import { api, downloadCsv } from '#lib/api.ts';
 	import { child, wording } from '#lib/app.svelte.ts';
 	import EntrySheet from '#lib/EntrySheet.svelte';
 	import { units } from '#lib/app.svelte.ts';
@@ -100,6 +100,26 @@
 		load();
 	});
 
+	// the CSV has the same types, days and order as the list on the screen
+	let exporting = $state(false);
+	async function exportCsv() {
+		const q = new URLSearchParams({ sort, dir });
+		if (off.length) for (const t of types) q.append('type', t.type);
+		if (ranged) {
+			q.set('from', `${range.from}T00:00`);
+			q.set('to', `${addDays(range.to, 1)}T00:00`);
+		}
+		exporting = true;
+		error = '';
+		try {
+			await downloadCsv(child()!, localDay(), q.toString());
+		} catch (e) {
+			error = (e as Error).message;
+		} finally {
+			exporting = false;
+		}
+	}
+
 	// the total of the selected days, for the amounts that you can add
 	const total = $derived.by(() => {
 		if (sort === 'volume')
@@ -194,6 +214,10 @@
 		{/if}
 		{#if more}<button class="ghost wide" disabled={loading} onclick={() => load(true)}>Show older</button>{/if}
 		{#if ranged && entries.length > shown}<button class="ghost wide" onclick={() => (shown += 200)}>Show more</button>{/if}
+		{#if types.length && entries.length}
+			<button class="ghost wide" disabled={exporting} onclick={exportCsv}><Icon name="download" /> Download this list as CSV</button>
+			<p class="muted small">The file has all entries of the selected types and days, in this order.</p>
+		{/if}
 	{/if}
 </section>
 

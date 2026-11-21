@@ -57,4 +57,7 @@ To list entries, use `GET /children/{id}/entries`. It gives the newest entries f
 - `dir`: `desc` (default: newest or largest first) or `asc`.
 - `limit` (default 50, maximum 1000) and `offset` for the next page.
 
+`GET /children/{id}/export.csv` gives the entries as a CSV file. It accepts `type`, `from`, `to`, `sort` and `dir`
+in the same way, and has no limit. With no parameter it gives all entries, the oldest first.
+
 A time without an offset is read in the family time zone. Errors come back as `{"detail": "plain message"}`.

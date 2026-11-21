@@ -76,6 +76,13 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByText('(2 days)')).toBeVisible();
 	await expect(page.getByText('6 entries in 2 days. Total: 665 ml')).toBeVisible();
 	await expect(page.getByRole('button', { name: /Edit Bottle/ })).toHaveCount(6);
+	// the CSV of the list has the same selection and order: 6 bottles of 2 days, the smallest first
+	const [listCsv] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download this list as CSV' }).click()]);
+	const lines = readFileSync(await listCsv.path(), 'utf8').trim().split('\n');
+	expect(lines[0]).toContain('id,type,started_at');
+	expect(lines.length).toBe(7);
+	expect(lines[1]).toContain('""amount_ml"":90');
+	expect(lines.every((l, i) => i === 0 || l.includes(',bottle,'))).toBeTruthy();
 	// a range can have 180 days at most: the other day moves
 	await page.getByLabel('First day').fill(day(300));
 	await expect(page.getByText('(180 days)')).toBeVisible();

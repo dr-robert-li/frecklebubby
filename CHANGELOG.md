@@ -6,6 +6,13 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-11-22
+
+### Added
+
+- History, List view: "Download this list as CSV". The file has all entries of the selected types and days, in the order of the list. The format is the same as the CSV of the Reports page.
+- API: `GET /children/{id}/export.csv` accepts `type`, `from`, `to`, `sort` and `dir`, as the entry list does. With no parameter it gives all entries, the oldest first, as before.
+
 ## [0.8.1] - 2026-11-22
 
 ### Changed

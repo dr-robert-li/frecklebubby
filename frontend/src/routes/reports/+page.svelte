@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { api, apiRaw } from '#lib/api.ts';
+	import { api, downloadCsv } from '#lib/api.ts';
 	import { child, units, wording } from '#lib/app.svelte.ts';
 	import BarChart, { average } from '#lib/BarChart.svelte';
 	import { addDays, fmtDay, fmtDur, localDay, round, toUnit, unitLabel, type UnitKind } from '#lib/format.svelte.ts';
@@ -48,13 +48,7 @@
 		const c = child()!;
 		exporting = true;
 		try {
-			const res = await apiRaw(`/children/${c.id}/export.csv`);
-			if (!res.ok) throw new Error('Export failed. Try again.');
-			const a = document.createElement('a');
-			a.href = URL.createObjectURL(await res.blob());
-			a.download = `frecklebubby-${c.name.toLowerCase().replace(/\W+/g, '-')}-${localDay()}.csv`;
-			a.click();
-			URL.revokeObjectURL(a.href);
+			await downloadCsv(c, localDay());
 		} catch (e) {
 			error = (e as Error).message;
 		} finally {

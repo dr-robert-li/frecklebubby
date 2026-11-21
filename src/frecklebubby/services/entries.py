@@ -81,11 +81,12 @@ MEASURES = {
 
 
 def list_entries(s: Session, ctx: Ctx, child_id: int, type_: str | list[str] | None = None,
-                 start: datetime | None = None, end: datetime | None = None, limit: int = 50,
+                 start: datetime | None = None, end: datetime | None = None, limit: int | None = 50,
                  before: datetime | None = None, newest_first: bool = True, sort: str = "time",
                  offset: int = 0) -> list[Entry]:
     """Entries that start in [start, end) and before `before` (page cursor). `sort` is "time" or a name in MEASURES;
-    with a measure, entries that do not have it are left out, and `newest_first` means largest first."""
+    with a measure, entries that do not have it are left out, and `newest_first` means largest first.
+    `limit` None gives all entries (for the export)."""
     child = get_child(s, ctx, child_id)
     q = select(Entry).where(Entry.child_id == child.id)
     if type_ is not None:
@@ -101,7 +102,7 @@ def list_entries(s: Session, ctx: Ctx, child_id: int, type_: str | list[str] | N
         m = MEASURES[sort]()
         q = q.where(m.is_not(None))
         order = (m.desc() if newest_first else m.asc(), Entry.started_at.desc(), Entry.id.desc())
-    return list(s.scalars(q.order_by(*order).offset(offset).limit(max(1, min(limit, 1000)))))
+    return list(s.scalars(q.order_by(*order).offset(offset).limit(limit and max(1, min(limit, 1000)))))
 
 
 def update_entry(s: Session, ctx: Ctx, entry_id: int, body: EntryPatch) -> Entry:

@@ -1,6 +1,17 @@
 // REST client and sign-in. Dev mode: X-Dev-User header. Clerk mode: session token.
 import type { Clerk } from '@clerk/clerk-js';
 
+/** Download the entries of a child as a CSV file. `query` is the selection of the entry list; empty = all entries. */
+export async function downloadCsv(child: { id: number; name: string }, day: string, query = '') {
+	const res = await apiRaw(`/children/${child.id}/export.csv${query && '?' + query}`);
+	if (!res.ok) throw new Error('Export failed. Try again.');
+	const a = document.createElement('a');
+	a.href = URL.createObjectURL(await res.blob());
+	a.download = `frecklebubby-${child.name.toLowerCase().replace(/\W+/g, '-')}-${day}.csv`;
+	a.click();
+	URL.revokeObjectURL(a.href);
+}
+
 export type Config = {
 	auth_mode: 'dev' | 'clerk';
 	invite_only: boolean;

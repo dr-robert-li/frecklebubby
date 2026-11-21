@@ -36,3 +36,14 @@ async def test_list_filter_and_order(client):
     assert [e["type"] for e in await get("sort=temperature")] == ["temperature"]
     assert [e["type"] for e in await get("sort=volume&limit=1&offset=1")] == ["pump"]
     assert (await client.get(f"{c}?sort=colour", headers=h)).status_code == 422
+
+    # the CSV export takes the same selection and order
+    async def ids(q):
+        r = await client.get(f"{API}/children/{cid}/export.csv?{q}", headers=h)
+        assert r.status_code == 200, r.text
+        return [line.split(",")[1] for line in r.text.strip().splitlines()[1:]]
+
+    assert len(await ids("")) == 8 and (await ids(""))[0] == "bottle"  # all entries, the oldest first
+    assert await ids("type=bottle&type=nappy&dir=desc") == ["nappy", "bottle", "bottle"]
+    assert await ids("sort=volume&dir=desc") == ["bottle", "pump", "bottle"]
+    assert await ids("from=2026-11-01T17:00:00Z&to=2026-11-01T19:00:00Z") == ["sleep", "nursing"]

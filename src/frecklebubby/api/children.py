@@ -155,8 +155,19 @@ def child_growth(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get
 
 @router.get("/children/{cid}/export.csv", response_class=Response,
             responses={200: {"content": {"text/csv": {}}}})
-def export_csv(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
-    name, text = export.export_csv(s, ctx, cid)
+def export_csv(
+    cid: int,
+    type: list[EntryType] | None = Query(None, description="One type or more. Without it, all types"),
+    start: datetime | None = Query(None, alias="from", description="Entries that start at or after this time"),
+    end: datetime | None = Query(None, alias="to", description="Entries that start before this time"),
+    sort: Literal["time", "duration", "volume", "weight", "height", "head", "temperature"] = Query(
+        "time", description="The order, as in the entry list. With an amount, entries without it are left out"),
+    dir: Literal["desc", "asc"] = Query("asc", description="asc: oldest or smallest first (default). desc: the reverse"),
+    ctx: Ctx = Depends(get_ctx),
+    s: Session = Depends(get_session),
+):
+    """All entries as CSV, or the same selection and order as `GET /children/{cid}/entries`."""
+    name, text = export.export_csv(s, ctx, cid, type_=type, start=start, end=end, sort=sort, newest_first=dir == "desc")
     return Response(text, media_type="text/csv; charset=utf-8",
                     headers={"Content-Disposition": f'attachment; filename="{name}"'})
 

@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.8.1-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.8.2-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -40,7 +40,7 @@ Your data stays on your server.
 - Shows the history by day, week or month, or as a list. Week and month show each day as one row of 24 hours,
   with sleep as bars and feeds and nappies as marks, so you see the pattern. You select the types to show, and
   you can put the list in the order of time or of a logged amount (duration, volume, weight, length, temperature).
-  In the list you can also select a range of days (180 days at most), to see them together with a total.
+  In the list you can also select a range of days (180 days at most), to see them together with a total, and download the list as a CSV file.
 - Shows reports: sleep, feeds and nappies per day for a week or a month, with the average and the common range,
   and growth on WHO percentile curves. Exports CSV.
 - Sends reminders in the app and as push notifications.

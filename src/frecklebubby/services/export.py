@@ -1,15 +1,14 @@
-"""CSV export of all entries of a child."""
+"""CSV export of the entries of a child: all of them, or the same selection as the entry list."""
 
 import csv
 import io
 import json
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..models import Entry
 from . import Ctx
 from .children import get_child
+from .entries import list_entries
 
 COLUMNS = ["id", "type", "started_at", "ended_at", "duration_minutes", "data", "notes", "source"]
 
@@ -19,14 +18,15 @@ def _cell(text: str) -> str:
     return "'" + text if text[:1] in ("=", "+", "-", "@", "\t", "\r") else text
 
 
-def export_csv(s: Session, ctx: Ctx, child_id: int) -> tuple[str, str]:
-    """Returns (filename, csv text). Times are local to the family, with offset."""
+def export_csv(s: Session, ctx: Ctx, child_id: int, **select) -> tuple[str, str]:
+    """Returns (filename, csv text). Times are local to the family, with offset. `select` are the filter and
+    order arguments of list_entries; with none, all entries, the oldest first."""
     child = get_child(s, ctx, child_id)
     tz = ctx.tz
     out = io.StringIO()
     w = csv.writer(out)
     w.writerow(COLUMNS)
-    for e in s.scalars(select(Entry).where(Entry.child_id == child.id).order_by(Entry.started_at, Entry.id)):
+    for e in list_entries(s, ctx, child.id, **{"newest_first": False, **select, "limit": None}):
         minutes = round((e.ended_at - e.started_at).total_seconds() / 60, 1) if e.ended_at else ""
         w.writerow([
             e.id, e.type, e.started_at.astimezone(tz).isoformat(),
