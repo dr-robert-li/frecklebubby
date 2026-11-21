@@ -72,7 +72,7 @@ test('the parent asks the assistant and opens a source', async ({ page, family }
 
 	await page.getByRole('tab', { name: 'Sleep plan' }).click();
 	await expect(page.getByRole('region', { name: 'Day and night plan' }).locator('.schedule li.night')).toBeVisible(); // calculated, no model
-	await page.getByRole('button', { name: 'Write advice for this plan' }).click();
+	await page.getByRole('button', { name: 'Write a sleep plan' }).click();
 	await expect(page.getByText('Three naps and bedtime at 18:45.')).toBeVisible();
 	await expect(page.getByText('Keep the room dark for naps.')).toBeVisible();
 	await shot(page, '11-sleep-plan');

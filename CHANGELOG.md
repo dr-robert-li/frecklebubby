@@ -6,6 +6,16 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-11-21
+
+### Fixed
+
+- The plan for a young baby showed too few sleeps in the day, and some feeds in a row with no sleep between them. The sleeps of the day are often at different hours from day to day, so the night took all the sleep blocks. The plan now counts the usual number of sleeps for the day and for the night separately.
+
+### Changed
+
+- The button under the plan is "Write a sleep plan" again (then "Write new sleep plan"), and the part that the assistant writes is named "Sleep plan in words".
+
 ## [0.6.3] - 2026-11-21
 
 ### Fixed

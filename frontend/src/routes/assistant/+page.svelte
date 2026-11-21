@@ -310,7 +310,7 @@
 		<p class="disclaimer">The app calculates this plan from the logs. It is a guide, not a target. General information, not medical advice.</p>
 	</section>
 	<section class="card" aria-label="Sleep plan">
-		<h2>Advice from the assistant</h2>
+		<h2>Sleep plan in words</h2>
 		{#if plan}
 			<p class="muted small">Made {fmtDay(localDay(plan.created_at), { day: 'numeric', month: 'long' })}</p>
 			<p>{plan.summary}</p>
@@ -323,11 +323,11 @@
 			{/if}
 			{@render chips(plan.citations ?? [])}
 		{:else if plan === null && !planError}
-			<p class="muted">No advice yet. The assistant can write a summary and tips for {child()?.name}'s plan, with sources.</p>
+			<p class="muted">The assistant can write a sleep plan in words for {child()?.name}: a summary of the day and night plan above, and tips with sources.</p>
 		{/if}
 		{#if planError}<p class="notice">{planError}</p>{/if}
 		<button class="wide" disabled={planBusy || plan === undefined} onclick={makePlan}>
-			<Icon name="sparkle" /> {planBusy ? 'Writing the advice… this can take a minute' : plan ? 'Write new advice' : 'Write advice for this plan'}
+			<Icon name="sparkle" /> {planBusy ? 'Writing the sleep plan… this can take a minute' : plan ? 'Write new sleep plan' : 'Write a sleep plan'}
 		</button>
 		<p class="disclaimer">General information, not medical advice.</p>
 	</section>

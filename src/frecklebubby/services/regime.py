@@ -459,18 +459,21 @@ def _young(age: Age, eps, night0: int, night1: int, facts) -> tuple[list[dict], 
                   if min(e[1], d * DAY + (k + 1) * 30) - max(e[0], d * DAY + k * 30) >= 15] for k in range(48)]
         share = [len(c) / len(logged) for c in cover]
         smooth = [(share[k - 1] + 2 * share[k] + share[(k + 1) % 48]) / 4 for k in range(48)]
-        want = round(median(sum(1 for e in eps if e[0] // DAY == d) for d in logged))
-        for k in sorted(range(48), key=lambda k: -smooth[k]):
-            if len(blocks) >= want or smooth[k] < 0.15:
-                break
-            if not cover[k]:
-                continue
-            first, last = (median(e[i] - c for e, c in cover[k]) for i in (0, 1))  # start and end, from the half hour
-            start = (k * 30 + 15 + first - night1) % DAY + night1  # from the morning: the times after midnight come last
-            end = start + max(last - first, 20)
-            # 30 minutes awake or more between two blocks, also over midnight
-            if not any(start - 30 < b["end"] + s and b["start"] + s < end + 30 for b in blocks for s in (-DAY, 0, DAY)):
-                blocks.append({"start": start, "end": end, "basis": "own"})
+        # The usual number of sleeps is counted for the day and for the night separately. The sleeps of the day are
+        # often at different hours from day to day; with one count for the 24 hours, the night would take all blocks.
+        for night in (False, True):
+            want = round(median(sum(1 for e in eps if e[0] // DAY == d and at_night(e[0]) == night) for d in logged))
+            got = 0
+            for k in sorted((k for k in range(48) if at_night(k * 30 + 15) == night), key=lambda k: -smooth[k]):
+                if got >= want or not cover[k]:
+                    continue
+                first, last = (median(e[i] - c for e, c in cover[k]) for i in (0, 1))  # start and end, from the half hour
+                start = (k * 30 + 15 + first - night1) % DAY + night1  # from the morning: after midnight comes last
+                end = start + max(last - first, 20)
+                # 30 minutes awake or more between two blocks, also over midnight
+                if not any(start - 30 < b["end"] + s and b["start"] + s < end + 30 for b in blocks for s in (-DAY, 0, DAY)):
+                    blocks.append({"start": start, "end": end, "basis": "own"})
+                    got += 1
     if not blocks:  # typical for the age (or the baby's own lengths, no usual hours)
         t, end = night1, night1 + DAY
         while t + awake["value"] + 30 < end:

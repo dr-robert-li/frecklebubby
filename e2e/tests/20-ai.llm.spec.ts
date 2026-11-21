@@ -144,14 +144,14 @@ test('d: the sleep plan for an 8-month-old shows a waiting state, then a cited p
 	const calc = page.getByRole('region', { name: 'Day and night plan' });
 	await expect(calc.locator('.schedule li.night')).toContainText('to 05:40'); // the child's own night, with no model
 	expect(await calc.locator('.schedule li.nap').count()).toBeGreaterThanOrEqual(1);
-	await page.getByRole('button', { name: 'Write advice for this plan' }).click();
-	const waiting = page.getByRole('button', { name: /Writing the advice/ });
+	await page.getByRole('button', { name: 'Write a sleep plan' }).click();
+	const waiting = page.getByRole('button', { name: /Writing the sleep plan/ });
 	await expect(waiting).toBeDisabled();
 	await page.waitForTimeout(5000);
 	await snap(page, 'd1-plan-waiting');
 	await expect(waiting).toBeHidden({ timeout: 240_000 });
 	const plan = page.getByRole('region', { name: 'Sleep plan' });
-	await expect(plan.getByRole('heading', { name: 'Advice from the assistant' })).toBeVisible();
+	await expect(plan.getByRole('heading', { name: 'Sleep plan in words' })).toBeVisible();
 	await expect(plan.getByRole('listitem').first()).toBeVisible();
 	await expect(plan.locator('.cite').first()).toBeVisible();
 	// every advice mark has a chip

@@ -257,6 +257,25 @@ async def test_a_young_baby_with_sleeps_at_different_hours_each_day_still_gets_t
                    if f["kind"] == "feed")
 
 
+async def test_day_sleeps_at_changing_hours_still_get_their_blocks_between_the_feeds(client):
+    # From the live server: 3 night sleeps at fixed hours, and 2 day sleeps at hours that change each day. With one
+    # count for the 24 hours the night took all blocks, and the plan showed 4 feeds in a row with no sleep.
+    s, c, cid = await child(client, birthdate="2026-10-07")
+    for d in range(4, 16):
+        for h, m, length in ((20, 20, 65), (1, 30, 125), (4, 5, 145)):
+            add(s, cid, "sleep", local(d, h, m), local(d, h, m) + timedelta(minutes=length))
+        for h, length in ((8 + d % 3, 60), (13 + (d * 2) % 4, 90)):  # 08:00 to 10:00, and 13:00 to 16:00
+            add(s, cid, "sleep", local(d, h, 15), local(d, h, 15) + timedelta(minutes=length))
+        for h, m in ((0, 30), (3, 40), (6, 30), (9, 5), (11, 20), (13, 55), (16, 0), (18, 50), (21, 30)):
+            add(s, cid, "nursing", local(d, h, m), local(d, h, m) + timedelta(minutes=10))
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    usual = [x for x in r["schedule"] if x["kind"] != "feed" and not x["change"]]
+    assert [x["kind"] for x in usual].count("nap") == 2 and [x["kind"] for x in usual].count("night") == 3
+    kinds = "".join("f" if x["kind"] == "feed" else "s" for x in r["schedule"])
+    assert "ffff" not in kinds  # no long run of feeds with no sleep between
+
+
 async def test_a_young_baby_with_a_long_night_gets_naps_and_a_night(client):
     s, c, cid = await child(client, birthdate="2026-09-07")  # 10 weeks, and the logs show a night of 10 hours
     for d in range(6, 17):
