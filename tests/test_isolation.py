@@ -79,7 +79,7 @@ OWN = {
     ("POST", "/children"), ("GET", "/notifications"), ("POST", "/notifications/read-all"),
     ("POST", "/push/subscriptions"), ("DELETE", "/push/subscriptions"), ("POST", "/push/test"),
     ("POST", "/family/settings/llm-test"), ("GET", "/knowledge/sources"), ("POST", "/knowledge/uploads"),
-    ("POST", "/import/huckleberry"),
+    ("POST", "/import/huckleberry"), ("POST", "/voice/transcribe"),
 }
 # M17: operator routes; a user who is not an operator gets 404.
 OPERATOR = {("GET", "/operator/invites"), ("POST", "/operator/invites"), ("DELETE", "/operator/invites/{invite_id}"),

@@ -190,7 +190,7 @@ def used_numbers(text: str) -> set[int]:
     return {int(n) for m in re.finditer(r"\[(\d+)\]", text) for n in [m.group(1)]}
 
 
-async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterator[str]:
+async def chat(s: Session, ctx: Ctx, child_id: int, message: str, voice: bool = False) -> AsyncIterator[str]:
     """SSE events. Raises llm.LlmError before the first event when the model is down and there is no warning."""
     child = get_child(s, ctx, child_id)
     now = utcnow()
@@ -207,7 +207,8 @@ async def chat(s: Session, ctx: Ctx, child_id: int, message: str) -> AsyncIterat
                 llm.QUEUE.check()
                 waited = True
                 yield sse("waiting", {})
-            logged = await nl_log.log_words(s, ctx, child.id, report, drop_notes=asks, limited=False)  # heartbeat
+            logged = await nl_log.log_words(s, ctx, child.id, report, drop_notes=asks, limited=False,
+                                             save_unsure=voice)  # heartbeat
         except llm.LlmError:
             asks = True  # not read: answer it as a question (that fails too if the model is down)
         if logged and not (logged["items"] or logged["proposals"]):

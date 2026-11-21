@@ -4,6 +4,7 @@
 	import { refresh, toast } from './app.svelte';
 	import Icon from './Icon.svelte';
 	import Proposals, { type Proposal } from './Proposals.svelte';
+	import VoiceButtons from './VoiceButtons.svelte';
 
 	let { childId }: { childId: number } = $props();
 	let text = $state('');
@@ -51,6 +52,7 @@
 		<label for="nl-text" class="sr-only">Tell me what happened</label>
 		<input id="nl-text" placeholder="Tell me what happened…" bind:value={text} autocomplete="off" />
 		<button class="icon send" type="submit" disabled={busy || !text.trim()} aria-label="Read my words"><Icon name="sparkle" /></button>
+		<VoiceButtons />
 	</form>
 	{#if busy && !proposals}<p class="muted small" aria-live="polite">Reading…</p>{/if}
 	{#if error}<p class="error" role="alert">{error}</p>{/if}

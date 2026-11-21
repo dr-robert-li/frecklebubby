@@ -13,6 +13,7 @@
 	import Icon from '#lib/Icon.svelte';
 	import Sheet from '#lib/Sheet.svelte';
 	import { applyTheme } from '#lib/theme.ts';
+	import VoiceCard from '#lib/VoiceCard.svelte';
 
 	let { children } = $props();
 	let phase = $state<'loading' | 'signin' | 'ready' | 'refused' | 'error'>('loading');
@@ -145,6 +146,8 @@
 	<main class:withtabs={!onboarding}>
 		{@render children()}
 	</main>
+
+	{#if !onboarding && app.me?.family}<VoiceCard />{/if}
 
 	{#if !onboarding}
 		<nav aria-label="Main">

@@ -114,6 +114,11 @@ def ai_limit(ctx: Ctx = Depends(get_ctx)) -> None:
     ratelimit.hit("ai", ctx.user.id)
 
 
+def voice_limit(ctx: Ctx = Depends(get_ctx)) -> None:
+    """Route dependency: voice recordings, per user. Hands free sends one for each phrase it hears."""
+    ratelimit.hit("voice", ctx.user.id)
+
+
 def upload_limit(ctx: Ctx = Depends(get_ctx)) -> None:
     """Route dependency: file uploads and import starts, per user."""
     ratelimit.hit("uploads", ctx.user.id)

@@ -577,6 +577,9 @@ def doubt(s: Session, ctx: Ctx, child: Child, ev: dict, p: dict, text: str, now:
     return None
 
 
+SAME = "it is the same as another item"
+
+
 async def parse(s: Session, ctx: Ctx, child_id: int, text: str, limited: bool = True) -> dict:
     """{"proposals", "message", "problems"}. A proposal that may be a guess has `unsure` (the reason)."""
     child = get_child(s, ctx, child_id)
@@ -606,7 +609,7 @@ async def parse(s: Session, ctx: Ctx, child_id: int, text: str, limited: bool = 
             p["summary"] = summary(p, ctx)
             p["unsure"] = doubt(s, ctx, child, ev, p, text, now) or (
                 "your words can mean two things" if out.get("unclear") else None) or (
-                "it is the same as another item" if p["summary"] in seen else None)
+                SAME if p["summary"] in seen else None)
             seen.add(p["summary"])
             proposals.append({k: v for k, v in p.items() if v is not None})
         except (ServiceError, KeyError, TypeError, ValueError) as err:
@@ -700,18 +703,21 @@ def _json(p: dict) -> dict:
 
 
 async def log_words(s: Session, ctx: Ctx, child_id: int, text: str, save: bool = True,
-                    drop_notes: bool = False, limited: bool = True) -> dict:
+                    drop_notes: bool = False, limited: bool = True, save_unsure: bool = False) -> dict:
     """Parse the words and save what is sure in one step. {"items": saved rows, "proposals": not saved (unsure, or
     all when save is false; JSON form), "message"}. `drop_notes`: the text also asks something, so a note is not
-    what the parent wants to record."""
+    what the parent wants to record. `save_unsure` (voice commands: no hand free to confirm): the unsure
+    proposals are saved too, and each saved item says why it is not sure."""
     out = await parse(s, ctx, child_id, text, limited)
     props = [p for p in out["proposals"] if not (drop_notes and p["action"] == "entry" and p["type"] == "note")]
-    sure = [p for p in props if save and not p.get("unsure")]
+    # A copy of another item is not saved, also with save_unsure: it would be a double entry.
+    sure = [p for p in props if save and (not p.get("unsure") or (save_unsure and p["unsure"] != SAME))]
     later = [p for p in props if p not in sure]
     items, failed = [], ""
     if sure:
         try:
             items = commit(s, ctx, child_id, [PROPOSAL.validate_python(p) for p in sure])["items"]
+            items = [i | {"unsure": p["unsure"]} if p.get("unsure") else i for i, p in zip(items, sure, strict=True)]
         except ServiceError as err:
             later, failed = props, f" I could not save them: {err}"
     parts = []

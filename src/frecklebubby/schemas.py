@@ -641,3 +641,4 @@ class ConfigOut(BaseModel):
     clerk_publishable_key: str
     vapid_public_key: str
     version: str
+    voice: bool = False  # voice commands are installed on this server

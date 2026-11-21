@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import threading
 from contextlib import asynccontextmanager
 from importlib.metadata import version
 from pathlib import Path
@@ -16,7 +17,7 @@ from .api import ai, children, core, cry, importer, notify, operator
 from .config import get_settings
 from .db import SessionLocal, init_db, utcnow
 from .mcp_server import create_mcp
-from .services import ServiceError
+from .services import ServiceError, voice
 from .services.notifications import vapid
 from .services.reminders import tick
 
@@ -81,6 +82,8 @@ def create_app(scheduler: bool = True) -> FastAPI:
     async def lifespan(app: FastAPI):
         async with mcp_app.lifespan(app):
             task = asyncio.create_task(_reminder_loop()) if scheduler else None
+            if scheduler and voice.available():
+                threading.Thread(target=voice.warm, daemon=True).start()
             try:
                 yield
             finally:

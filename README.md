@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.4.3-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.5.0-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -40,6 +40,9 @@ Your data stays on your server.
 - Has an AI assistant that runs on an open model on your own server. It logs from plain words
   ("120 ml formula 20 minutes ago") on the Home screen and in the chat, answers questions with citations to
   medical sources, makes a sleep plan, and shows insights.
+- Takes voice commands, so you can log and ask with no hand or one hand free: a talk button, hands free with the
+  keyword "Hey Bubby" or "OK Bubby", an optional large hold-to-talk button on the side of the screen, and an option
+  to read the answer aloud. Your own server changes the speech into text.
 - Gives development guidance from birth to 5 years: what most children do by each age (CDC), movement, behaviour
   and body changes to expect around now, cited tips on how to help, and a notification at each new age band.
   For a baby born early, give the due date and the app uses the corrected age until 2 years.
@@ -108,6 +111,7 @@ to a doctor or nurse. In an emergency, call your local emergency number.
 - [REST API](#rest-api)
 - [The AI model](#the-ai-model)
 - [Sleep model](#sleep-model)
+- [Voice commands](#voice-commands)
 - [Cry helper](#cry-helper)
 - [Knowledge library and licences](#knowledge-library-and-licences)
 - [Move from Huckleberry](#move-from-huckleberry)
@@ -362,6 +366,49 @@ at this age. The recommended sleep ranges (AASM 2016, NSF 2015) stay the main re
 - **Fallback**: a table of common wake windows by age (`src/frecklebubby/data/wake_windows.json`). The app uses it
   when the file is missing or not valid, or the child is older than 24 months, or no night sleep is
   logged in the last 24 hours, the app uses the wake-window table as before.
+
+## Voice commands
+
+You can log things and ask questions with your voice. The words go to the assistant, the same as typed words:
+"wet nappy", "she had 120 ml of formula", "start a nap", "how long can she stay awake?".
+
+- **Talk button** (microphone, next to "Tell me what happened" on Home and next to the question box in the
+  Assistant): tap, say your words, tap again.
+- **Hands free** (wave button, next to the microphone): the app listens. Say **"Hey Bubby"** or **"OK Bubby"** and
+  then your words. A short sound tells you that the app heard the keyword. You can also say the keyword, wait for
+  the sound, and then say your words.
+- **Hold-to-talk button on the side** (Settings > Voice): a large see-through button on the left or right side of
+  the screen, at the height you select, on all pages. Hold it down, say your words, and let go. It is for use with
+  one hand.
+- **Read the answer aloud** (Settings > Voice): off, for hands free only, or for all voice commands. The answer
+  always shows on the screen too. The voice is the voice of your phone or browser.
+
+A voice command **saves the entries immediately**, because you have no hand free to confirm. When the app is not
+sure (for example the amount was not in your words), the entry is saved with the text "Not sure: …". You can undo
+it in the voice card or in the Assistant, and you can change or delete each entry in the timeline. An exact copy
+of another item in the same command is not saved.
+
+**Limits of hands free.** A web app can listen only while the app is open and the screen is on. With hands free on,
+the app keeps the screen on, so connect the phone to power for long use. Hands free stops when you lock the phone
+or go to another app.
+
+**Privacy.** The speech-to-text model (Whisper) runs on your own server, on the CPU. No audio goes to a third
+party. With hands free on, the phone finds each spoken phrase and sends it to your server for the keyword check.
+When the phrase does not start with the keyword, the server gives back no text. The server does not store or log
+the sound or the text. Read aloud uses the speech voice of the device; some browsers use an online voice.
+
+**Server settings** (`.env`):
+
+- `VOICE=false` removes the voice buttons.
+- `WHISPER_MODEL` (default `small.en`, about 500 MB, about 1 second for a command on a modern CPU). The first start
+  downloads the model to `DATA_DIR/models/whisper`. `base.en` is faster and makes more errors.
+- Other languages: `WHISPER_MODEL=small` and `WHISPER_LANGUAGE=` (empty). The keyword and the assistant are English.
+- `LIMIT_VOICE` (default `300/300`): recordings per user in a time window.
+- **Without containers**: install the extra (`uv sync --extra voice`).
+- **Microphone**: browsers give the microphone only to HTTPS pages (or `localhost`). See [HTTPS](#https).
+
+API: `POST /api/v1/voice/transcribe` (a WAV file: one channel, 16 bit, 16 kHz, 30 seconds maximum; form field
+`wake=true` for the keyword check) gives `{"heard", "text"}`. `POST .../assistant/chat` takes `"voice": true`.
 
 ## Cry helper
 

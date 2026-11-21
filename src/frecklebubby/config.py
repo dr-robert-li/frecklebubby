@@ -32,11 +32,17 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
     # Cry sound models (optional extra "cry"). Default: <DATA_DIR>/models/cry, else the bundled files
     cry_model_dir: Path | None = None
+    # Voice commands (optional extra "voice"): Whisper on the CPU. The first use downloads the model to
+    # DATA_DIR/models/whisper. Other languages: WHISPER_MODEL=small and WHISPER_LANGUAGE= (empty = find it).
+    voice: bool = True
+    whisper_model: str = "small.en"
+    whisper_language: str = "en"
     host: str = "0.0.0.0"
     port: int = 8000
     # Rate limits as "count/seconds". AI and uploads: per user. Wrong tokens: per client address.
     limit_ai: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "30/300"
     limit_uploads: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "20/3600"
+    limit_voice: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "300/300"
     limit_bad_token: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "20/600"
     # Model requests that can wait for the model at one time; one more gets "The assistant is busy" (429).
     llm_queue_max: int = 8

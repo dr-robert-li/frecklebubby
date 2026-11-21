@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { AI_DOWN, api, apiRaw, runJob, softMessage } from '#lib/api.ts';
+	import { api, runJob, softMessage } from '#lib/api.ts';
+	import { streamChat, type Item, type Msg } from '#lib/chat.ts';
+	import { onCommand } from '#lib/voice.svelte.ts';
+	import VoiceButtons from '#lib/VoiceButtons.svelte';
 	import { child, refresh, toast, wording } from '#lib/app.svelte.ts';
 	import { fmtDay, localDay } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
@@ -10,10 +13,6 @@
 	import { tracker, type Entry } from '#lib/trackers.ts';
 	import { tick } from 'svelte';
 
-	// M14: what a chat turn saved ("Logged" block) and what it did not save without a check (proposals).
-	type Item = { action: 'entry' | 'timer'; type: string; summary: string; entry_id?: number | null; timer_action?: string | null; undone: boolean };
-	type Logged = { items: Item[]; proposals: Proposal[]; message: string };
-	type Msg = { id?: number; role: 'user' | 'assistant'; content: string; citations: Citation[]; logged?: Logged | null; waiting?: boolean };
 	type Insight = { kind: string; severity: 'info' | 'attention' | 'urgent'; title: string; body: string; citations: Citation[] };
 
 	let tab = $state<'ask' | 'insights' | 'plan' | 'milestones'>('ask');
@@ -56,12 +55,18 @@
 		api(`/children/${cid}/milestones`).then((m) => (milestones = m)).catch((e) => (msError = softMessage(e, 'Milestones are not available now.')));
 	}
 
-	async function ask(e: SubmitEvent) {
+	function ask(e: SubmitEvent) {
 		e.preventDefault();
 		const text = question.trim();
 		if (!text || streaming) return;
-		chatError = '';
 		question = '';
+		send(text);
+	}
+
+	/** One chat turn. `voice`: a voice command (saves also what is not sure). Returns the answer, or null. */
+	async function send(text: string, voice = false): Promise<Msg | null> {
+		tab = 'ask';
+		chatError = '';
 		asked = true;
 		messages.push({ role: 'user', content: text, citations: [] });
 		messages.push({ role: 'assistant', content: '', citations: [] });
@@ -70,46 +75,18 @@
 		// Show the new question at the top of the screen; the answer grows below it.
 		tick().then(() => [...document.querySelectorAll('.msgs li.user')].at(-1)?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
 		try {
-			const res = await apiRaw(`/children/${cid}/assistant/chat`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-				body: JSON.stringify({ message: text })
-			});
-			if (!res.ok || !res.body) {
-				const d = await res.json().catch(() => null);
-				throw new Error((res.status === 503 || res.status === 429) && d?.detail ? d.detail : AI_DOWN);
-			}
-			const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
-			let buf = '';
-			for (;;) {
-				const { value, done } = await reader.read();
-				if (done) break;
-				buf += value;
-				let i;
-				while ((i = buf.indexOf('\n\n')) >= 0) {
-					const block = buf.slice(0, i);
-					buf = buf.slice(i + 2);
-					const ev = /^event: ?(.*)$/m.exec(block)?.[1].trim() ?? 'message';
-					const data = JSON.parse(/^data: ?(.*)$/m.exec(block)?.[1] ?? '{}');
-					if (ev !== 'waiting') answer.waiting = false;
-					if (ev === 'waiting') answer.waiting = true;
-					else if (ev === 'logged') {
-						answer.logged = { items: data.items, proposals: data.proposals, message: data.message };
-						answer.id = data.message_id;
-						refresh();
-					} else if (ev === 'token') answer.content += data.text;
-					else if (ev === 'citations') answer.citations = data.citations;
-					else if (ev === 'done') answer.id = data.message_id;
-					else if (ev === 'error') throw new Error(data.detail || AI_DOWN);
-				}
-			}
+			await streamChat(cid!, text, answer, voice);
+			return answer;
 		} catch (err) {
-			chatError = err instanceof TypeError ? AI_DOWN : (err as Error).message;
+			chatError = (err as Error).message;
 			if (!answer.content && !answer.logged) messages.pop();
+			return null;
 		} finally {
 			streaming = false;
 		}
 	}
+	// Voice commands on this page go into the chat.
+	$effect(() => onCommand((text) => send(text, true)));
 
 	const canUndo = (it: Item) =>
 		!!it.entry_id || ['start', 'pause', 'resume'].includes(it.timer_action ?? '') || (it.timer_action === 'switch' && it.type === 'nursing');
@@ -216,7 +193,7 @@
 										{@const t = tracker(it.type, wording()) ?? tracker('activity', wording())}
 										<li class:undone={it.undone}>
 											<span class="bubble" style="background: var({t.color})"><Icon name={t.icon ?? t.type} size={18} /></span>
-											<span class="what">{it.summary}</span>
+											<span class="what">{it.summary}{#if it.unsure && !it.undone}<br /><span class="unsure small">Not sure: {it.unsure}</span>{/if}</span>
 											{#if it.undone}<span class="tag small">Undone</span>{/if}
 											{#if !it.undone}
 												{#if it.entry_id}<button class="ghost small" aria-label="Edit {it.summary}" onclick={() => edit(it)}>Edit</button>{/if}
@@ -253,6 +230,7 @@
 			<label for="q" class="sr-only">Your question</label>
 			<input id="q" placeholder="Ask, or tell me what happened…" bind:value={question} autocomplete="off" />
 			<button class="icon send" type="submit" disabled={streaming || !question.trim()} aria-label="Send"><Icon name="send" /></button>
+			<VoiceButtons />
 		</form>
 		<div class="spread">
 			<p class="disclaimer">General information, not medical advice.</p>
@@ -341,6 +319,10 @@
 {#if sheet && cid}<EntrySheet type={sheet.type} entry={sheet.entry} childId={cid} onclose={() => (sheet = null)} />{/if}
 
 <style>
+	.unsure {
+		color: var(--danger);
+		font-weight: 700;
+	}
 	.tabs {
 		margin-bottom: 14px;
 	}

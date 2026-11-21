@@ -24,7 +24,7 @@ from ..schemas import (
     TokenIn,
     TokenOut,
 )
-from ..services import Ctx, families, tokens
+from ..services import Ctx, families, tokens, voice
 from ..services.notifications import vapid_public_key
 
 router = APIRouter()
@@ -39,7 +39,7 @@ def health() -> dict:
 def config():
     st = get_settings()
     return {"auth_mode": st.auth_mode, "invite_only": bool(st.operators), "clerk_publishable_key": st.clerk_publishable_key,
-            "vapid_public_key": vapid_public_key(), "version": version("frecklebubby")}
+            "vapid_public_key": vapid_public_key(), "version": version("frecklebubby"), "voice": voice.available()}
 
 
 @router.get("/me", response_model=MeOut)

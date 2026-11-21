@@ -1,6 +1,6 @@
 [project]
 name = "frecklebubby"
-version = "0.4.3"
+version = "0.5.0"
 description = "Self-hosted baby tracker with REST API and MCP server"
 readme = "README.md"
 license = { text = "MIT" }
@@ -23,6 +23,8 @@ dependencies = [
 import = ["huckleberry-api @ git+https://github.com/dr-robert-li/py-huckleberry-api"]
 # Cry sound analysis (experimental). Also needs the ffmpeg program and the model files (see README).
 cry = ["onnxruntime>=1.20", "numpy>=2.1"]
+# Voice commands: speech to text on the server (Whisper, CPU). The first use downloads the model to DATA_DIR.
+voice = ["faster-whisper>=1.1", "numpy>=2.1"]
 
 [project.scripts]
 frecklebubby = "frecklebubby.main:run"

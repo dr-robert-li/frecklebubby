@@ -6,6 +6,32 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-21
+
+### Added
+
+- Voice commands. A talk button (microphone) and a hands-free button (wave) are next to "Tell me what happened"
+  on Home and next to the question box in the Assistant. The words go to the assistant, which logs them or
+  answers them.
+- Hands free: say "Hey Bubby" or "OK Bubby" and then your words. The app makes a short sound when it hears the
+  keyword, and keeps the screen on while hands free is on.
+- Settings > Voice: an optional large hold-to-talk button on the left or right side of the screen at a height you
+  select, and an option to read the answer aloud (off, hands free only, all voice commands).
+- Speech to text runs on your own server (Whisper `small.en` on the CPU, the new `voice` extra). The audio is not
+  stored. New settings: `VOICE`, `WHISPER_MODEL`, `WHISPER_LANGUAGE`, `LIMIT_VOICE`.
+- API: `POST /voice/transcribe`; `POST /children/{id}/assistant/chat` takes `voice: true`; `/config` has `voice`;
+  a logged item can have `unsure`.
+
+### Changed
+
+- A voice command saves its entries immediately, also when the app is not sure. Such an entry shows
+  "Not sure: …" and can be undone. Typed words work as before: the app asks before it saves a guess.
+- The day theme has a beige cream background in place of the bright white tone.
+
+### Fixed
+
+- Import from Huckleberry: the radio buttons were very large and not in line with their text.
+
 ## [0.4.3] - 2026-11-21
 
 ### Changed

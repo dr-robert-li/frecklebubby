@@ -9,6 +9,7 @@
 		['units', 'Units and wording', 'ml or oz, kg or lb, nappy or diaper', 'growth'],
 		['reminders', 'Reminders', 'Feeds, nappies, medicine, sleep', 'history'],
 		['notifications', 'Notifications on this device', 'Push messages', 'bell'],
+		['voice', 'Voice', 'Talk button, hands free, read aloud', 'mic'],
 		['ai', 'AI model', 'Server, model and key', 'sparkle'],
 		['knowledge', 'Knowledge sources', 'Library and your uploads', 'note'],
 		['tokens', 'API tokens and MCP', 'Connect scripts and AI apps', 'link'],

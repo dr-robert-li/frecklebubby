@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-    image: frecklebubby:0.4.3
+    image: frecklebubby:0.5.0
     restart: unless-stopped
     ports:
       - "${FRECKLEBUBBY_PORT:-8000}:8000"
@@ -28,6 +28,10 @@ services:
       LIMIT_BAD_TOKEN: ${LIMIT_BAD_TOKEN:-20/600}
       LLM_QUEUE_MAX: ${LLM_QUEUE_MAX:-8}
       LLM_QUEUE_WAIT: ${LLM_QUEUE_WAIT:-60}
+      VOICE: ${VOICE:-true}
+      WHISPER_MODEL: ${WHISPER_MODEL:-small.en}
+      WHISPER_LANGUAGE: ${WHISPER_LANGUAGE-en}
+      LIMIT_VOICE: ${LIMIT_VOICE:-300/300}
       LLM_BASE_URL: ${LLM_BASE_URL:-http://llama:8080/v1}
       LLM_MODEL: ${LLM_MODEL:-}
       LLM_API_KEY: ${LLM_API_KEY:-}

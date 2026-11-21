@@ -5,16 +5,17 @@ from collections.abc import AsyncIterator
 from datetime import date, datetime
 from typing import Literal
 
-from fastapi import APIRouter, Depends, File, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Response, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, ValidationError, field_validator
 from sqlalchemy.orm import Session
 
 from ..ai import assistant, jobs, llm, nl_log, sleep_plan, support_report
-from ..auth import ai_limit, get_ctx, upload_limit
+from ..auth import ai_limit, get_ctx, upload_limit, voice_limit
 from ..db import get_session
 from ..knowledge import uploads
-from ..services import Ctx, insights
+from ..services import Ctx, insights, voice
 from ..services.children import get_child
 
 router = APIRouter()
@@ -61,6 +62,7 @@ class InsightOut(BaseModel):
 
 class ChatIn(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
+    voice: bool = Field(False, description="A voice command: also save the items that are not sure, with a flag.")
 
 
 class LoggedItem(BaseModel):
@@ -70,6 +72,7 @@ class LoggedItem(BaseModel):
     entry_id: int | None = None
     timer_action: str | None = None
     undone: bool = False
+    unsure: str | None = None  # a voice command saved it without a check: why it can be wrong
 
 
 class LoggedOut(BaseModel):
@@ -192,6 +195,11 @@ class JobOut(BaseModel):
     error: str | None
 
 
+class HeardOut(BaseModel):
+    heard: bool  # false: no words, or (with wake) the words do not start with the keyword
+    text: str  # the words; with wake, the words after the keyword
+
+
 class LlmTestOut(BaseModel):
     ok: bool
     detail: str
@@ -239,7 +247,7 @@ def clear_messages(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(g
                      "A comment line (': ping') comes at least every 15 s, also while the request waits for the model.",
              dependencies=[Depends(ai_limit)])
 async def chat(cid: int, body: ChatIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
-    events = assistant.chat(s, ctx, cid, body.message)
+    events = assistant.chat(s, ctx, cid, body.message, body.voice)
     # child check, retrieval and the model connection (or "waiting"); errors become JSON (404, 429, 503)
     first = await anext(events)
 
@@ -298,6 +306,21 @@ def support_report_job(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depen
              dependencies=[Depends(ai_limit)])
 async def llm_test(ctx: Ctx = Depends(get_ctx)):
     return await llm.test(ctx.fam)
+
+
+@router.post("/voice/transcribe", response_model=HeardOut, dependencies=[Depends(voice_limit)],
+             summary="Speech to text for a voice command. WAV: one channel, 16 bit, 16 kHz, max 30 s. With wake: "
+                     "only text that starts with \"Hey Bubby\" or \"OK Bubby\" comes back. The audio is not stored.")
+async def transcribe(file: UploadFile = File(...), wake: bool = Form(False), ctx: Ctx = Depends(get_ctx)):
+    ctx.fam  # noqa: B018  409 for a user with no family
+    data = await file.read(voice.MAX_BYTES + 1)
+    if len(data) > voice.MAX_BYTES:
+        raise voice.Invalid("The recording is too long. The limit is 30 seconds.")
+    text = await run_in_threadpool(voice.transcribe, data)
+    if wake:
+        command = voice.wake(text)
+        return {"heard": command is not None, "text": command or ""}
+    return {"heard": bool(text), "text": text}
 
 
 @router.get("/knowledge/sources", response_model=list[SourceOut])

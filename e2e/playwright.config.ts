@@ -64,6 +64,18 @@ const m17Server = [
 	`AUTH_MODE=dev OPERATOR_EMAILS=operator@example.com DATA_DIR="$D" SLEEP_NORMS_PATH="$D/none.json" PORT=${M17_PORT} exec uv run frecklebubby`
 ].join('\n');
 
+// Voice commands: the real model and the real Whisper. VOICE_E2E_WAV: a 48 kHz WAV where a person says "Hey Bubby,
+// she had a wet nappy." and then 5 s of silence (Chromium plays it again and again as the microphone). The journey
+// is skipped without it. VOICE_E2E_MODEL: a folder with the Whisper model (default: download small.en).
+const VOICE_PORT = Number(process.env.E2E_VOICE_PORT ?? 8016);
+const voiceURL = `http://127.0.0.1:${VOICE_PORT}`;
+export const VOICE_WAV = process.env.VOICE_E2E_WAV ?? '';
+const voiceServer = [
+	'set -e',
+	'cd .. && D=$(mktemp -d -t frecklebubby-e2e-voice-XXXXXX)',
+	`AUTH_MODE=dev LLM_BASE_URL=${LLM_BASE_URL} WHISPER_MODEL="${process.env.VOICE_E2E_MODEL ?? 'small.en'}" DATA_DIR="$D" SLEEP_NORMS_PATH="$D/none.json" PORT=${VOICE_PORT} exec uv run --extra voice frecklebubby`
+].join('\n');
+
 const phone = { ...devices['Pixel 7'], browserName: 'chromium' as const };
 // Real-model journeys: one at a time (one CPU model), long timeouts.
 const slow = { testDir: './tests', timeout: 600_000, workers: 1, use: { ...phone, baseURL: llmURL } };
@@ -85,7 +97,7 @@ export default defineConfig({
 		screenshot: 'on'
 	},
 	projects: [
-		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9|m11|m13|m14|m15|m17)\.spec\.ts$/ },
+		{ name: 'phone', use: phone, testIgnore: /\.(llm|m4|m5|m8|m9|m11|m13|m14|m15|m17|m18)\.spec\.ts$/ },
 		{ name: 'llm', ...slow, testMatch: /\.llm\.spec\.ts$/, outputDir: './recordings/m3/results' },
 		{ name: 'm4', ...slow, testMatch: /\.m4\.spec\.ts$/, outputDir: './recordings/m4/results' },
 		{ name: 'm5', ...slow, testMatch: /\.m5\.spec\.ts$/, outputDir: './recordings/m5/results' },
@@ -99,6 +111,21 @@ export default defineConfig({
 		{ name: 'm17', use: { ...phone, baseURL: m17URL }, testMatch: /\.m17\.spec\.ts$/, outputDir: './recordings/m17/results', workers: 1 },
 		// M9 new logging: the main server (no model); the confined notification waits for the 60 s server tick.
 		{ name: 'm9', use: phone, testMatch: /\.m9\.spec\.ts$/, outputDir: './recordings/m9/results', timeout: 240_000 },
+		{
+			name: 'm18',
+			...slow,
+			testMatch: /\.m18\.spec\.ts$/,
+			outputDir: './recordings/m18/results',
+			use: {
+				...phone,
+				baseURL: voiceURL,
+				permissions: ['microphone'],
+				launchOptions: {
+					args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream',
+						...(VOICE_WAV ? [`--use-file-for-fake-audio-capture=${VOICE_WAV}`] : [])]
+				}
+			}
+		},
 		{
 			name: 'm8',
 			testMatch: /\.m8\.spec\.ts$/,
@@ -120,6 +147,7 @@ export default defineConfig({
 		{ command: `bash -c '${llmServer}'`, url: `${llmURL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
 		{ command: `bash -c '${m15Server}'`, url: `${m15URL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
 		{ command: `bash -c '${m17Server}'`, url: `${m17URL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
+		{ command: `bash -c '${voiceServer}'`, url: `${voiceURL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' },
 		{ command: `bash -c '${cryServer}'`, url: `${cryURL}/api/v1/health`, timeout: 120_000, reuseExistingServer: false, stdout: 'ignore', stderr: 'pipe' }
 	]
 });

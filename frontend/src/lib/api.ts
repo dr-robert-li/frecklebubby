@@ -7,6 +7,7 @@ export type Config = {
 	clerk_publishable_key: string;
 	vapid_public_key: string;
 	version: string;
+	voice?: boolean;
 };
 
 export class ApiError extends Error {
