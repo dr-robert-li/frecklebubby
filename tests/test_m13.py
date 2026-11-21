@@ -60,7 +60,8 @@ async def test_due_date_validation(client):
         r = await client.patch(f"{API}/children/{cid}", headers=h, json={"due_date": bad})
         assert r.status_code == 422 and "due_date" in r.json()["detail"]
     ms = (await client.get(f"{API}/children/{cid}/milestones", headers=h)).json()
-    days = (date.today() - date(2026, 7, 15)).days
+    # The date of the family (Brisbane), not the date of the test machine: CI runs in UTC, a day behind at night.
+    days = (datetime.now(ZoneInfo("Australia/Brisbane")).date() - date(2026, 7, 15)).days
     assert ms["corrected"] is True and ms["age_months"] == round(days / 30.4375, 1)
     r = await client.patch(f"{API}/children/{cid}", headers=h, json={"due_date": None})
     assert r.json()["due_date"] is None
