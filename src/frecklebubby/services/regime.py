@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from ..config import PACKAGE_DATA
 from ..db import utcnow
 from ..models import Child, Entry
+from . import training
 from .children import hm
 from .sleep import DAY, _recent, band, nights, norms, p50, sleep_days, wake_range
 
@@ -172,12 +173,17 @@ def regime(s: Session, child: Child, tz, now: datetime | None = None) -> dict:
         select(Entry.started_at).where(Entry.child_id == child.id, Entry.type.in_(FEEDS),
                                        Entry.started_at >= now - timedelta(days=DAYS + 2)).order_by(Entry.started_at))]
     night0, night1 = (h.hour * 60 + h.minute for h in (hm(child.night_start), hm(child.morning_cutoff)))
+    # Sleep training (an option, off by default): the plan takes no step at bedtime; bedtime fading sets bedtime.
+    t = training.current(s, child)
+    active = t is not None and t.status == "active"
     return calculate(child.name, (local.date() - child.birthdate).days, eps, feeds, local.hour * 60 + local.minute,
-                     night0, night1)
+                     night0, night1, hold_bedtime=active,
+                     bedtime=t.state.get("bedtime") if active and t.method == "fading" else None)
 
 
 def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[int], now_min: int,
-              night0: int = 19 * 60, night1: int = 7 * 60) -> dict:
+              night0: int = 19 * 60, night1: int = 7 * 60, hold_bedtime: bool = False,
+              bedtime: float | None = None) -> dict:
     """The plan from plain data, with no database (training/sleep replays it on the research data).
     eps: merged sleep episodes [start, end] in local minutes from today 00:00 (the past is negative), in time order.
     feed_starts: the same clock, in time order. night0, night1: night start and morning start of the profile."""
@@ -261,7 +267,7 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
             inside = own_total >= b["ok_low"] * 60
             gap = b["rec_low"] * 60 - own_total
             step = STEP_MIN if inside else min(max(round(gap / 4 / 5) * 5, STEP_MIN), STEP_MAX)
-            added = _more_sleep(blocks, step, rhythm, age, name, begin)
+            added = _more_sleep(blocks, step, rhythm, age, name, begin, hold_bedtime)
             if added:
                 nudges.append({
                     "text": f"{says} The recommended range for this age is {words}. "
@@ -325,6 +331,13 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
                                "cites": [feeds_age["cite"]]})
         feed_rows += new
 
+    night_block = next((x for x in blocks if x["kind"] == "night"), None)
+    if bedtime is not None and night_block and not rhythm:
+        night_block.setdefault("usual", night_block["start"])
+        night_block["start"] = bedtime
+        night_block["change"] = (f"Sleep training (bedtime fading): bedtime tonight. {name} usually falls asleep at "
+                                 f"about {clock(night_block['usual'])}.")
+
     # A feed that the app placed (typical for the age, or new in this plan) does not go into a sleep block: it moves
     # to the end of the block. The child's own usual feed times stay as they are.
     for f in feed_rows:
@@ -343,7 +356,9 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
     return _finish(age, months, caveats + notes, {
         "mode": "rhythm" if rhythm else "clock", "basis": basis, "own_days": own_days, "own_nights": len(recs),
         "naps": sum(1 for b in blocks if b["kind"] != "night"), "schedule": rows, "facts": facts, "nudges": nudges,
-        "confidence": "low" if doubts else "normal"})
+        "confidence": "low" if doubts else "normal", "training": hold_bedtime,
+        "usual_bedtime": night_block and night_block["basis"] != "age" and night_block.get("usual", night_block["start"])
+        or None})
 
 
 def _doubts(rhythm: bool, blocks: list[dict], days: list[dict], eps, own_days: int, own_total: float | None) -> list[str]:
@@ -487,7 +502,8 @@ def _young(age: Age, eps, night0: int, night1: int, facts) -> tuple[list[dict], 
     return blocks, len(logged), night1, total and total["value"]
 
 
-def _more_sleep(blocks: list[dict], step: int, rhythm: bool, age: Age, name: str, begin: float) -> int:
+def _more_sleep(blocks: list[dict], step: int, rhythm: bool, age: Age, name: str, begin: float,
+                hold_bedtime: bool = False) -> int:
     """Add about `step` minutes of sleep to the plan, in the way that fits the age. Returns the minutes added."""
     if rhythm:
         # A young baby: one new sleep block in the longest time awake between two blocks.
@@ -511,12 +527,13 @@ def _more_sleep(blocks: list[dict], step: int, rhythm: bool, age: Age, name: str
             x["label"] = f"Sleep {i}"
         return round(length)
     night, naps = blocks[-1], blocks[:-1]
-    earlier = min(BED_STEP, step)
+    earlier = 0 if hold_bedtime else min(BED_STEP, step)  # sleep training runs: bedtime is not for the plan
     if naps and night["start"] - earlier < naps[-1]["end"] + 60:
         earlier = 0
     added = earlier
     if earlier:
         night["change"] = f"{earlier} minutes earlier than {name}'s usual {clock(night['start'])}"
+        night["usual"] = night["start"]
         night["start"] -= earlier
     rest = step - earlier
     for b in naps:

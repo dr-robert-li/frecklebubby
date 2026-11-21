@@ -1,0 +1,32 @@
+{
+  "about": "Numbers for the optional sleep training mode (services/training.py). Each number is from a published trial or review; the app stores the numbers and a link. The scale goes from 1 (gentle) to 10 (firm); 5 is the usual schedule of the trials.",
+  "ages": {"min_months": 4, "warn_below_months": 6, "fading_from_months": 12},
+  "graduated": {
+    "about": "Waits before each check, in minutes: gentle = a fixed 2 minutes; usual = 2, 4, 6, 8, 10 (Hiscock 2008); firm = 5, 10, 15 (RACGP). No source gives a wait above 15 minutes.",
+    "first_wait": [2, 2, 5], "increment": [0, 2, 5], "max_wait": [2, 10, 15], "check_seconds": [15, 60, 60]
+  },
+  "presence": {
+    "about": "Parental presence. With graduated extinction: the parent moves away in steps (camping out). nights_per_step: gentle 4, usual 3, firm 1. With extinction: the parent stays in the room for 7 nights.",
+    "nights_per_step": [4, 3, 1], "stay_nights": 7,
+    "steps": [
+      "Sit beside the bed. Pat or stroke {name} until asleep.",
+      "Sit beside the bed. Do not touch {name}. Use your voice only.",
+      "Move the chair about 1 metre away from the bed. Use your voice only.",
+      "Sit at the door.",
+      "Sit outside the door, where {name} cannot see you."
+    ]
+  },
+  "fading": {
+    "about": "Bedtime fading (Cooney 2018; Piazza 1991). Start 30 minutes after the usual time that the child falls asleep, for 2 nights. A good night: asleep in 15 minutes or less.",
+    "start_later": 30, "hold_nights": 2, "good_minutes": 15
+  },
+  "review": {"good_minutes": 10, "good_wakes": 1, "good_nights": 3, "no_gain_nights": 7, "max_nights": 14},
+  "sources": {
+    "hiscock08": {"title": "Long-term mother and child mental health effects of a population-based infant sleep intervention: cluster-randomized, controlled trial (Hiscock H, et al. Pediatrics 2008;122:e621-e627)", "publisher": "Pediatrics", "url": "https://doi.org/10.1542/peds.2007-3783", "year": 2008},
+    "mindell06": {"title": "Behavioral treatment of bedtime problems and night wakings in infants and young children (Mindell JA, et al. Sleep 2006;29:1263-1276)", "publisher": "Sleep (American Academy of Sleep Medicine review)", "url": "https://doi.org/10.1093/sleep/29.10.1263", "year": 2006},
+    "price12": {"title": "Five-year follow-up of harms and benefits of behavioral infant sleep intervention: randomized trial (Price AMH, et al. Pediatrics 2012;130:643-651)", "publisher": "Pediatrics", "url": "https://doi.org/10.1542/peds.2011-3467", "year": 2012},
+    "gradisar16": {"title": "Behavioral interventions for infant sleep problems: a randomized controlled trial (Gradisar M, et al. Pediatrics 2016;137:e20151486)", "publisher": "Pediatrics", "url": "https://doi.org/10.1542/peds.2015-1486", "year": 2016},
+    "cooney18": {"title": "An open trial of bedtime fading for sleep disturbances in preschool children (Cooney MR, Short MA, Gradisar M. Sleep Med 2018;46:98-106)", "publisher": "Sleep Medicine", "url": "https://pubmed.ncbi.nlm.nih.gov/29773219/", "year": 2018},
+    "france90": {"title": "Behavior management of infant sleep disturbance (France KG, Hudson SM. J Appl Behav Anal 1990;23:91-98)", "publisher": "Journal of Applied Behavior Analysis", "url": "https://doi.org/10.1901/jaba.1990.23-91", "year": 1990}
+  }
+}

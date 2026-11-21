@@ -190,6 +190,22 @@ class SleepPlan(Base):
     created_at: Mapped[datetime] = _created()
 
 
+class SleepTraining(Base):
+    """The optional sleep training mode of a child (0.7.0). One row for each time the parent starts it."""
+    __tablename__ = "sleep_training"
+    id: Mapped[int] = _id()
+    child_id: Mapped[int] = mapped_column(ForeignKey("child.id", ondelete="CASCADE"), index=True)
+    method: Mapped[str] = mapped_column(String)  # extinction | graduated | fading
+    presence: Mapped[bool] = mapped_column(Boolean, default=False)
+    pace: Mapped[int] = mapped_column(default=5)  # the scale: 1 gentle to 10 firm
+    auto_pace: Mapped[bool] = mapped_column(Boolean, default=True)  # the answers of the parent move the scale
+    status: Mapped[str] = mapped_column(String, default="active")  # active | paused | ended
+    goal_bedtime: Mapped[str | None] = mapped_column(String(5))  # bedtime fading
+    state: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    nights: Mapped[list[Any]] = mapped_column(JSON, default=list)  # one report for each night
+    created_at: Mapped[datetime] = _created()
+
+
 class SupportReport(Base):
     """The last support report of a child (M11). A new report replaces the old one."""
 

@@ -27,8 +27,11 @@ from ..schemas import (
     TimerOut,
     TimerResult,
     TimerType,
+    TrainingIn,
+    TrainingNightIn,
+    TrainingOut,
 )
-from ..services import Ctx, children, entries, export, growth, milestones, regime, reports, sleep, timers
+from ..services import Ctx, children, entries, export, growth, milestones, regime, reports, sleep, timers, training
 
 router = APIRouter()
 
@@ -171,3 +174,37 @@ def sleep_prediction(
             summary="The day and night plan: one typical 24 hours, from the child's last 14 days and the age")
 def sleep_regime(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     return regime.regime(s, children.get_child(s, ctx, cid), ctx.tz)
+
+
+def _today(ctx: Ctx) -> date:
+    return utcnow().astimezone(ctx.tz).date()
+
+
+@router.get("/children/{cid}/sleep/training", response_model=TrainingOut,
+            summary="Sleep training (an option, off by default): the state, the steps for tonight, and the age limits")
+def get_training(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    return training.out(s, children.get_child(s, ctx, cid), _today(ctx))
+
+
+@router.put("/children/{cid}/sleep/training", response_model=TrainingOut,
+            summary="Start sleep training, or change the pace, the switch, parental presence or pause")
+def put_training(cid: int, body: TrainingIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    child = children.get_child(s, ctx, cid)
+    usual = regime.regime(s, child, ctx.tz)["usual_bedtime"] if body.method == "fading" else None
+    training.save(s, child, body.model_dump(exclude_unset=True), _today(ctx), usual)
+    return training.out(s, child, _today(ctx))
+
+
+@router.post("/children/{cid}/sleep/training/nights", response_model=TrainingOut,
+             summary="Report one night of sleep training. With the switch on, the answer moves the scale")
+def training_night(cid: int, body: TrainingNightIn, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    child = children.get_child(s, ctx, cid)
+    training.report(s, child, body.model_dump(mode="json"))
+    return training.out(s, child, _today(ctx))
+
+
+@router.delete("/children/{cid}/sleep/training", response_model=TrainingOut, summary="End the sleep training")
+def end_training(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    child = children.get_child(s, ctx, cid)
+    training.end(s, child)
+    return training.out(s, child, _today(ctx))

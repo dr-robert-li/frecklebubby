@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { api, runJob, softMessage } from '#lib/api.ts';
+	import SleepTraining from '#lib/SleepTraining.svelte';
 	import { streamChat, type Item, type Msg } from '#lib/chat.ts';
 	import { canVoice, onCommand } from '#lib/voice.svelte.ts';
 	import VoiceButtons from '#lib/VoiceButtons.svelte';
@@ -309,6 +310,7 @@
 		{#if regimeError}<p class="notice">{regimeError}</p>{/if}
 		<p class="disclaimer">The app calculates this plan from the logs. It is a guide, not a target. General information, not medical advice.</p>
 	</section>
+	<SleepTraining onchange={() => api(`/children/${cid}/sleep/regime`).then((r) => (regime = r)).catch(() => {})} />
 	<section class="card" aria-label="Sleep plan">
 		<h2>Sleep plan in words</h2>
 		{#if plan}

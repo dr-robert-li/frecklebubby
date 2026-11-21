@@ -31,7 +31,7 @@ async def test_family_isolation(client):
     members_b = (await client.get(f"{API}/family/members", headers=b)).json()
 
     child_urls = ["", "/entries", "/timers", "/status", "/reports/daily", "/growth", "/export.csv", "/milestones",
-                  "/sleep/prediction", "/sleep/regime", "/reminders"]
+                  "/sleep/prediction", "/sleep/regime", "/sleep/training", "/reminders"]
     for suffix in child_urls:
         r = await client.get(f"{API}/children/{bcid}{suffix}", headers=a)
         assert r.status_code == 404, (suffix, r.text)
@@ -90,6 +90,8 @@ BODIES = {
     ("DELETE", "/children/{cid}/permanent"): {"confirm": "Bea"},
     ("POST", "/children/{cid}/entries"): {"type": "note", "started_at": "2026-11-01T10:00:00Z", "notes": "x"},
     ("POST", "/children/{cid}/reminders"): {"type": "bottle", "mode": "in", "interval_minutes": 60},
+    ("PUT", "/children/{cid}/sleep/training"): {"method": "graduated"},
+    ("POST", "/children/{cid}/sleep/training/nights"): {"day": "2026-11-01", "minutes_to_sleep": 10},
     ("PATCH", "/entries/{eid}"): {"notes": "x"},
     ("PATCH", "/reminders/{rid}"): {"enabled": False},
     ("POST", "/children/{cid}/nl/parse"): {"text": "a wet nappy"},

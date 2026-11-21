@@ -692,8 +692,70 @@ class RegimeOut(BaseModel):
     own_nights: int
     days: int
     naps: int
+    training: bool = Field(False, description="Sleep training runs: the plan takes no step at bedtime")
+    usual_bedtime: float | None = Field(None, description="The usual start of the night sleep in the logs, minutes "
+                                        "after midnight (above 1440 = after midnight). None with no logs.")
     schedule: list[RegimeRow] = Field(description="Sleep blocks and feeds from the morning, in the order of the clock")
     nudges: list[RegimeNote] = Field(description="The small steps toward best practice that this plan takes, and why")
     facts: list[RegimeFact]
     notes: list[RegimeNote]
+    sources: list[RegimeSource]
+
+
+class TrainingIn(BaseModel):
+    """Start sleep training, or change the training that runs. Send only the fields that change."""
+    method: Literal["extinction", "graduated", "fading"] | None = None
+    presence: bool | None = Field(None, description="Parental presence: the parent stays in the room")
+    pace: int | None = Field(None, ge=1, le=10, description="The scale: 1 gentle to 10 firm")
+    auto_pace: bool | None = Field(None, description="True: the parent's answer after each night moves the scale")
+    goal_bedtime: HHMM | None = Field(None, description="Bedtime fading: the bedtime to reach")
+    status: Literal["active", "paused"] | None = None
+    confirm_warning: bool = Field(False, description="The parent read the warning for a baby of 4 to 6 months")
+
+
+class TrainingNightIn(BaseModel):
+    day: date = Field(description="The date of the evening of the night")
+    minutes_to_sleep: int | None = Field(None, ge=0, le=600, description="From put down to asleep")
+    wakes: int | None = Field(None, ge=0, le=30)
+    crying_minutes: int | None = Field(None, ge=0, le=600)
+    answer: Literal["too_hard", "ok", "faster"] = "ok"
+
+
+class TrainingGate(BaseModel):
+    available: bool
+    methods: list[str]
+    warning: str | None
+    reason: str | None
+
+
+class TrainingTonight(BaseModel):
+    night: int
+    bedtime: str | None
+    steps: list[str]
+
+
+class TrainingReview(BaseModel):
+    kind: Literal["success", "no_gain", "stop"]
+    text: str
+
+
+class TrainingState(BaseModel):
+    id: int
+    method: str
+    method_name: str
+    presence: bool
+    pace: int
+    auto_pace: bool
+    status: Literal["active", "paused"]
+    goal_bedtime: str | None
+    nights: list[dict[str, Any]]
+    tonight: TrainingTonight
+    review: TrainingReview | None
+    pause_hint: bool = Field(description="A fever or a medicine in the last 24 hours: pause the training")
+
+
+class TrainingOut(BaseModel):
+    gate: TrainingGate
+    training: TrainingState | None
+    scale: dict[str, int]
     sources: list[RegimeSource]

@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.6.5-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.0-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -48,6 +48,8 @@ Your data stays on your server.
 - Calculates a day and night plan for each child: a timeline of sleep blocks and feeds. It starts from your
   child's own logs of the last 14 days. When the logs are outside a recommended range, it moves toward the range
   in small steps and says what it changed.
+- Has sleep training as an option, off by default: graduated extinction, extinction or bedtime fading, each
+  with parental presence if you want, on a scale from gentle to firm, with age limits and a review of each night.
 - Gives development guidance from birth to 5 years: what most children do by each age (CDC), movement, behaviour
   and body changes to expect around now, cited tips on how to help, and a notification at each new age band.
   For a baby born early, give the due date and the app uses the corrected age until 2 years.
@@ -163,7 +165,7 @@ The long sections are in the `docs/` folder:
 - [Sign-in](docs/sign-in.md): how to set up Clerk sign-in, and how to run an invite-only server for more than one family.
 - [HTTPS and phone install](docs/https.md): how to get an HTTPS address (Tailscale Funnel, Cloudflare Tunnel or a reverse proxy), and how to install the app on a phone.
 - [API and MCP](docs/api-and-mcp.md): how to connect Claude to the MCP server, and how to use the REST API with a token.
-- [AI functions](docs/ai.md): the AI model and the GPU setting, the day and night plan, the sleep model, voice commands, the cry helper, and the knowledge library with its licences.
+- [AI functions](docs/ai.md): the AI model and the GPU setting, the day and night plan, sleep training, the sleep model, voice commands, the cry helper, and the knowledge library with its licences.
 - [Operations](docs/operations.md): how to move your data from Huckleberry, and how to back up and restore the database.
 - [Development](docs/development.md): how to run the app without containers, and how to run the tests.
 

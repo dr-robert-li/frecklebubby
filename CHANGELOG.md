@@ -6,6 +6,20 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-21
+
+### Added
+
+- Sleep training, as an option (**Assistant > Sleep plan > Sleep training**). It is off by default. With the mode off, the sleep plan works as before.
+- Three methods: graduated extinction, extinction, and bedtime fading. Each has parental presence as an option.
+- Age limits, with the corrected age for a baby born early: not available below 4 months; from 4 to 6 months only graduated extinction, after a warning that the parent confirms; from 6 months graduated extinction and extinction; bedtime fading from 12 months.
+- A pace on a scale from 1 (gentle) to 10 (firm). For graduated extinction the waits go from a fixed 2 minutes, through 2, 4, 6, 8, 10 minutes (the usual schedule of the trials), to 5, 10, 15 minutes. No wait is longer than 15 minutes. With parental presence, the scale sets the nights for each step: 4 to 1.
+- A switch for the scale: the parent's answer after each night ("too hard", "all right", "it can go faster") moves the scale one step for the next night, or the scale stays and the parent moves it by hand.
+- The steps for tonight, a report for each night (minutes to fall asleep, wakes, minutes of crying), and a review: the goal holds for 3 nights, no gain after 7 nights, or 14 nights are over.
+- A prompt to pause when a fever or a medicine is logged in the last 24 hours. Feeds that the child still needs at night stay in the plan.
+- While sleep training runs, the day and night plan takes no step at bedtime. With bedtime fading, the night block of the plan shows the bedtime of the training.
+- API `GET`, `PUT` and `DELETE /children/{id}/sleep/training`, and `POST /children/{id}/sleep/training/nights`.
+
 ## [0.6.5] - 2026-11-21
 
 ### Fixed

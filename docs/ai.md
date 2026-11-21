@@ -102,6 +102,48 @@ so the app uses only numbers from parent reports.
 The file with the numbers is `src/frecklebubby/data/sleep_regime.json`. The calculation is in
 `src/frecklebubby/services/regime.py`.
 
+## Sleep training (an option)
+
+Some parents want sleep training and some do not. So it is an option, off by default, for each child:
+**Assistant > Sleep plan > Sleep training**. With the mode off, the day and night plan works as before. When a
+training holds, it shows in the logs of the last 14 days, and the plan follows those logs.
+
+| Method | What the parent does |
+|---|---|
+| Graduated extinction | Leaves the room. When the child cries, waits some minutes, then goes in for a short check |
+| Extinction | Leaves the room, and does not go back in until the morning. Some sources do not recommend it, because many parents find it too hard to do |
+| Bedtime fading | Starts with a late bedtime, at which the child falls asleep fast. Then bedtime moves earlier in steps of 15 minutes |
+| Parental presence, with each method | Stays in the room. With graduated extinction the parent moves away in 5 steps. With extinction the parent stays for 7 nights |
+
+- **Age limits** (corrected age for a baby born early): not available below 4 months. From 4 to 6 months only
+  graduated extinction, after a warning that the parent must confirm. From 6 months graduated extinction and
+  extinction. Bedtime fading from 12 months. The 6-month line is the age of the children in the trials; no
+  guideline body gives a minimum age.
+- **The pace is a scale from 1 (gentle) to 10 (firm).** Graduated extinction: a fixed wait of 2 minutes at 1;
+  waits of 2, 4, 6, 8, 10 minutes at 5 (Hiscock 2008); waits of 5, 10, 15 minutes at 10. No source gives a wait
+  above 15 minutes, so the scale stops there. Parental presence: 4 nights for each step at 1, 3 nights at 5, 1
+  night at 10. Bedtime fading: 15 minutes earlier after 2 good nights; at the firm end after 1 good night, and
+  then 30 minutes.
+- **The switch for the scale.** On: the parent's answer after each night moves the scale one step for the next
+  night ("too hard": gentler; "it can go faster": firmer). Off: the scale stays, and the parent moves it by hand.
+- **Changes are for the next night only.** The one risk that the sources document is a parent who goes in after
+  long crying outside the plan: this teaches longer crying. So the steps of a night do not change in the night.
+- **Review.** The goal holds when the child falls asleep in 10 minutes or less with 1 wake or none on 3 nights in
+  a row. With no gain after 7 nights, the page says to try a gentler pace or to speak to a child health nurse.
+  After 14 nights it says to speak to a nurse or doctor.
+- **Pause.** The page asks the parent to pause when a fever or a medicine is logged in the last 24 hours.
+- **Feeds at night stay.** The mode does not remove a feed.
+- **With the plan.** While the mode runs, the day and night plan takes no step at bedtime. With bedtime fading,
+  the night block shows the bedtime of the training.
+- **Safety.** Long-term follow-up found no harm (Price 2012, Gradisar 2016). The page says this, and also that
+  sleep training is a choice.
+
+Sources of the numbers: Hiscock 2008, Mindell 2006 (AASM review), Price 2012, Gradisar 2016, Cooney 2018, France
+and Hudson 1990. The file is `src/frecklebubby/data/sleep_training.json`; the rules are in
+`src/frecklebubby/services/training.py`. No verified numbers exist for these, so the app does not set them: a
+night-by-night table of waits, a wait above 15 minutes, and bedtime fading together with parental presence (the
+bedtime steps are then the same as with no presence).
+
 ## Sleep model
 
 The Home screen shows the next nap or bedtime. With the bundled **sleep norms file** it uses your child's last 14 days and typical patterns of babies of the same
