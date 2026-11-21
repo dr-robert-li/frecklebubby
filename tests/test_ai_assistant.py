@@ -147,7 +147,7 @@ async def test_sleep_plan(client, fake_llm):
     # 0.6.0: the app calculates the schedule; the model writes the summary and the advice only.
     assert fake_llm.requests[0]["response_format"]["json_schema"]["schema"]["required"] == ["summary", "advice"]
     kinds = [row["kind"] for row in plan["schedule"]]
-    assert kinds[0] == "wake" and kinds[-1] == "bedtime" and "nap" in kinds  # the model sent no nap row
+    assert kinds[-1] == "bedtime" and "nap" in kinds  # the model sent no nap row
     asked = fake_llm.requests[0]["messages"][1]["content"]  # a full day, not from the time now
     assert "Plan for one typical 24 hours" in asked and "Now:" not in asked and "Today so far" not in asked
     assert (await client.get(f"/api/v1/children/{cid}/sleep/plan", headers=h)).json()["id"] == plan["id"]

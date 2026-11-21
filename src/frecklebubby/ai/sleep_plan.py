@@ -31,25 +31,32 @@ The app calculated the plan from the child's own logs. You do not change it.
 Rules:
 - Use ONLY the plan, the child's data and the numbered sources given. Do not use your own knowledge.
 - Do not give new clock times. Do not tell the parent to change a time of the plan.
+- When the plan has small steps toward best practice, say in a kind way what they are and that they are small.
+  Do not ask for bigger or faster changes.
 - Summary: 2 or 3 short sentences about this child's day and night, from the plan and the facts.
-- A value outside the common range is not a problem by itself. Children differ a lot. Do not tell the parent to
-  make the child fit a range.
+- Do not blame the parent. Children differ a lot.
 - Advice: 2 to 4 short tips that fit the child's age and this plan, also for the night when the child wakes or feeds
   at night. Put the numbers of the sources that support each tip in "cites".
+- Use a tip only when the source gives it for a child of this age. Do not use a tip for older children (for
+  example food before bed, or a child who gets out of bed) for a baby.
 - No medicine. Short plain sentences."""
 
 QUERIES = ("baby sleep routine bedtime naps settle", "night feeds night waking baby sleep")
-KINDS = {"night_feed": "feed", "night_wake": "other"}  # the kinds of the plan rows before 0.6.0
+KINDS = {"night": "bedtime"}  # the kinds of the plan rows before 0.6.0
 
 
 def plan_text(r: dict) -> str:
     """The calculated plan as text for the model."""
     basis = {"own": "the child's own logs", "mixed": "the child's logs and typical values for the age",
              "age": "typical values for the age (no logs)"}[r["basis"]]
-    lines = [f"Plan for one typical 24 hours (age: {r['age_band']}; from {basis}):"]
+    lines = [f"Plan for one typical 24 hours (age: {r['age_band']}; start point: {basis}):"]
+    if r["mode"] == "rhythm":
+        lines.append("A young baby with no fixed day and night: the sleep blocks are the hours of usual sleep.")
     for x in r["schedule"]:
-        usual = f" (usually {x['earliest']} to {x['latest']})" if x["earliest"] and x["earliest"] != x["latest"] else ""
-        lines.append(f"- {x['time']}{'-' + x['end'] if x['end'] else ''} {x['label']}{usual}")
+        change = f" [small change in this plan: {x['change']}]" if x["change"] else ""
+        lines.append(f"- {x['time']}{'-' + x['end'] if x['end'] else ''} {x['label']}{change}")
+    if r["nudges"]:
+        lines += ["Small steps toward best practice in this plan:"] + [f"- {n['text']}" for n in r["nudges"]]
     lines.append("Facts:")
     for f in r["facts"]:
         common = f"; common for the age: {f['common']}" if f["common"] else ""

@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.6.0-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.6.1-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -45,8 +45,9 @@ Your data stays on your server.
 - Takes voice commands, so you can log and ask with no hand or one hand free: a talk button, hands free with the
   keyword "Hey Bubby" or "OK Bubby", an optional large hold-to-talk button on the side of the screen, and an option
   to read the answer aloud. Your own server changes the speech into text.
-- Calculates a day and night plan for each child: wake time, naps, bedtime, night feeds and night wakes. It uses
-  your child's own logs of the last 14 days first, and typical values for the age only where logs are missing.
+- Calculates a day and night plan for each child: a timeline of sleep blocks and feeds. It starts from your
+  child's own logs of the last 14 days. When the logs are outside a recommended range, it moves toward the range
+  in small steps and says what it changed.
 - Gives development guidance from birth to 5 years: what most children do by each age (CDC), movement, behaviour
   and body changes to expect around now, cited tips on how to help, and a notification at each new age band.
   For a baby born early, give the due date and the app uses the corrected age until 2 years.

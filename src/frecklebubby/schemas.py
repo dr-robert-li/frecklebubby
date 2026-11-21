@@ -645,14 +645,15 @@ class ConfigOut(BaseModel):
 
 
 class RegimeRow(BaseModel):
-    time: str = Field(description="HH:MM, local time")
-    end: str | None = Field(None, description="End of a nap, HH:MM")
-    kind: Literal["wake", "nap", "bedtime", "night_feed", "night_wake"]
+    time: str = Field(description="Start, HH:MM, local time")
+    end: str | None = Field(None, description="End of a sleep block, HH:MM")
+    kind: Literal["nap", "night", "feed"] = Field(description="nap = a sleep in the day; night = sleep at night")
     label: str
     part: Literal["day", "night"]
     basis: Literal["own", "mixed", "age"] = Field(description="own = the child's logs; age = typical for the age; mixed = both")
-    earliest: str | None = Field(None, description="The child's own usual range (8 in 10 days), from")
-    latest: str | None = Field(None, description="The child's own usual range, to")
+    earliest: str | None = Field(None, description="The child's own usual range for the start (8 in 10 days), from")
+    latest: str | None = Field(None, description="The child's own usual range for the start, to")
+    change: str | None = Field(None, description="A small step toward best practice: what this plan changed in this row")
     note: str | None = None
 
 
@@ -682,12 +683,17 @@ class RegimeSource(Citation):
 class RegimeOut(BaseModel):
     """The day and night plan: one typical 24 hours, calculated from the child's last 14 days and the age."""
     age_band: str
+    mode: Literal["clock", "rhythm"] = Field(description="rhythm = a young baby with no fixed day and night yet: "
+                                             "the sleep blocks are the hours in which the baby usually sleeps")
     basis: Literal["own", "mixed", "age"]
+    confidence: Literal["normal", "low"] = Field(description="low = the logs do not fit a pattern that the calculator "
+                                                 "knows: a rough guide, and no steps")
     own_days: int
     own_nights: int
     days: int
     naps: int
-    schedule: list[RegimeRow]
+    schedule: list[RegimeRow] = Field(description="Sleep blocks and feeds from the morning, in the order of the clock")
+    nudges: list[RegimeNote] = Field(description="The small steps toward best practice that this plan takes, and why")
     facts: list[RegimeFact]
     notes: list[RegimeNote]
     sources: list[RegimeSource]

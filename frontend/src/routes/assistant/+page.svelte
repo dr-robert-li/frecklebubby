@@ -264,23 +264,27 @@
 	<section class="card" aria-label="Day and night plan">
 		<h2>Day and night plan</h2>
 		{#if regime}
-			<p class="muted small">One typical 24 hours for {child()?.name}, {regime.age_band}. {regime.basis === 'own' ? `From ${child()?.name}'s own logs of the last ${regime.days} days.` : regime.basis === 'mixed' ? `From ${child()?.name}'s logs and typical times for the age.` : 'From typical times for the age.'}</p>
-			{#each [['day', 'Day'], ['night', 'Night']] as [part, title] (part)}
-				{@const list = regime.schedule.filter((r: any) => r.part === part)}
-				{#if list.length}
-					<h3>{title}</h3>
-					<ol class="schedule">
-						{#each list as row, i (i)}
-							<li class={row.kind}>
-								<strong>{row.time}</strong>
-								<span>{row.label}{row.end ? ` to ${row.end}` : ''}{#if row.basis !== 'own'} <span class="tag">{row.basis === 'age' ? 'typical for the age' : 'partly typical'}</span>{/if}
-									{#if row.earliest && row.earliest !== row.latest}<br /><span class="muted small">Usually {row.earliest} to {row.latest}</span>{/if}
-									{#if row.note}<br /><span class="muted small">{row.note}</span>{/if}</span>
-							</li>
-						{/each}
-					</ol>
-				{/if}
-			{/each}
+			<p class="muted small">One typical 24 hours for {child()?.name}, {regime.age_band}. {regime.basis === 'own' ? `The start point is ${child()?.name}'s own logs of the last ${regime.days} days.` : regime.basis === 'mixed' ? `From ${child()?.name}'s logs and typical times for the age.` : 'From typical times for the age.'}</p>
+			{#if regime.confidence === 'low'}<p class="notice">{regime.notes[0].text}</p>{/if}
+			{#if regime.nudges.length}
+				<div class="steps" role="note" aria-label="Small steps in this plan">
+					<h3>Small steps in this plan</h3>
+					{#each regime.nudges as n, i (i)}
+						<p>{n.text}{#each n.cites as k (k)}{@const c = cite(regime.sources, k)}{#if c}<button class="mark" onclick={() => (source = c)} aria-label="Source {k}">{k}</button>{/if}{/each}</p>
+					{/each}
+				</div>
+			{/if}
+			<ol class="schedule">
+				{#each regime.schedule as row, i (i)}
+					<li class={row.kind} class:changed={row.change}>
+						<strong>{row.time}</strong>
+						<span>{row.label}{row.end ? ` to ${row.end}` : ''}{#if row.change} <span class="tag step">small step</span>{:else if row.basis !== 'own'} <span class="tag">{row.basis === 'age' ? 'typical for the age' : 'partly typical'}</span>{/if}
+							{#if row.change}<br /><span class="small">{row.change}</span>{/if}
+							{#if row.note}<br /><span class="muted small">{row.note}</span>{/if}
+							{#if row.earliest}<br /><span class="muted small">Usually starts {row.earliest} to {row.latest}</span>{/if}</span>
+					</li>
+				{/each}
+			</ol>
 			{#if regime.facts.length}
 				<h3>{child()?.name}'s numbers</h3>
 				<dl class="facts">
@@ -520,14 +524,36 @@
 		background: var(--cloud);
 	}
 	.schedule li.nap,
+	.schedule li.night,
 	.schedule li.bedtime {
 		background: var(--lavender);
 		color: var(--ink-strong);
 	}
-	.schedule li.feed,
-	.schedule li.night_feed {
+	.schedule li.feed {
 		background: var(--rose);
 		color: var(--ink-strong);
+		padding-top: 4px;
+		padding-bottom: 4px;
+		margin-left: 28px;
+	}
+	.schedule li.changed {
+		outline: 2px dashed var(--accent);
+		outline-offset: -2px;
+	}
+	.steps {
+		border: 2px solid var(--accent);
+		border-radius: 14px;
+		padding: 8px 12px;
+		margin: 0 0 12px;
+	}
+	.steps h3 {
+		margin: 0 0 4px;
+	}
+	.steps p {
+		margin: 4px 0;
+	}
+	.tag.step {
+		border-color: var(--accent);
 	}
 	.tag {
 		font-size: 0.75rem;

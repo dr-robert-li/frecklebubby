@@ -25,6 +25,7 @@
       "total": {"mean": 876, "low": 558, "high": 1200, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
       "night_wakes": {"mean": 2.2, "sd": 1.3, "p50": 2, "low": 1, "high": 4, "range": "10th and 90th percentile at 3 months", "cite": "paavonen20"},
       "longest_night": {"mean": 300, "sd": 108, "cite": "sadeh09"},
+      "feeds_24h": {"p50": 10, "low": 8, "high": 12, "range": "the usual number for a newborn", "cite": "cdc_feeds"},
       "notes": [
         {"text": "A young baby has no fixed day and night rhythm yet. The rhythm starts at about 8 to 9 weeks and gets clearer at about 15 weeks. The times in this plan are a guide, not a target.", "cites": ["wong22"]},
         {"text": "Newborns feed 8 to 12 times in 24 hours, also at night. In the first weeks, do not let more than about 4 hours pass at night without a feed. Wake the baby if necessary.", "cites": ["cdc_feeds"]},

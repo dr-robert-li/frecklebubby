@@ -6,6 +6,21 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-21
+
+### Changed
+
+- The day and night plan is now one timeline of sleep blocks and feeds, from the morning. Each nap and the night sleep is a block with a start and an end. The feeds of the day and of the night are rows in the same timeline. The "wake up", "bedtime" and "night wake" rows are gone.
+- Small steps toward best practice. The start point is the child's own logs of the last 14 days. When the logs show less sleep in 24 hours than the recommended range for the age, the plan adds a small amount of sleep: a quarter of the gap, from 15 to 60 minutes. It moves bedtime earlier by 20 minutes at most, or makes naps a little longer. The page says what changed and why. The next plan starts from the new logs, so the plan does not run ahead of the family.
+- A young baby with fewer than 8 feeds in 24 hours in the logs gets 1 more feed in the plan, in the longest time between two feeds. In the first 4 weeks the plan also adds a feed when more than about 4 hours pass at night.
+
+- A fit check. When the logs do not fit a pattern that the calculator knows (for example no night sleep that the app can find, or a different number of naps each day), the page says so. The plan is then a rough guide and takes no steps.
+- Feeds that start within 45 minutes of each other count as one feed (for example the left and the right side).
+
+### Fixed
+
+- The plan for a baby younger than 12 weeks. A young baby has no fixed day and night, so the plan showed a bedtime after midnight and one nap. The plan now takes the baby's usual number of sleeps in a day and puts them at the times of the day at which the baby sleeps most often. When the logs show too little sleep, the plan adds one new sleep block in the longest time with no sleep.
+
 ## [0.6.0] - 2026-11-21
 
 ### Added

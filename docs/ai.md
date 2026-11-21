@@ -30,21 +30,37 @@ must support JSON schema output (`response_format`), as llama.cpp does.
 
 ## Day and night plan
 
-**Assistant > Sleep plan** shows one typical 24 hours for your child: the wake time, the naps, bedtime, and the
-usual night feeds and night wakes. The app calculates the plan. The AI model does not make the times.
+**Assistant > Sleep plan** shows one typical 24 hours for your child as a timeline from the morning: sleep blocks
+(each nap and the night sleep, with a start and an end) and the feeds of the day and of the night. The app
+calculates the plan. The AI model does not make the times.
 
-- **Your child's own logs come first.** The plan uses the sleep and the feeds that you logged in the last 14 days.
-  Each time is the middle value (the median) of those days, so one unusual day does not change the plan. Sleep
-  data has a long tail: some nights are very different, and they must not move the plan.
-- **From 5 complete days, the plan uses only your child's times.** With 1 to 4 days it mixes them with typical
-  times for the age, and it says so on each row. With no logs it shows typical times for the age.
-- **Values for the age are not targets.** The page shows the range that is common for the age next to your
-  child's own numbers. The plan does not move your child's times toward that range. Children differ a lot.
-- **The night.** Night feeds and night wakes get a clock time when at least 3 nights of the last 14 have the same
-  number of them. Log the feeds at night to see them in the plan.
-- **The rules change with the age**, in 7 age bands from birth to 5 years. For example: no fixed clock schedule
-  before the day and night rhythm forms (about 8 to 15 weeks), the change from 2 naps to 1, and "nap on some
-  days" from about 3 years.
+- **The start point is your child's own logs** of the last 14 days. Each time is the middle value (the median) of
+  those days, so one unusual day does not change the plan. Sleep data has a long tail: some nights are very
+  different, and they must not move the plan.
+- **From 5 complete days, the start point is only your child's times.** With 1 to 4 days the plan mixes them with
+  typical times for the age, and it says so on each row. With no logs it shows typical times for the age.
+- **Small steps toward best practice.** When the logs show less sleep in 24 hours than the recommended range for
+  the age, the plan adds a small amount of sleep: a quarter of the gap, from 15 to 60 minutes. It moves bedtime
+  earlier (20 minutes at most in one plan) or makes naps a little longer. The page says what changed and why
+  ("Small steps in this plan"). The next plan starts from the new logs. So the plan follows what your family
+  really does, and it does not make large changes.
+- **Feeds for a young baby.** When the logs of a baby younger than 3 months show fewer than 8 feeds in 24 hours,
+  the plan adds 1 feed in the longest time between two feeds. In the first 4 weeks it also adds a feed when more
+  than about 4 hours pass at night.
+- **A baby younger than 12 weeks** has no fixed day and night yet. The plan takes the baby's usual number of
+  sleeps in a day and puts them at the times of the day at which the baby sleeps most often. When the logs show too
+  little sleep, the plan adds one new sleep block in the longest time with no sleep. A young baby whose logs show a
+  night of 8 hours or more gets naps and a night block.
+- **A fit check.** The calculator knows two patterns: naps with a night, and (a young baby) sleeps round the
+  clock. When the logs do not fit (for example the app finds no night sleep, or the number of naps is different
+  each day), the page says so. The plan is then a rough guide, and it takes no steps.
+- **The app counts only what is logged.** If you do not log each sleep and each feed, the plan sees too little
+  and makes steps that are not necessary. Log them, and the plan needs fewer changes.
+- **Your child's numbers** (sleep in 24 hours, sleep at night, wakes and feeds at night) show next to the range
+  that is common for the age. Children differ a lot: the common range is information. The steps of the plan use
+  only the recommended ranges of the guideline bodies.
+- **The rules change with the age**, in 7 age bands from birth to 5 years. For example: the change from 2 naps to
+  1, and "nap on some days" from about 3 years.
 - **Advice from the assistant** is optional. The AI model gets the calculated plan and writes a short summary and
   tips with sources. It cannot change the times.
 - **API and MCP**: `GET /api/v1/children/{id}/sleep/regime` and the MCP tool `get_day_and_night_plan`.
@@ -59,7 +75,8 @@ Where the numbers for the age come from (the app stores the numbers and a link, 
 | Total sleep by age, with the reference range | Galland et al. 2012, Sleep Medicine Reviews 16:213-222 |
 | Bedtime and wake time from 2 years, with limits | Blair et al. 2012, Sleep 35:353-360 |
 | Naps and night sleep from 2 years | Iglowstein et al. 2003, Pediatrics 111:302-307; Staton et al. 2020, Sleep Medicine Reviews 50:101247 |
-| Recommended sleep in 24 hours | AASM 2016, NSF 2015 |
+| Recommended sleep in 24 hours (the range that the steps move toward) | AASM 2016, NSF 2015 |
+| Feeds in 24 hours for a young baby | CDC, How Much and How Often to Breastfeed |
 
 No published numbers exist for these, so only your child's own logs decide them: wake windows from 2 years, the
 number of night feeds before 6 months, the time to stop a night feed, and the time to drop a nap. Night wakes

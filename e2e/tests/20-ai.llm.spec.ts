@@ -142,7 +142,7 @@ test('d: the sleep plan for an 8-month-old shows a waiting state, then a cited p
 	await page.goto('/assistant');
 	await page.getByRole('tab', { name: 'Sleep plan' }).click();
 	const calc = page.getByRole('region', { name: 'Day and night plan' });
-	await expect(calc.locator('.schedule li.wake')).toContainText('05:40'); // the child's own wake time, with no model
+	await expect(calc.locator('.schedule li.night')).toContainText('to 05:40'); // the child's own night, with no model
 	expect(await calc.locator('.schedule li.nap').count()).toBeGreaterThanOrEqual(1);
 	await page.getByRole('button', { name: 'Write advice for this plan' }).click();
 	const waiting = page.getByRole('button', { name: /Writing the advice/ });

@@ -1,4 +1,5 @@
-"""The day and night plan (0.6.0): the child's own last 14 days come first; values for the age fill gaps only."""
+"""The day and night plan: a timeline of sleep blocks and feeds. The start point is the child's own last 14 days;
+then one small step toward best practice when the logs are outside a recommended range."""
 
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -37,78 +38,214 @@ async def child(client, birthdate="2026-06-01"):
     return s, get_child(s, ctx, cid), cid
 
 
-def rows(r, part=None):
-    return [(x["time"], x["kind"]) for x in r["schedule"] if part is None or x["part"] == part]
+def rows(r, feeds=True):
+    return [(x["time"], x["end"], x["kind"]) for x in r["schedule"] if feeds or x["kind"] != "feed"]
 
 
-async def test_own_days_decide_the_24_hours(client):
-    s, c, cid = await child(client)  # about 5.5 months
+def changed(r):
+    return [(x["time"], x["kind"], x["change"]) for x in r["schedule"] if x["change"]]
+
+
+async def test_own_days_give_one_timeline_of_sleep_blocks_and_feeds(client):
+    s, c, cid = await child(client)  # about 5.5 months; 13.75 hours of sleep: inside the recommended 12 to 16 hours
     for d in range(6, 17):
         day(s, cid, d)
+        for h, m in ((6, 10), (10, 0), (14, 0), (18, 30)):  # the feeds of the day
+            add(s, cid, "bottle", local(d, h, m), local(d, h, m + 10))
     s.commit()
     r = regime(s, c, BNE, NOW)
-    assert r["basis"] == "own" and r["own_days"] >= 9 and r["naps"] == 3
-    assert rows(r, "day") == [("06:00", "wake"), ("08:00", "nap"), ("11:30", "nap"), ("15:00", "nap"), ("19:00", "bedtime")]
-    assert r["schedule"][1]["end"] == "09:00" and all(x["basis"] == "own" for x in r["schedule"])
-    # The night: the two feeds at their usual times. Rows after midnight come after the rows before it.
-    assert rows(r, "night") == [("23:00", "night_feed"), ("03:00", "night_feed")]
+    assert r["mode"] == "clock" and r["basis"] == "own" and r["own_days"] >= 9 and r["naps"] == 3
+    assert r["confidence"] == "normal"
+    # From the morning, in the order of the clock. The night is one block; the night feeds come after its start.
+    assert rows(r) == [
+        ("06:10", None, "feed"), ("08:00", "09:00", "nap"), ("10:00", None, "feed"), ("11:30", "12:30", "nap"),
+        ("14:00", None, "feed"), ("15:00", "15:45", "nap"), ("18:30", None, "feed"), ("19:00", "06:00", "night"),
+        ("23:00", None, "feed"), ("03:00", None, "feed")]
+    assert [x["part"] for x in r["schedule"]][-3:] == ["night", "night", "night"]
+    assert r["nudges"] == [] and changed(r) == []  # inside the ranges: the plan is the child's own pattern
     facts = {f["key"]: f for f in r["facts"]}
-    assert facts["feeds"]["value"] == "2" and facts["feeds"]["basis"] == "own"
+    assert facts["feeds"]["value"] == "2" and facts["feeds_24h"]["value"] == "6"
     assert facts["night_sleep"]["value"] == "11 hours" and facts["total"]["value"] == "13.8 hours"
-    assert r["notes"][0]["text"].startswith("This plan uses Ada's own times")
-    assert all(1 <= n <= len(r["sources"]) for x in r["notes"] for n in x["cites"])
+    assert r["notes"][0]["text"].startswith("The start point of this plan is Ada's own times")
+    assert all(1 <= n <= len(r["sources"]) for x in r["notes"] + r["nudges"] for n in x["cites"])
 
 
 async def test_one_unusual_day_does_not_move_the_plan(client):
     s, c, cid = await child(client)
     for d in range(6, 17):
-        day(s, cid, d, wake=(9, 30) if d == 12 else (6, 0), naps=((11, 0, 60),) if d == 12 else ((8, 0, 60), (11, 30, 60)))
+        day(s, cid, d, wake=(9, 30) if d == 12 else (6, 0),
+            naps=((11, 0, 60),) if d == 12 else ((8, 0, 90), (11, 30, 90), (15, 0, 45)), feeds=())
     s.commit()
     r = regime(s, c, BNE, NOW)
-    assert rows(r, "day")[:3] == [("06:00", "wake"), ("08:00", "nap"), ("11:30", "nap")]
-    wake = r["schedule"][0]
-    assert wake["earliest"] == "06:00" and wake["latest"] in ("06:00", "06:20")  # the usual range ignores the long tail
+    assert rows(r) == [("08:00", "09:30", "nap"), ("11:30", "13:00", "nap"), ("15:00", "15:45", "nap"),
+                       ("19:00", "06:00", "night")]
 
 
-async def test_own_times_are_not_pulled_to_the_range_for_the_age(client):
+async def test_too_little_sleep_gets_one_small_step_and_follows_the_logs(client):
+    s, c, cid = await child(client, birthdate="2026-01-10")  # 10 months: 12 to 16 hours are recommended
+    for d in range(6, 17):  # 9 h at night and 2 naps of 45 minutes: 10.5 hours
+        day(s, cid, d, bed=(21, 0), naps=((10, 0, 45), (14, 30, 45)), feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    # A quarter of the gap of 90 minutes: about 20 minutes, at bedtime. Not the full 90 minutes.
+    assert rows(r) == [("10:00", "10:45", "nap"), ("14:30", "15:15", "nap"), ("20:40", "06:00", "night")]
+    assert changed(r) == [("20:40", "night", "20 minutes earlier than Ada's usual 21:00")]
+    assert len(r["nudges"]) == 1 and "10.5 hours" in r["nudges"][0]["text"] and "12 to 16 hours" in r["nudges"][0]["text"]
+    assert "adds about 20 minutes" in r["nudges"][0]["text"] and r["nudges"][0]["cites"]
+    assert {f["key"]: f["value"] for f in r["facts"]}["total"] == "10.5 hours"  # the fact is the logs, not the plan
+    assert any("speak to a doctor or nurse" in n["text"] for n in r["notes"])
+    # The family follows: bedtime at 20:40 for a week. The next plan starts there and takes the next step.
+    for d in range(10, 17):
+        s.query(Entry).filter(Entry.child_id == cid, Entry.started_at == local(d - 1, 21)).update(
+            {"started_at": local(d - 1, 20, 40)})
+    s.commit()
+    r2 = regime(s, c, BNE, NOW)
+    assert changed(r2) == [("20:20", "night", "20 minutes earlier than Ada's usual 20:40")]
+    # The family does not follow: the plan stays one small step from the logs. It does not run ahead.
+    assert changed(regime(s, c, BNE, NOW)) == changed(r2)
+
+
+async def test_a_late_family_inside_the_range_is_not_changed(client):
     s, c, cid = await child(client)
-    for d in range(6, 17):  # a late family: bedtime 22:30, wake 09:30, 5 night feeds would also stay
+    for d in range(6, 17):  # bedtime 22:30, wake 09:30, one nap: 12.5 hours, inside 12 to 16 hours
         day(s, cid, d, wake=(9, 30), bed=(22, 30), naps=((12, 0, 90),), feeds=())
     s.commit()
     r = regime(s, c, BNE, NOW)
-    assert rows(r, "day") == [("09:30", "wake"), ("12:00", "nap"), ("22:30", "bedtime")]
-    assert rows(r, "night") == []
-    assert any("no night feed on most" in n["text"] for n in r["notes"])
+    assert rows(r) == [("12:00", "13:30", "nap"), ("22:30", "09:30", "night")]
+    assert r["nudges"] == [] and changed(r) == []
 
 
 async def test_few_days_mix_with_the_age_and_no_days_use_the_age(client):
     s, c, cid = await child(client)
     r = regime(s, c, BNE, NOW)
-    assert r["basis"] == "age" and r["own_days"] == 0
-    kinds = [k for _, k in rows(r)]
-    assert kinds[0] == "wake" and kinds[-1] == "bedtime" and "nap" in kinds  # typical times for the age
+    assert r["basis"] == "age" and r["own_days"] == 0 and r["nudges"] == []  # no logs: no step
+    kinds = [x["kind"] for x in r["schedule"]]
+    assert kinds[-1] == "night" and "nap" in kinds  # typical times for the age
     assert all(x["basis"] == "age" and x["earliest"] is None for x in r["schedule"])
     assert "No complete day of sleep is logged" in r["notes"][0]["text"]
     for d in (15, 16):
         day(s, cid, d, wake=(5, 0))
     s.commit()
     r2 = regime(s, c, BNE, NOW)
-    assert r2["basis"] == "mixed" and r2["schedule"][0]["basis"] == "mixed"
-    assert "05:00" < r2["schedule"][0]["time"] < r["schedule"][0]["time"]  # between the own time and the age time
+    assert r2["basis"] == "mixed" and r2["schedule"][-1]["basis"] == "mixed"
+    assert "05:00" < r2["schedule"][-1]["end"] < r["schedule"][-1]["end"]  # between the own time and the age time
 
 
 async def test_a_child_of_3_years_with_and_without_a_nap(client):
     s, c, cid = await child(client, birthdate="2023-06-01")  # 3.5 years: older than the norms file
     r = regime(s, c, BNE, NOW)
     assert r["basis"] == "age" and r["age_band"] == "3 to 4 years"
-    assert [k for _, k in rows(r)] == ["wake", "nap", "bedtime"]
+    assert [x["kind"] for x in r["schedule"]] == ["nap", "night"]
     assert any("About half of the children of this age still nap" in n["text"] for n in r["notes"])
-    for d in range(6, 17):
+    for d in range(6, 17):  # 11 hours at night: inside 10 to 13 hours
         day(s, cid, d, wake=(6, 30), bed=(19, 30), naps=((12, 30, 90),) if d % 3 == 0 else (), feeds=())
     s.commit()
     r = regime(s, c, BNE, NOW)
-    assert rows(r) == [("06:30", "wake"), ("19:30", "bedtime")] and r["naps"] == 0
+    assert rows(r) == [("19:30", "06:30", "night")] and r["naps"] == 0 and r["nudges"] == []
     assert any("The number of naps is changing" in n["text"] for n in r["notes"])
+
+
+async def test_a_young_baby_gets_blocks_from_the_usual_hours_and_small_steps(client):
+    s, c, cid = await child(client, birthdate="2026-10-07")  # 40 days: no fixed day and night yet
+    for d in range(4, 16):  # 8.7 hours of sleep and 7 feeds are logged
+        for h, m, length in ((1, 30, 120), (4, 0, 130), (9, 0, 60), (17, 0, 90), (20, 0, 120)):
+            add(s, cid, "sleep", local(d, h, m), local(d, h, m) + timedelta(minutes=length))
+        for h, m in ((0, 30), (3, 40), (6, 30), (10, 30), (14, 0), (18, 40), (22, 10)):
+            add(s, cid, "nursing", local(d, h, m), local(d, h, m + 15))
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert r["mode"] == "rhythm" and r["basis"] == "own" and r["own_days"] == 12
+    blocks = rows(r, feeds=False)
+    # The baby's own usual hours of sleep, and ONE new block in the longest time with no sleep (10:00 to 17:00).
+    assert [b for b in blocks if b[0] not in [x[0] for x in changed(r)]] == [
+        ("09:00", "10:00", "nap"), ("17:00", "18:30", "nap"), ("20:00", "22:00", "night"),
+        ("01:30", "03:30", "night"), ("04:00", "06:10", "night")]
+    new = [x for x in r["schedule"] if x["change"] and x["kind"] != "feed"]
+    assert len(new) == 1 and "10:00" < new[0]["time"] < new[0]["end"] < "17:00" and "Offer a sleep" in new[0]["change"]
+    # 7 feeds are fewer than 8 to 12: ONE new feed, in the longest time between two feeds.
+    feeds = [x for x in r["schedule"] if x["kind"] == "feed"]
+    assert len(feeds) == 8 and [x["time"] for x in feeds if x["change"]] == ["16:20"]
+    assert len(r["nudges"]) == 2 and "8.7 hours" in r["nudges"][0]["text"] and "14 to 17 hours" in r["nudges"][0]["text"]
+    assert "about 7 feeds" in r["nudges"][1]["text"] and all(n["cites"] for n in r["nudges"])
+    times = [x["time"] for x in r["schedule"]]
+    assert times[0] >= "07:00" and times.index("09:00") < times.index("20:00") < times.index("01:30")  # from the morning
+    facts = {f["key"]: f for f in r["facts"]}
+    assert facts["feeds_24h"]["value"] == "7" and facts["feeds_24h"]["common"] == "8 to 12"
+    assert facts["total"]["label"] == "Sleep logged in 24 hours" and facts["total"]["value"] == "8.7 hours"
+    assert any("no fixed day and night yet" in n["text"] for n in r["notes"])
+    # With no logs: typical blocks and feeds for the age, and no feed inside a sleep block.
+    s2, c2, _ = await child2(client)
+    r2 = regime(s2, c2, BNE, NOW)
+    assert r2["mode"] == "rhythm" and r2["basis"] == "age" and r2["nudges"] == []
+    sleeps = [x for x in r2["schedule"] if x["kind"] != "feed"]
+    assert len(sleeps) >= 4 and sum(x["kind"] == "feed" for x in r2["schedule"]) >= 6
+    mins = lambda x: (int(x[:2]) * 60 + int(x[3:]) - 420) % 1440  # noqa: E731  minutes after 07:00
+    assert not any(mins(b["time"]) <= mins(f["time"]) < mins(b["end"]) for b in sleeps for f in r2["schedule"]
+                   if f["kind"] == "feed")
+
+
+async def test_a_young_baby_with_sleeps_at_different_hours_each_day_still_gets_the_usual_number_of_blocks(client):
+    s, c, cid = await child(client, birthdate="2026-10-07")
+    for d in range(4, 16):  # 5 sleeps a day; the day sleeps move by up to 2 hours from day to day
+        shift = (d % 4) * 40
+        for h, m, length in ((1, 30, 120), (4, 0, 120)):
+            add(s, cid, "sleep", local(d, h, m), local(d, h, m) + timedelta(minutes=length))
+        for h, length in ((8, 60), (12, 90), (17, 60)):
+            add(s, cid, "sleep", local(d, h) + timedelta(minutes=shift), local(d, h) + timedelta(minutes=shift + length))
+        for h in (0, 3, 6, 9, 12, 15, 18, 21):  # each feed is logged as two entries: left, then right
+            add(s, cid, "nursing", local(d, h, 30), local(d, h, 40))
+            add(s, cid, "nursing", local(d, h, 45), local(d, h, 55))
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    usual = [x for x in r["schedule"] if x["kind"] != "feed" and not x["change"]]
+    assert r["mode"] == "rhythm" and len(usual) == 5 and sum(x["kind"] == "nap" for x in usual) == 3
+    assert {f["key"]: f["value"] for f in r["facts"]}["feeds_24h"] == "8"  # two sides are one feed
+    assert not any("feeds in 24 hours" in n["text"] for n in r["nudges"])
+    mins = lambda x: (int(x[:2]) * 60 + int(x[3:]) - 420) % 1440  # noqa: E731
+    sleeps = [x for x in r["schedule"] if x["kind"] != "feed"]
+    assert not any(mins(b["time"]) <= mins(f["time"]) < mins(b["end"]) for b in sleeps for f in r["schedule"]
+                   if f["kind"] == "feed")
+
+
+async def test_a_young_baby_with_a_long_night_gets_naps_and_a_night(client):
+    s, c, cid = await child(client, birthdate="2026-09-07")  # 10 weeks, and the logs show a night of 10 hours
+    for d in range(6, 17):
+        day(s, cid, d, bed=(20, 0), naps=((8, 0, 90), (11, 0, 90), (14, 0, 90), (17, 0, 45)))
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert r["mode"] == "clock" and rows(r, feeds=False)[0] == ("08:00", "09:30", "nap")
+    assert rows(r, feeds=False)[-1][2] == "night"
+
+
+async def test_logs_that_fit_no_known_pattern_give_a_rough_guide_and_no_steps(client):
+    # A family on night shifts: the child sleeps in the day. The app finds no night, and it must say so.
+    s, c, cid = await child(client, birthdate="2026-01-10")
+    for d in range(4, 16):
+        add(s, cid, "sleep", local(d, 8), local(d, 15))
+        add(s, cid, "sleep", local(d, 17), local(d, 18))
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert r["confidence"] == "low" and r["nudges"] == [] and not any(x["change"] for x in r["schedule"])
+    assert "do not show one regular pattern" in r["notes"][0]["text"] and "night sleep" in r["notes"][0]["text"]
+    # A different number of naps each day: also a rough guide.
+    s, c, cid = await child3(client)
+    for d in range(4, 16):
+        day(s, cid, d, bed=(21, 30), naps=[(9 + 2 * i, 0, 30) for i in range(d % 5)], feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert r["confidence"] == "low" and r["nudges"] == [] and "number of naps" in r["notes"][0]["text"]
+
+
+async def child3(client):
+    _, cid = await make_family(client, email="c@example.com", birthdate="2026-01-10")
+    s, ctx = ctx_for("c@example.com")
+    return s, get_child(s, ctx, cid), cid
+
+
+async def child2(client):
+    _, cid = await make_family(client, email="b@example.com", birthdate="2026-10-07")
+    s, ctx = ctx_for("b@example.com")
+    return s, get_child(s, ctx, cid), cid
 
 
 async def test_the_route_and_the_helpers(client):
@@ -116,7 +253,7 @@ async def test_the_route_and_the_helpers(client):
     r = await client.get(f"{API}/children/{cid}/sleep/regime", headers=h)
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["basis"] == "age" and body["schedule"][0]["kind"] == "wake" and body["sources"]
+    assert body["basis"] == "age" and body["schedule"][-1]["kind"] == "night" and body["sources"] and body["nudges"] == []
     assert pct([1, 2, 3, 4, 5], 0.5) == 3 and pct([0, 10], 0.1) == 1
     assert blend([], None) is None and blend([], 7)["basis"] == "age"
     assert blend([10, 10], 20) == {"value": 16, "basis": "mixed", "samples": 2}
