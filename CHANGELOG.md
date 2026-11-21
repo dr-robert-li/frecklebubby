@@ -6,6 +6,16 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-11-22
+
+### Changed
+
+- History, List view: the button "Show older" is now "Show more", because the list is not always in the order of time.
+
+### Fixed
+
+- History, List view: the "Show more" button and the "Download this list as CSV" button now have space between them.
+
 ## [0.8.2] - 2026-11-22
 
 ### Added

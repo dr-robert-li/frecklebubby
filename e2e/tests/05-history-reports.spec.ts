@@ -96,6 +96,10 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByText('Days: all')).toBeVisible();
 	await page.getByLabel('Order by').selectOption('time');
 	await page.getByRole('button', { name: 'Newest first' }).click();
+	// two wide buttons, one under the other, have space between them
+	const older = await page.getByRole('button', { name: 'Show more' }).boundingBox();
+	const csvButton = await page.getByRole('button', { name: 'Download this list as CSV' }).boundingBox();
+	expect(csvButton!.y - (older!.y + older!.height)).toBeGreaterThanOrEqual(8);
 	await shot(page, '06-history-list');
 
 	await page.getByRole('link', { name: 'Reports' }).click();

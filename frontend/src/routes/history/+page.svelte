@@ -212,7 +212,7 @@
 			{/if}
 			<Timeline entries={ranged ? entries.slice(0, shown) : entries} dated onpick={(e) => (edit = e)} empty={loading ? 'Loading…' : sort === 'time' ? (ranged ? 'Nothing logged on these days.' : 'Nothing logged yet.') : 'No entry has this amount.'} />
 		{/if}
-		{#if more}<button class="ghost wide" disabled={loading} onclick={() => load(true)}>Show older</button>{/if}
+		{#if more}<button class="ghost wide" disabled={loading} onclick={() => load(true)}>Show more</button>{/if}
 		{#if ranged && entries.length > shown}<button class="ghost wide" onclick={() => (shown += 200)}>Show more</button>{/if}
 		{#if types.length && entries.length}
 			<button class="ghost wide" disabled={exporting} onclick={exportCsv}><Icon name="download" /> Download this list as CSV</button>
@@ -281,6 +281,10 @@
 	}
 	.row {
 		flex-wrap: wrap;
+	}
+	/* two wide buttons, one under the other */
+	button.wide + button.wide {
+		margin-top: 12px;
 	}
 	.sum {
 		margin: 0 0 6px;
