@@ -61,7 +61,7 @@ def blocks(plan: dict) -> list[tuple[int, int, str]]:
 def rule_faults(plan: dict) -> list[str]:
     bl = blocks(plan)
     faults = []
-    for (a, b, kind), nxt in zip(bl, bl[1:] + [None], strict=True):
+    for (a, b, _), nxt in zip(bl, bl[1:] + [None], strict=True):
         if b - a < 5 or b - a > 16 * 60:  # a nap of 10 or 15 minutes is real in this data
             faults.append("block length")
         if nxt and nxt[0] < b:
