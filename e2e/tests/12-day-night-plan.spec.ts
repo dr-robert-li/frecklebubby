@@ -32,7 +32,7 @@ test('5 months: typical times first, then the child\'s own sleep blocks with the
 		/06:20\s*Feed/, /08:30\s*Nap 1 to 09:30/, /09:40\s*Feed/, /12:00\s*Nap 2 to 13:15/, /13:20\s*Feed/, /15:30\s*Nap 3 to 16:00/, /16:10\s*Feed/,
 		/19:00\s*Feed/, /19:30\s*Night sleep to 06:10/, /23:00\s*Feed/, /03:10\s*Feed/
 	]);
-	await expect(plan.getByRole('note', { name: 'Small steps in this plan' })).toHaveCount(0);
+	await expect(plan.getByRole('note', { name: 'Steps and checks in this plan' })).toHaveCount(0);
 	await expect(plan.locator('.facts')).toContainText('Feeds at night');
 	await shot(page, '12-plan-own');
 	await page.screenshot({ path: `recordings/m2/screens/12-plan-own-full.png`, fullPage: true });
@@ -46,14 +46,14 @@ test('10 months with too little sleep: one small step, and the reason', async ({
 	await page.goto('/assistant');
 	await page.getByRole('tab', { name: 'Sleep plan' }).click();
 	const plan = page.getByRole('region', { name: 'Day and night plan' });
-	const steps = plan.getByRole('note', { name: 'Small steps in this plan' });
+	const steps = plan.getByRole('note', { name: 'Steps and checks in this plan' });
 	await expect(steps).toContainText('about 10.5 hours of sleep in 24 hours');
-	await expect(steps).toContainText('12 to 16 hours');
-	await expect(steps).toContainText('adds about 20 minutes');
+	await expect(steps).toContainText('12 to 15 hours');
+	await expect(steps).toContainText('adds about 15 minutes');
 	const night = plan.locator('.schedule li.night');
-	await expect(night).toContainText('20:40');
-	await expect(night).toContainText("20 minutes earlier than Mia's usual 21:00");
-	await expect(plan.locator('.schedule li.changed')).toHaveCount(1); // one step, not the full 90 minutes
+	await expect(night).toContainText('20:45');
+	await expect(night).toContainText("15 minutes earlier than Mia's usual 21:00");
+	await expect(plan.locator('.schedule li.changed')).toHaveCount(1); // the smallest step, not the full 90 minutes
 	await shot(page, '12-plan-step');
 	await page.screenshot({ path: `recordings/m2/screens/12-plan-step-full.png`, fullPage: true });
 });
@@ -64,7 +64,7 @@ test('a young baby: sleep blocks from the usual hours, one new sleep and one new
 	await page.goto('/assistant');
 	await page.getByRole('tab', { name: 'Sleep plan' }).click();
 	const plan = page.getByRole('region', { name: 'Day and night plan' });
-	const steps = plan.getByRole('note', { name: 'Small steps in this plan' });
+	const steps = plan.getByRole('note', { name: 'Steps and checks in this plan' });
 	await expect(steps).toContainText('14 to 17 hours');
 	await expect(steps).toContainText('adds 1 feed');
 	await expect(plan.locator('.schedule li.nap, .schedule li.night')).toHaveCount(6); // 5 usual blocks and 1 new

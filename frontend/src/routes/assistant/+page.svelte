@@ -267,8 +267,8 @@
 			<p class="muted small">One typical 24 hours for {child()?.name}, {regime.age_band}. {regime.basis === 'own' ? `The start point is ${child()?.name}'s own logs of the last ${regime.days} days.` : regime.basis === 'mixed' ? `From ${child()?.name}'s logs and typical times for the age.` : 'From typical times for the age.'}</p>
 			{#if regime.confidence === 'low'}<p class="notice">{regime.notes[0].text}</p>{/if}
 			{#if regime.nudges.length}
-				<div class="steps" role="note" aria-label="Small steps in this plan">
-					<h3>Small steps in this plan</h3>
+				<div class="steps" role="note" aria-label="Steps and checks in this plan">
+					<h3>Steps and checks in this plan</h3>
 					{#each regime.nudges as n, i (i)}
 						<p>{n.text}{#each n.cites as k (k)}{@const c = cite(regime.sources, k)}{#if c}<button class="mark" onclick={() => (source = c)} aria-label="Source {k}">{k}</button>{/if}{/each}</p>
 					{/each}

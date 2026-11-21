@@ -39,11 +39,27 @@ calculates the plan. The AI model does not make the times.
   different, and they must not move the plan.
 - **From 5 complete days, the start point is only your child's times.** With 1 to 4 days the plan mixes them with
   typical times for the age, and it says so on each row. With no logs it shows typical times for the age.
-- **Small steps toward best practice.** When the logs show less sleep in 24 hours than the recommended range for
-  the age, the plan adds a small amount of sleep: a quarter of the gap, from 15 to 60 minutes. It moves bedtime
-  earlier (20 minutes at most in one plan) or makes naps a little longer. The page says what changed and why
-  ("Small steps in this plan"). The next plan starts from the new logs. So the plan follows what your family
-  really does, and it does not make large changes.
+- **Small steps toward best practice.** The plan uses the three bands of the National Sleep Foundation for the
+  age: recommended, "may be appropriate" (the experts did not agree), and not recommended. The page says what
+  changed and why ("Steps and checks in this plan"). The next plan starts from the new logs. So the plan follows
+  what your family really does, and it does not make large changes.
+
+  | The logs show | The plan |
+  |---|---|
+  | Less sleep than "may be appropriate" | Adds a quarter of the gap, from 15 to 60 minutes. Says to speak to a doctor or nurse |
+  | Less than recommended, inside "may be appropriate" | Adds 15 minutes |
+  | Inside the recommended range | No change |
+  | More than recommended, inside "may be appropriate" | No change, one note |
+  | More than "may be appropriate" | No change. Says to check the logs for a timer that was not stopped, then to speak to a doctor or nurse, with the warning signs |
+
+  Added sleep goes to bedtime first (20 minutes earlier at most in one plan), then to the naps.
+- **Sleep is never cut.** No study shows harm from long sleep in children under 5, and no source says to cut the
+  sleep of a healthy child. Long sleep can be a sign of illness, so the page says to get the child checked.
+- **Naps from 2 years.** When a nap is longer than 2 hours or ends after 15:00, and the night sleep starts after
+  20:30 or is shorter than 10 hours, the plan ends the nap 15 minutes earlier (Thorpe 2015; Raising Children
+  Network).
+- **Number of naps.** The page shows your child's number next to the typical number for the age. The plan takes
+  no step toward it: no source recommends a number of naps.
 - **Feeds for a young baby.** When the logs of a baby younger than 3 months show fewer than 8 feeds in 24 hours,
   the plan adds 1 feed in the longest time between two feeds. In the first 4 weeks it also adds a feed when more
   than about 4 hours pass at night.
@@ -75,7 +91,7 @@ Where the numbers for the age come from (the app stores the numbers and a link, 
 | Total sleep by age, with the reference range | Galland et al. 2012, Sleep Medicine Reviews 16:213-222 |
 | Bedtime and wake time from 2 years, with limits | Blair et al. 2012, Sleep 35:353-360 |
 | Naps and night sleep from 2 years | Iglowstein et al. 2003, Pediatrics 111:302-307; Staton et al. 2020, Sleep Medicine Reviews 50:101247 |
-| Recommended sleep in 24 hours (the range that the steps move toward) | AASM 2016, NSF 2015 |
+| Sleep in 24 hours: recommended, may be appropriate, not recommended (the steps use these) | National Sleep Foundation 2015 (Hirshkowitz et al.), Table 2 |
 | Feeds in 24 hours for a young baby | CDC, How Much and How Often to Breastfeed |
 
 No published numbers exist for these, so only your child's own logs decide them: wake windows from 2 years, the

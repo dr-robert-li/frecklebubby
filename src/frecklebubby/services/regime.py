@@ -25,7 +25,7 @@ from ..config import PACKAGE_DATA
 from ..db import utcnow
 from ..models import Child, Entry
 from .children import hm
-from .sleep import DAY, _recent, band, nights, norms, p50, recommendations, sleep_days, wake_range
+from .sleep import DAY, _recent, band, nights, norms, p50, sleep_days, wake_range
 
 DAYS = 14
 MIN_OWN = 5  # complete days (or nights) from which the child's own median is used alone
@@ -163,27 +163,33 @@ LONG_AWAKE = 150  # a young baby: a gap between sleep blocks from which the plan
 
 
 def regime(s: Session, child: Child, tz, now: datetime | None = None) -> dict:
+    """The plan for a child of the app: read the logs of the last days, then calculate."""
     now = now or utcnow()
     local = now.astimezone(tz)
-    age_days = (local.date() - child.birthdate).days
+    eps, _ = _recent(s, child, tz, now, DAYS + 2)
+    origin = datetime.combine(local.date(), datetime.min.time())
+    feeds = [int((t.astimezone(tz).replace(tzinfo=None) - origin).total_seconds() // 60) for t in s.scalars(
+        select(Entry.started_at).where(Entry.child_id == child.id, Entry.type.in_(FEEDS),
+                                       Entry.started_at >= now - timedelta(days=DAYS + 2)).order_by(Entry.started_at))]
+    night0, night1 = (h.hour * 60 + h.minute for h in (hm(child.night_start), hm(child.morning_cutoff)))
+    return calculate(child.name, (local.date() - child.birthdate).days, eps, feeds, local.hour * 60 + local.minute,
+                     night0, night1)
+
+
+def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[int], now_min: int,
+              night0: int = 19 * 60, night1: int = 7 * 60) -> dict:
+    """The plan from plain data, with no database (training/sleep replays it on the research data).
+    eps: merged sleep episodes [start, end] in local minutes from today 00:00 (the past is negative), in time order.
+    feed_starts: the same clock, in time order. night0, night1: night start and morning start of the profile."""
     months = age_days / 30.4375
     age = Age(age_days, months)
-    name = child.name
-    now_min = local.hour * 60 + local.minute
-
-    eps, _ = _recent(s, child, tz, now, DAYS + 2)
     nts = nights(eps, age.n["night_gap_minutes"] if age.n else 70)
     days = [d for d in sleep_days(eps, nts) if d["day"] >= -DAYS]
-    origin = datetime.combine(local.date(), datetime.min.time())
     feeds: list[int] = []
-    for t in s.scalars(select(Entry.started_at).where(
-            Entry.child_id == child.id, Entry.type.in_(FEEDS),
-            Entry.started_at >= now - timedelta(days=DAYS + 2)).order_by(Entry.started_at)):
-        m = int((t.astimezone(tz).replace(tzinfo=None) - origin).total_seconds() // 60)
+    for m in feed_starts:
         if not feeds or m - feeds[-1] > FEED_GAP:  # the second side, or a top-up, is the same feed
             feeds.append(m)
     recs = _nights(eps, nts, feeds, now_min)
-    night0, night1 = (h.hour * 60 + h.minute for h in (hm(child.night_start), hm(child.morning_cutoff)))
     facts: list[dict] = []
     notes: list[dict] = []
     fact = lambda *args, **kw: _fact(facts, age, *args, **kw)  # noqa: E731
@@ -199,7 +205,7 @@ def regime(s: Session, child: Child, tz, now: datetime | None = None) -> dict:
                       f"{name} is a young baby with no fixed day and night yet. Too few days are logged, so the sleep "
                       "blocks are typical for the age.", "cites": ["wong22"]})
     else:
-        blocks, own_days, begin, own_total = _older(child, age, days, recs, months, night0, night1, facts, notes)
+        blocks, own_days, begin, own_total = _older(name, age, days, recs, months, night0, night1, facts, notes)
     basis = "own" if own_days >= MIN_OWN else "mixed" if own_days else "age"
     if basis == "own" and not rhythm:
         notes.insert(0, {"text": f"The start point of this plan is {name}'s own times from {own_days} of the last {DAYS} "
@@ -241,28 +247,65 @@ def regime(s: Session, child: Child, tz, now: datetime | None = None) -> dict:
     # --- small steps toward best practice ----------------------------------------------------------------------------
     nudges: list[dict] = []
     caveats: list[dict] = []
-    rec = recommendations(months)[-1:]
+    bands = table()["sleep_bands"]
+    b = next(x for x in bands["bands"] if x["min_months"] <= months and (x["max_months"] is None or months < x["max_months"]))
+    words = f"{b['rec_low']} to {b['rec_high']} hours"
     if doubts:
-        rec, feed_count = [], feed_count and {**feed_count, "basis": "age"}
-    if rec and own_total is not None and basis != "age":
-        lo, hi = rec[0]["min_hours"] * 60, rec[0]["max_hours"] * 60
-        words = f"{rec[0]['min_hours']:g} to {rec[0]['max_hours']:g} hours"
-        if own_total < lo:
-            step = min(max(round((lo - own_total) / 4 / 5) * 5, STEP_MIN), STEP_MAX)
+        feed_count = feed_count and {**feed_count, "basis": "age"}
+    if own_total is not None and basis != "age":
+        says = f"{name}'s logs show about {hours(own_total)} of sleep in 24 hours."
+        if doubts and own_total <= b["ok_high"] * 60:
+            pass  # a rough guide: no steps. The check for very long sleep below is not a step, so it stays.
+        elif own_total < b["rec_low"] * 60:
+            # Too little sleep: a step up. Inside the "may be appropriate" band the step is the smallest one.
+            inside = own_total >= b["ok_low"] * 60
+            gap = b["rec_low"] * 60 - own_total
+            step = STEP_MIN if inside else min(max(round(gap / 4 / 5) * 5, STEP_MIN), STEP_MAX)
             added = _more_sleep(blocks, step, rhythm, age, name, begin)
             if added:
                 nudges.append({
-                    "text": f"{name}'s logs show about {hours(own_total)} of sleep in 24 hours. The recommended range for "
-                            f"this age is {words}. This plan adds about {dur(added)} of sleep. The plan changes in small "
-                            f"steps. When {name}'s logs follow, the next plan takes the next step.",
-                    "cites": [], "citation": rec[0]["citation"]})
+                    "text": f"{says} The recommended range for this age is {words}. "
+                            + (f"{b['ok_low']} hours or more can also be right for some children, so the step is small. "
+                               if inside else "")
+                            + f"This plan adds about {dur(added)} of sleep. The plan changes in small steps. When "
+                              f"{name}'s logs follow, the next plan takes the next step.", "cites": [bands["cite"]]})
                 caveats.append({"text": f"The app counts only the sleep that is logged. If {name} sleeps at times that "
-                                        "are not logged, log them, and the plan needs fewer changes. If a child sleeps "
-                                        "much less than the range for many days, speak to a doctor or nurse.", "cites": []})
-        elif own_total > hi:
-            notes.append({"text": f"{name}'s logs show about {hours(own_total)} of sleep in 24 hours. This is more than "
-                                  f"the recommended range of {words}. Some children need more sleep. Speak to a doctor "
-                                  "or nurse if you are worried.", "cites": [], "citation": rec[0]["citation"]})
+                                        "are not logged, log them, and the plan needs fewer changes."
+                                        + ("" if inside else f" Fewer than {b['ok_low']} hours of sleep in 24 hours is "
+                                           "not recommended for this age. If the logs are complete, speak to a doctor "
+                                           "or nurse."), "cites": [] if inside else [bands["cite"]]})
+        elif own_total > b["ok_high"] * 60:
+            # Much more sleep than recommended. No source says to cut the sleep of a healthy child: check, not cut.
+            nudges.append({
+                "text": f"{says} This is more than {b['ok_high']} hours, which is not recommended for this age. The plan "
+                        f"does not cut sleep. First check the logs: a sleep timer that was not stopped gives too many "
+                        f"hours. If the logs are right, speak to a doctor or nurse. Long sleep can be a sign of illness. "
+                        f"See a doctor soon if {name} is hard to wake, is floppy, does not feed well, has fewer wet "
+                        "nappies, or has yellow skin.", "cites": [bands["cite"]]})
+        elif own_total > b["rec_high"] * 60:
+            notes.append({"text": f"{says} This is more than the recommended range of {words}. Up to {b['ok_high']} "
+                                  "hours can be right for some children, so the plan makes no change. Speak to a doctor "
+                                  "or nurse if you are worried.", "cites": [bands["cite"]]})
+    # From about 2 years: a long or late nap can move the night. One step down for the nap, when the night suffers.
+    lim = table()["nap_limit"]
+    naps_ = [x for x in blocks if x["kind"] == "nap"]
+    night_ = next((x for x in blocks if x["kind"] == "night"), None)
+    if not doubts and not rhythm and basis != "age" and months >= lim["from_months"] and naps_ and night_:
+        nap = naps_[-1]
+        long_, late = nap["end"] - nap["start"] > lim["max_minutes"], nap["end"] > lim["latest_end"]
+        usual_start = night_["start"] + (BED_STEP if night_.get("change") else 0)
+        suffers = usual_start > lim["late_night_start"] or night_["end"] - usual_start < lim["short_night"]
+        if (long_ or late) and suffers and not nap.get("change"):
+            step = min(lim["step"], nap["end"] - nap["start"] - 45)
+            if step >= 5:
+                nap["change"] = f"Ends {step} minutes earlier than {name}'s usual {clock(nap['end'])}. Wake {name} gently."
+                nap["end"] -= step
+                nudges.append({
+                    "text": f"{name}'s nap " + ("is longer than 2 hours" if long_ else f"ends after {clock(lim['latest_end'])}")
+                            + f", and the night sleep starts late or is short. From about 2 years, a long or late nap can "
+                              f"move the night sleep. This plan ends the nap {step} minutes earlier. A nap of 2 hours at "
+                              f"most, with the child awake by {clock(lim['latest_end'])}, is the usual advice.",
+                    "cites": list(lim["cites"])})
     feeds_age = age.pub.get("feeds_24h")
     if feeds_age and feed_rows and feed_count and feed_count["basis"] != "age":
         new = []
@@ -323,9 +366,8 @@ def _doubts(rhythm: bool, blocks: list[dict], days: list[dict], eps, own_days: i
     return out
 
 
-def _older(child, age: Age, days, recs, months, night0, night1, facts, notes) -> tuple[list[dict], int, float, float | None]:
+def _older(name: str, age: Age, days, recs, months, night0, night1, facts, notes) -> tuple[list[dict], int, float, float | None]:
     """A child with a day and a night: naps and one night block, from the child's own medians."""
-    name = child.name
     fact = lambda *args, **kw: _fact(facts, age, *args, **kw)  # noqa: E731
     num = lambda x: f"{x:.1f}".rstrip("0").rstrip(".")  # noqa: E731
     counts = [d["naps"] for d in days]
@@ -373,6 +415,8 @@ def _older(child, age: Age, days, recs, months, night0, night1, facts, notes) ->
     fact("longest", "Longest sleep at night", blend([r["longest"] for r in recs], age.value("longest_night")),
          "longest_night", hours)
     fact("wakes", "Wakes at night", wakes, "night_wakes", num, count=True)
+    if counts:  # the typical number only describes children of this age: no step toward it
+        fact("naps", "Sleeps in the day", blend(counts, None), "naps", num, count=True, flag=False)
 
     if len(counts) >= 4 and counts.count(k) / len(counts) < 0.7:
         other = mode([c for c in counts if c != k])
@@ -558,9 +602,11 @@ def _fact(facts: list, age: Age, key: str, label: str, v: dict | None, field: st
 
 def _finish(age: Age, months: float, notes: list[dict], out: dict) -> dict:
     """The rules for the age, and a number for each source that the plan used."""
-    for r in recommendations(months)[-1:]:
-        text = f"Recommended sleep in 24 hours for this age: {r['min_hours']:g} to {r['max_hours']:g} hours, naps included."
-        notes.append({"text": text, "cites": [], "citation": r["citation"]})
+    bands = table()["sleep_bands"]
+    b = next(x for x in bands["bands"] if x["min_months"] <= months and (x["max_months"] is None or months < x["max_months"]))
+    notes.append({"text": f"Recommended sleep in 24 hours for this age: {b['rec_low']} to {b['rec_high']} hours, naps "
+                          f"included. {b['ok_low']} to {b['ok_high']} hours can be right for some children.",
+                  "cites": [bands["cite"]]})
     notes += [{"text": x["text"], "cites": list(x["cites"])} for x in age.pub["notes"]]
     both = out["nudges"] + notes
     for x in both:

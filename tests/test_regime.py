@@ -81,28 +81,78 @@ async def test_one_unusual_day_does_not_move_the_plan(client):
                        ("19:00", "06:00", "night")]
 
 
-async def test_too_little_sleep_gets_one_small_step_and_follows_the_logs(client):
-    s, c, cid = await child(client, birthdate="2026-01-10")  # 10 months: 12 to 16 hours are recommended
+async def test_a_little_too_little_sleep_gets_the_smallest_step_and_follows_the_logs(client):
+    s, c, cid = await child(client, birthdate="2026-01-10")  # 10 months: 12 to 15 hours recommended, 10 to 18 can be right
     for d in range(6, 17):  # 9 h at night and 2 naps of 45 minutes: 10.5 hours
         day(s, cid, d, bed=(21, 0), naps=((10, 0, 45), (14, 30, 45)), feeds=())
     s.commit()
     r = regime(s, c, BNE, NOW)
-    # A quarter of the gap of 90 minutes: about 20 minutes, at bedtime. Not the full 90 minutes.
-    assert rows(r) == [("10:00", "10:45", "nap"), ("14:30", "15:15", "nap"), ("20:40", "06:00", "night")]
-    assert changed(r) == [("20:40", "night", "20 minutes earlier than Ada's usual 21:00")]
-    assert len(r["nudges"]) == 1 and "10.5 hours" in r["nudges"][0]["text"] and "12 to 16 hours" in r["nudges"][0]["text"]
-    assert "adds about 20 minutes" in r["nudges"][0]["text"] and r["nudges"][0]["cites"]
+    # Below the recommended range, but 10 hours or more can be right: the smallest step, 15 minutes at bedtime.
+    assert rows(r) == [("10:00", "10:45", "nap"), ("14:30", "15:15", "nap"), ("20:45", "06:00", "night")]
+    assert changed(r) == [("20:45", "night", "15 minutes earlier than Ada's usual 21:00")]
+    text = r["nudges"][0]["text"]
+    assert len(r["nudges"]) == 1 and "10.5 hours" in text and "12 to 15 hours" in text and r["nudges"][0]["cites"]
+    assert "can also be right for some children" in text and "adds about 15 minutes" in text
     assert {f["key"]: f["value"] for f in r["facts"]}["total"] == "10.5 hours"  # the fact is the logs, not the plan
-    assert any("speak to a doctor or nurse" in n["text"] for n in r["notes"])
-    # The family follows: bedtime at 20:40 for a week. The next plan starts there and takes the next step.
+    assert not any("speak to a doctor or nurse" in n["text"] for n in r["notes"][:2])
+    # The family follows: bedtime at 20:45 for a week. The next plan starts there and takes the next step.
     for d in range(10, 17):
         s.query(Entry).filter(Entry.child_id == cid, Entry.started_at == local(d - 1, 21)).update(
-            {"started_at": local(d - 1, 20, 40)})
+            {"started_at": local(d - 1, 20, 45)})
     s.commit()
     r2 = regime(s, c, BNE, NOW)
-    assert changed(r2) == [("20:20", "night", "20 minutes earlier than Ada's usual 20:40")]
-    # The family does not follow: the plan stays one small step from the logs. It does not run ahead.
-    assert changed(regime(s, c, BNE, NOW)) == changed(r2)
+    assert changed(r2) == [("20:30", "night", "15 minutes earlier than Ada's usual 20:45")]
+
+
+async def test_much_too_little_sleep_gets_a_larger_step_and_the_doctor_note(client):
+    s, c, cid = await child(client, birthdate="2026-01-10")
+    for d in range(6, 17):  # 8 h at night and 2 naps of 45 minutes: 9.5 hours, below the 10 hours that can be right
+        day(s, cid, d, bed=(22, 0), naps=((10, 0, 45), (14, 30, 45)), feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    # A quarter of the gap of 150 minutes: 40 minutes. Bedtime takes 20, each nap takes 10. Not the full 150.
+    assert rows(r) == [("10:00", "10:55", "nap"), ("14:30", "15:25", "nap"), ("21:40", "06:00", "night")]
+    assert "adds about 40 minutes" in r["nudges"][0]["text"] and "can also be right" not in r["nudges"][0]["text"]
+    assert any("Fewer than 10 hours" in n["text"] and "speak to a doctor or nurse" in n["text"] for n in r["notes"])
+
+
+async def test_more_sleep_than_recommended_is_never_cut(client):
+    s, c, cid = await child(client, birthdate="2026-01-10")  # 10 months
+    for d in range(6, 17):  # 12.5 h at night and 2 naps of 2 hours: 16.5 hours, inside 16 to 18 that can be right
+        day(s, cid, d, wake=(7, 0), bed=(18, 30), naps=((9, 0, 120), (13, 0, 120)), feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert r["nudges"] == [] and changed(r) == []
+    assert any("Up to 18 hours can be right for some children, so the plan makes no change" in n["text"] for n in r["notes"])
+    # 19.5 hours: not recommended. Still no cut: check the logs, then a doctor, with the warning signs.
+    for d in range(6, 17):
+        add(s, cid, "sleep", local(d, 15, 15), local(d, 18, 0))
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert changed(r) == [] and len(r["nudges"]) == 1
+    text = r["nudges"][0]["text"]
+    assert "more than 18 hours" in text and "does not cut sleep" in text and "timer that was not stopped" in text
+    assert "speak to a doctor or nurse" in text and "hard to wake" in text
+
+
+async def test_from_2_years_a_long_late_nap_with_a_late_night_ends_a_little_earlier(client):
+    s, c, cid = await child(client, birthdate="2024-03-01")  # 2 years 8 months
+    for d in range(6, 17):  # nap 13:00 to 15:45, night 21:00 to 06:45: 12.5 hours, inside the range
+        day(s, cid, d, wake=(6, 45), bed=(21, 0), naps=((13, 0, 165),), feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert rows(r) == [("13:00", "15:30", "nap"), ("21:00", "06:45", "night")]
+    assert changed(r) == [("13:00", "nap", "Ends 15 minutes earlier than Ada's usual 15:45. Wake Ada gently.")]
+    assert "longer than 2 hours" in r["nudges"][0]["text"] and len(r["nudges"][0]["cites"]) == 2
+    # The same nap with an early night: the night does not suffer, so the nap stays.
+    s, c, cid = await child3(client, birthdate="2024-03-01", email="d@example.com")
+    for d in range(6, 17):
+        day(s, cid, d, wake=(6, 45), bed=(19, 30), naps=((13, 0, 135),), feeds=())
+    s.commit()
+    r = regime(s, c, BNE, NOW)
+    assert changed(r) == [] and r["nudges"] == []
+    # The number of naps is shown next to the typical number, with no step toward it.
+    assert {f["key"]: f["value"] for f in r["facts"]}["naps"] == "1"
 
 
 async def test_a_late_family_inside_the_range_is_not_changed(client):
@@ -236,9 +286,9 @@ async def test_logs_that_fit_no_known_pattern_give_a_rough_guide_and_no_steps(cl
     assert r["confidence"] == "low" and r["nudges"] == [] and "number of naps" in r["notes"][0]["text"]
 
 
-async def child3(client):
-    _, cid = await make_family(client, email="c@example.com", birthdate="2026-01-10")
-    s, ctx = ctx_for("c@example.com")
+async def child3(client, birthdate="2026-01-10", email="c@example.com"):
+    _, cid = await make_family(client, email=email, birthdate=birthdate)
+    s, ctx = ctx_for(email)
     return s, get_child(s, ctx, cid), cid
 
 

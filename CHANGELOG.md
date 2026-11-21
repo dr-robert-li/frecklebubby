@@ -6,6 +6,17 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-21
+
+### Changed
+
+- The steps of the day and night plan now use the three bands of the National Sleep Foundation for each age: recommended, "may be appropriate", and not recommended.
+- A little too little sleep (below the recommended range, but inside "may be appropriate"): the smallest step, 15 minutes. Much too little sleep: a quarter of the gap, from 15 to 60 minutes, and the page says to speak to a doctor or nurse when the logs are complete.
+- More sleep than recommended is never cut. No source says to cut the sleep of a healthy child. Inside "may be appropriate" the page has one note. Above it, the page says to check the logs for a sleep timer that was not stopped, and then to speak to a doctor or nurse, with the warning signs.
+- From 2 years: when a nap is longer than 2 hours or ends after 15:00, and the night sleep starts late or is short, the plan ends the nap 15 minutes earlier.
+- The page shows the child's number of sleeps in the day next to the typical number for the age. The plan takes no step toward the typical number, because no source recommends a number of naps.
+- The recommended range in the plan is now the one of the National Sleep Foundation for all ages (for example 12 to 15 hours at 4 to 11 months).
+
 ## [0.6.1] - 2026-11-21
 
 ### Changed
