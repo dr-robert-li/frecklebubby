@@ -749,7 +749,7 @@ wheels = [
 
 [[package]]
 name = "frecklebubby"
-version = "0.1.0"
+version = "0.7.0"
 source = { editable = "../../" }
 dependencies = [
     { name = "fastapi" },
@@ -768,10 +768,12 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "faster-whisper", marker = "extra == 'voice'", specifier = ">=1.1" },
     { name = "fastmcp", specifier = ">=2.13" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "huckleberry-api", marker = "extra == 'import'", git = "https://github.com/dr-robert-li/py-huckleberry-api" },
     { name = "numpy", marker = "extra == 'cry'", specifier = ">=2.1" },
+    { name = "numpy", marker = "extra == 'voice'", specifier = ">=2.1" },
     { name = "onnxruntime", marker = "extra == 'cry'", specifier = ">=1.20" },
     { name = "pydantic-settings", specifier = ">=2.6" },
     { name = "pyjwt", extras = ["crypto"], specifier = ">=2.10" },
@@ -782,7 +784,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0.36" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
 ]
-provides-extras = ["import", "cry"]
+provides-extras = ["import", "cry", "voice"]
 
 [package.metadata.requires-dev]
 dev = [

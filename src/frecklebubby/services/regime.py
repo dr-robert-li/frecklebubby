@@ -183,10 +183,11 @@ def regime(s: Session, child: Child, tz, now: datetime | None = None) -> dict:
 
 def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[int], now_min: int,
               night0: int = 19 * 60, night1: int = 7 * 60, hold_bedtime: bool = False,
-              bedtime: float | None = None) -> dict:
+              bedtime: float | None = None, steps: bool = True) -> dict:
     """The plan from plain data, with no database (training/sleep replays it on the research data).
     eps: merged sleep episodes [start, end] in local minutes from today 00:00 (the past is negative), in time order.
-    feed_starts: the same clock, in time order. night0, night1: night start and morning start of the profile."""
+    feed_starts: the same clock, in time order. night0, night1: night start and morning start of the profile.
+    steps=False gives the start point only (the child's own pattern), with no step toward best practice."""
     months = age_days / 30.4375
     age = Age(age_days, months)
     nts = nights(eps, age.n["night_gap_minutes"] if age.n else 70)
@@ -260,7 +261,7 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
         feed_count = feed_count and {**feed_count, "basis": "age"}
     if own_total is not None and basis != "age":
         says = f"{name}'s logs show about {hours(own_total)} of sleep in 24 hours."
-        if doubts and own_total <= b["ok_high"] * 60:
+        if (doubts or not steps) and own_total <= b["ok_high"] * 60:
             pass  # a rough guide: no steps. The check for very long sleep below is not a step, so it stays.
         elif own_total < b["rec_low"] * 60:
             # Too little sleep: a step up. Inside the "may be appropriate" band the step is the smallest one.
@@ -296,7 +297,7 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
     lim = table()["nap_limit"]
     naps_ = [x for x in blocks if x["kind"] == "nap"]
     night_ = next((x for x in blocks if x["kind"] == "night"), None)
-    if not doubts and not rhythm and basis != "age" and months >= lim["from_months"] and naps_ and night_:
+    if steps and not doubts and not rhythm and basis != "age" and months >= lim["from_months"] and naps_ and night_:
         nap = naps_[-1]
         long_, late = nap["end"] - nap["start"] > lim["max_minutes"], nap["end"] > lim["latest_end"]
         usual_start = night_["start"] + (BED_STEP if night_.get("change") else 0)
@@ -313,7 +314,7 @@ def calculate(name: str, age_days: int, eps: list[list[int]], feed_starts: list[
                               f"most, with the child awake by {clock(lim['latest_end'])}, is the usual advice.",
                     "cites": list(lim["cites"])})
     feeds_age = age.pub.get("feeds_24h")
-    if feeds_age and feed_rows and feed_count and feed_count["basis"] != "age":
+    if steps and feeds_age and feed_rows and feed_count and feed_count["basis"] != "age":
         new = []
         if feed_count["value"] < feeds_age["low"]:  # one more feed, in the longest time between two feeds
             new.append(_gap(feed_rows))

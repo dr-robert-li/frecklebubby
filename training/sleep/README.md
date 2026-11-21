@@ -41,6 +41,7 @@ OUT=~/.cache/frecklebubby-research/sleep-model
 | 3. NMF-TS | `uv run python nmf_ts.py $MAT $OUT/work $OUT/figures [ITERATIONS]` | `nmf_basis.npy`, `nmf_stats.json`, figure |
 | 4. Predictor | `uv run python predict.py $OUT/work $OUT/sleep_norms.json $OUT/work` | `predict_results.json`; adds the `model` block to the norms file |
 | Replay | `uv run python replay_app_db.py DB_FILE CHILD` | metrics for one child of a Frecklebubby database |
+| Plan replay | `uv run python replay_plan.py $OUT/work $OUT/replay_plan.json` | rule checks, fit to the next 7 days and settings for the day and night plan, with a test split (about 10 seconds) |
 | Tests | `uv run pytest` | |
 
 Step 1 takes about 1 minute. Step 3 takes about 20 minutes on a 16-core CPU. Step 4 takes about 25 minutes.
@@ -62,3 +63,39 @@ Step 1 takes about 1 minute. Step 3 takes about 20 minutes on a 16-core CPU. Ste
 
 Copy `sleep_norms.json` to the data folder of the app (`DATA_DIR/sleep_norms.json`), or set `SLEEP_NORMS_PATH`.
 Without the file the app uses its old wake-window table.
+
+## Plan replay (day and night plan)
+
+`replay_plan.py` runs the calculator of the day and night plan (`services/regime.py`, the function `calculate`) on
+each infant at each 14 days of age, with the 23 days before as the logs, at 10:00 of the day. The data has sleep
+only, so feeds are not replayed.
+
+- **Rule checks** (all infants): errors, blocks that overlap, a block shorter than 5 minutes or longer than 16
+  hours, a night block outside 6 to 15 hours, total sleep outside 4 to 22 hours. Also how often the plan takes a
+  step, and how often it says "rough guide".
+- **Fit** (test infants: the last 20 % of the split of `predict.py`): the start point of the plan (no steps)
+  against the medians of the next 7 days. Two simple plans for comparison: the same as yesterday, and typical for
+  the age.
+- **Settings**: the days of logs that the plan reads and the days from which it uses only the infant's own values.
+  Read the train column to select, and the test column to report.
+
+Results of 2026-11-21 (app 0.7.0, 13,823 plans, 678 infants, 140 test infants):
+
+| Measure (test infants, all ages) | Plan | Same as yesterday | Typical for the age |
+|---|---|---|---|
+| Bedtime, mean error | 19 min | 36 min | 45 min |
+| Wake time, mean error | 22 min | 34 min | 41 min |
+| Nap start, mean error | 30 min | 45 min | 52 min |
+| Same number of naps | 71 % | 60 % | 64 % |
+| Sleep in 24 hours, mean error | 35 min | 67 min | 54 min |
+
+- No error and no rule fault in 13,823 plans.
+- Days of logs: 7 days is worse (bedtime 20.7 min); 14 and 21 days are the same (19.1 min). The days from which
+  only the own values count (3, 5 or 7) make no difference. So 14 and 5 stay.
+- The plan takes a step up in 43 % of the plans at 0 to 3 months, 27 % at 3 to 6 months, 19 % at 6 to 12 months and
+  6 % after that. Nearly all are the smallest step (15 minutes), because the logged sleep is inside "may be
+  appropriate" but below "recommended".
+- The plan says "rough guide" in 36 % of the plans at 0 to 3 months and 17 % at 3 to 6 months, nearly always
+  because the number of naps is different from day to day. After 12 months it is 1 % or less.
+- Limits: the norms file of the app was made from all infants of this data. Parents who log in an app are not all
+  parents. The data has no feeds and stops at 24 months.
