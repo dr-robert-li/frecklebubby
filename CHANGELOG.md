@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-11-21
+
+### Fixed
+
+- The totals under "Today" on Home are now in two rows. Sleep and Breastfed are in the first row, so their times stay inside the cards. Wee, Poo and Bottle are in the second row.
+
 ## [0.6.2] - 2026-11-21
 
 ### Changed

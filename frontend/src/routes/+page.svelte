@@ -355,9 +355,10 @@
 	.editbar .done {
 		margin-left: auto;
 	}
+	/* Two rows: the two times (sleep, breastfed) are wide and get half a row each; the three counts share the second row. */
 	.totals {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+		grid-template-columns: repeat(6, 1fr);
 		gap: 8px;
 		margin-bottom: 8px;
 	}
@@ -367,6 +368,11 @@
 		padding: 8px 10px;
 		display: flex;
 		flex-direction: column;
+		grid-column: span 2;
+		min-width: 0;
+	}
+	.totals div:nth-child(-n + 2) {
+		grid-column: span 3;
 	}
 	.totals span {
 		font-size: 0.8rem;
