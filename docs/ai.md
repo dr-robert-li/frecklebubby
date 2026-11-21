@@ -28,6 +28,47 @@ example a llama.cpp or vLLM server with a GPU). Open **Settings > AI model**, en
 settings are per family. The defaults come from `LLM_BASE_URL`, `LLM_MODEL` and `LLM_API_KEY` in `.env`. The model
 must support JSON schema output (`response_format`), as llama.cpp does.
 
+## Day and night plan
+
+**Assistant > Sleep plan** shows one typical 24 hours for your child: the wake time, the naps, bedtime, and the
+usual night feeds and night wakes. The app calculates the plan. The AI model does not make the times.
+
+- **Your child's own logs come first.** The plan uses the sleep and the feeds that you logged in the last 14 days.
+  Each time is the middle value (the median) of those days, so one unusual day does not change the plan. Sleep
+  data has a long tail: some nights are very different, and they must not move the plan.
+- **From 5 complete days, the plan uses only your child's times.** With 1 to 4 days it mixes them with typical
+  times for the age, and it says so on each row. With no logs it shows typical times for the age.
+- **Values for the age are not targets.** The page shows the range that is common for the age next to your
+  child's own numbers. The plan does not move your child's times toward that range. Children differ a lot.
+- **The night.** Night feeds and night wakes get a clock time when at least 3 nights of the last 14 have the same
+  number of them. Log the feeds at night to see them in the plan.
+- **The rules change with the age**, in 7 age bands from birth to 5 years. For example: no fixed clock schedule
+  before the day and night rhythm forms (about 8 to 15 weeks), the change from 2 naps to 1, and "nap on some
+  days" from about 3 years.
+- **Advice from the assistant** is optional. The AI model gets the calculated plan and writes a short summary and
+  tips with sources. It cannot change the times.
+- **API and MCP**: `GET /api/v1/children/{id}/sleep/regime` and the MCP tool `get_day_and_night_plan`.
+
+Where the numbers for the age come from (the app stores the numbers and a link, not the text of the papers):
+
+| What | Source |
+|---|---|
+| Wake time, naps, wake windows, bedtime, longest sleep at night, to 24 months | The sleep norms file (Liu et al. 2019, see below) |
+| Night wakes by age, with the 10th and 90th percentile | Paavonen et al. 2020, Sleep Medicine 69:145-154 |
+| Night feeds at 6 to 12 months | Brown and Harries 2015, Breastfeeding Medicine 10:246-252 |
+| Total sleep by age, with the reference range | Galland et al. 2012, Sleep Medicine Reviews 16:213-222 |
+| Bedtime and wake time from 2 years, with limits | Blair et al. 2012, Sleep 35:353-360 |
+| Naps and night sleep from 2 years | Iglowstein et al. 2003, Pediatrics 111:302-307; Staton et al. 2020, Sleep Medicine Reviews 50:101247 |
+| Recommended sleep in 24 hours | AASM 2016, NSF 2015 |
+
+No published numbers exist for these, so only your child's own logs decide them: wake windows from 2 years, the
+number of night feeds before 6 months, the time to stop a night feed, and the time to drop a nap. Night wakes
+that a device measures (about 4 a night at 2 to 5 years) are not the same as wakes that a parent sees (about 1),
+so the app uses only numbers from parent reports.
+
+The file with the numbers is `src/frecklebubby/data/sleep_regime.json`. The calculation is in
+`src/frecklebubby/services/regime.py`.
+
 ## Sleep model
 
 The Home screen shows the next nap or bedtime. With the bundled **sleep norms file** it uses your child's last 14 days and typical patterns of babies of the same

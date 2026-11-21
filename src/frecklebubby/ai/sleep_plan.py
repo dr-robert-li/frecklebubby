@@ -1,30 +1,24 @@
-"""Sleep plan: the assistant pipeline with a fixed question and JSON schema output. Stored in sleep_plan."""
+"""Sleep plan: the app calculates the day and night plan (services/regime.py). The model writes only the summary
+and the cited advice for it. Stored in sleep_plan."""
 
 import re
-from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import utcnow
 from ..knowledge.store import search
-from ..models import Entry, SleepPlan
+from ..models import SleepPlan
 from ..services import Ctx
-from ..services.children import get_child, is_night
-from ..services.sleep import age_summary, norms, recommendations, stage, wake_range
+from ..services.children import get_child
+from ..services.regime import regime
 from . import llm
 from .assistant import SOURCE_CHARS, child_context
 
 SCHEMA = {
-    "type": "object", "additionalProperties": False, "required": ["summary", "schedule", "advice"],
+    "type": "object", "additionalProperties": False, "required": ["summary", "advice"],
     "properties": {
         "summary": {"type": "string", "maxLength": 400},
-        "schedule": {"type": "array", "minItems": 2, "maxItems": 16, "items": {
-            "type": "object", "additionalProperties": False, "required": ["time", "kind", "label"],
-            "properties": {"time": {"type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
-                           "kind": {"enum": ["wake", "nap", "feed", "bedtime", "other"]},
-                           "label": {"type": "string", "maxLength": 80},
-                           "note": {"type": "string", "maxLength": 160}}}},
         "advice": {"type": "array", "minItems": 1, "maxItems": 5, "items": {
             "type": "object", "additionalProperties": False, "required": ["text", "cites"],
             "properties": {"text": {"type": "string", "maxLength": 300},
@@ -32,43 +26,42 @@ SCHEMA = {
     },
 }
 
-SYSTEM = """You make a simple daily sleep plan for a baby, for parents in a baby-tracking app.
+SYSTEM = """You write the summary and the advice for a day and night sleep plan, for parents in a baby-tracking app.
+The app calculated the plan from the child's own logs. You do not change it.
 Rules:
-- Use ONLY the child's data, the age ranges and the numbered sources given. Do not use your own knowledge.
-- The schedule is one full typical day, in time order, 24-hour HH:MM. It is not a plan for the rest of today.
-- The first row is the morning wake (kind "wake") at the given morning start time. The last row is bedtime.
-- Fit the recommended total sleep and the wake-window range. Start from the child's own recent times.
-- If typical values for the age are given, use them where the child's own days are few or irregular.
-- Advice: 2 to 4 short tips. Put the numbers of the sources that support each tip in "cites".
+- Use ONLY the plan, the child's data and the numbered sources given. Do not use your own knowledge.
+- Do not give new clock times. Do not tell the parent to change a time of the plan.
+- Summary: 2 or 3 short sentences about this child's day and night, from the plan and the facts.
+- A value outside the common range is not a problem by itself. Children differ a lot. Do not tell the parent to
+  make the child fit a range.
+- Advice: 2 to 4 short tips that fit the child's age and this plan, also for the night when the child wakes or feeds
+  at night. Put the numbers of the sources that support each tip in "cites".
 - No medicine. Short plain sentences."""
 
-QUERIES = ("recommended sleep duration by age naps hours", "baby sleep routine bedtime naps settle")
+QUERIES = ("baby sleep routine bedtime naps settle", "night feeds night waking baby sleep")
+KINDS = {"night_feed": "feed", "night_wake": "other"}  # the kinds of the plan rows before 0.6.0
 
 
-def _recent_days(s: Session, ctx: Ctx, child, now) -> str:
-    """One line per day for the last 7 days: night sleep and naps as local times."""
-    rows = s.scalars(select(Entry).where(Entry.child_id == child.id, Entry.type == "sleep",
-                                         Entry.started_at >= now - timedelta(days=7)).order_by(Entry.started_at))
-    days: dict[str, list[str]] = {}
-    for e in rows:
-        a, b = e.started_at.astimezone(ctx.tz), e.ended_at.astimezone(ctx.tz)
-        kind = "night" if is_night(child, a) else "nap"
-        days.setdefault(a.strftime("%a %d"), []).append(f"{kind} {a:%H:%M}-{b:%H:%M}")
-    return "\n".join(f"{d}: {', '.join(v)}" for d, v in days.items()) or "No sleep logged in the last 7 days."
+def plan_text(r: dict) -> str:
+    """The calculated plan as text for the model."""
+    basis = {"own": "the child's own logs", "mixed": "the child's logs and typical values for the age",
+             "age": "typical values for the age (no logs)"}[r["basis"]]
+    lines = [f"Plan for one typical 24 hours (age: {r['age_band']}; from {basis}):"]
+    for x in r["schedule"]:
+        usual = f" (usually {x['earliest']} to {x['latest']})" if x["earliest"] and x["earliest"] != x["latest"] else ""
+        lines.append(f"- {x['time']}{'-' + x['end'] if x['end'] else ''} {x['label']}{usual}")
+    lines.append("Facts:")
+    for f in r["facts"]:
+        common = f"; common for the age: {f['common']}" if f["common"] else ""
+        lines.append(f"- {f['label']}: {f['value']}{common}")
+    lines += ["Notes from the app:"] + [f"- {n['text']}" for n in r["notes"]]
+    return "\n".join(lines)
 
 
 async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
     child = get_child(s, ctx, child_id)
     now = utcnow()
-    months = (now.date() - child.birthdate).days / 30.4375
-    lo, hi = wake_range(months)
-    recs = "; ".join(f"{r['min_hours']:g}-{r['max_hours']:g} h per 24 h ({r['citation']['publisher'].split(' /')[0]})"
-                     for r in recommendations(months)) or "none for this age"
-    n = norms()
-    st = stage(s, child, ctx.tz, now, n) if n else None
-    typical = (age_summary(n, (now.astimezone(ctx.tz).date() - child.birthdate).days) + "\n") if n else ""
-    if st:
-        typical += f"This child recently: {st['naps']} naps on most days.\n"
+    r = regime(s, child, ctx.tz, now)
     hits, seen = [], set()
     for q in QUERIES:
         for h in search(s, ctx.fam, q, limit=4):
@@ -83,22 +76,20 @@ async def generate(s: Session, ctx: Ctx, child_id: int) -> dict:
             citations.append({"n": numbers[h["id"]], "kind": h["kind"],
                               **{k: h[k] for k in ("title", "publisher", "author", "url", "year", "licence") if h[k]}})
         blocks.append(f"[{numbers[h['id']]}] {h['title']}, {h['heading']}:\n{h['text'][:SOURCE_CHARS]}")
-    # The plan is for a full day: the time now, today's totals and the next sleep make the model start from now.
+    # The plan is for a full day: the time now, today's totals and the next sleep are not for the model.
     data = "\n".join(x for x in child_context(s, ctx, child, now).splitlines()
                      if not x.startswith(("Today so far", "Next sleep")))
     data = re.sub(r"^Now: [^.]*\. ", "", data)
-    user = (f"Child data:\n{data}\n"
-            f"Morning starts at {child.morning_cutoff}. Night starts at {child.night_start}.\n"
-            f"Wake-window range for this age (common practice, not a medical standard): {lo}-{hi} minutes.\n"
-            f"Recommended total sleep: {recs}.\n" + typical
-            + f"Sleep in the last 7 days:\n{_recent_days(s, ctx, child, now)}\n\nSources:\n" + "\n\n".join(blocks)
-            + f"\n\nMake the sleep plan for a typical day. Start with the wake at {child.morning_cutoff}.")
+    user = (f"Child data:\n{data}\n\n{plan_text(r)}\n\nSources:\n" + "\n\n".join(blocks)
+            + "\n\nWrite the summary and the advice for this plan.")
     out = await llm.complete_json(ctx.fam, [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
-                                  SCHEMA, max_tokens=2000, limited=False)  # a polled job: no wait limit
+                                  SCHEMA, max_tokens=1200, limited=False)  # a polled job: no wait limit
     valid = {c["n"] for c in citations}
     advice = [_advice(a, valid) for a in out.get("advice", [])]
     used = {n for a in advice for n in a["cites"]}
-    content = {"summary": out.get("summary", ""), "schedule": out.get("schedule", []), "advice": advice}
+    schedule = [{"time": x["time"], "kind": KINDS.get(x["kind"], x["kind"]), "label": x["label"],
+                 **({"note": x["note"]} if x["note"] else {})} for x in r["schedule"]]
+    content = {"summary": out.get("summary", ""), "schedule": schedule, "advice": advice}
     plan = SleepPlan(child_id=child.id, content=content, citations=[c for c in citations if c["n"] in used])
     s.add(plan)
     s.commit()

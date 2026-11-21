@@ -31,7 +31,7 @@ async def test_family_isolation(client):
     members_b = (await client.get(f"{API}/family/members", headers=b)).json()
 
     child_urls = ["", "/entries", "/timers", "/status", "/reports/daily", "/growth", "/export.csv", "/milestones",
-                  "/sleep/prediction", "/reminders"]
+                  "/sleep/prediction", "/sleep/regime", "/reminders"]
     for suffix in child_urls:
         r = await client.get(f"{API}/children/{bcid}{suffix}", headers=a)
         assert r.status_code == 404, (suffix, r.text)

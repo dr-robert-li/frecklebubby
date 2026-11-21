@@ -33,6 +33,8 @@
 	let plan = $state<any>(undefined);
 	let planError = $state('');
 	let planBusy = $state(false);
+	let regime = $state<any>(undefined); // the calculated day and night plan
+	let regimeError = $state('');
 	let milestones = $state<any>(null);
 	let msError = $state('');
 
@@ -47,6 +49,7 @@
 		api<Insight[]>(`/children/${cid}/insights`)
 			.then((r) => (insights = [...r].sort((a, b) => ORDER[a.severity] - ORDER[b.severity])))
 			.catch((e) => (insightsError = softMessage(e, 'Insights are not available now.')));
+		api(`/children/${cid}/sleep/regime`).then((r) => (regime = r)).catch((e) => ((regime = null), (regimeError = softMessage(e))));
 		api(`/children/${cid}/sleep/plan`).then((p) => (plan = p)).catch((e) => ((plan = null), (planError = softMessage(e))));
 		loadMilestones();
 	});
@@ -258,18 +261,56 @@
 		<p class="disclaimer">General information, not medical advice.</p>
 	</section>
 {:else if tab === 'plan'}
+	<section class="card" aria-label="Day and night plan">
+		<h2>Day and night plan</h2>
+		{#if regime}
+			<p class="muted small">One typical 24 hours for {child()?.name}, {regime.age_band}. {regime.basis === 'own' ? `From ${child()?.name}'s own logs of the last ${regime.days} days.` : regime.basis === 'mixed' ? `From ${child()?.name}'s logs and typical times for the age.` : 'From typical times for the age.'}</p>
+			{#each [['day', 'Day'], ['night', 'Night']] as [part, title] (part)}
+				{@const list = regime.schedule.filter((r: any) => r.part === part)}
+				{#if list.length}
+					<h3>{title}</h3>
+					<ol class="schedule">
+						{#each list as row, i (i)}
+							<li class={row.kind}>
+								<strong>{row.time}</strong>
+								<span>{row.label}{row.end ? ` to ${row.end}` : ''}{#if row.basis !== 'own'} <span class="tag">{row.basis === 'age' ? 'typical for the age' : 'partly typical'}</span>{/if}
+									{#if row.earliest && row.earliest !== row.latest}<br /><span class="muted small">Usually {row.earliest} to {row.latest}</span>{/if}
+									{#if row.note}<br /><span class="muted small">{row.note}</span>{/if}</span>
+							</li>
+						{/each}
+					</ol>
+				{/if}
+			{/each}
+			{#if regime.facts.length}
+				<h3>{child()?.name}'s numbers</h3>
+				<dl class="facts">
+					{#each regime.facts as f (f.key)}
+						<dt>{f.label}</dt>
+						<dd><strong>{f.value}</strong>{#if f.basis === 'age'} <span class="tag">typical for the age</span>{:else if f.basis === 'mixed'} <span class="tag">partly typical</span>{/if}
+							{#if f.usual}<br /><span class="muted small">Usually {f.usual}</span>{/if}
+							{#if f.common && f.basis !== 'age'}<br /><span class="muted small">Common for the age: {f.common}</span>{/if}</dd>
+					{/each}
+				</dl>
+			{/if}
+			<h3>Good to know</h3>
+			<ul class="notes">
+				{#each regime.notes as n, i (i)}
+					<li>{n.text}{#each n.cites as k (k)}{@const c = cite(regime.sources, k)}{#if c}<button class="mark" onclick={() => (source = c)} aria-label="Source {k}">{k}</button>{/if}{/each}</li>
+				{/each}
+			</ul>
+			{@render chips(regime.sources)}
+		{:else if regime === undefined && !regimeError}
+			<p class="muted">Loading…</p>
+		{/if}
+		{#if regimeError}<p class="notice">{regimeError}</p>{/if}
+		<p class="disclaimer">The app calculates this plan from the logs. It is a guide, not a target. General information, not medical advice.</p>
+	</section>
 	<section class="card" aria-label="Sleep plan">
+		<h2>Advice from the assistant</h2>
 		{#if plan}
-			<h2>Sleep plan</h2>
 			<p class="muted small">Made {fmtDay(localDay(plan.created_at), { day: 'numeric', month: 'long' })}</p>
 			<p>{plan.summary}</p>
-			<ol class="schedule">
-				{#each plan.schedule as row, i (i)}
-					<li class={row.kind}><strong>{row.time}</strong><span>{row.label}{#if row.note}<br /><span class="muted small">{row.note}</span>{/if}</span></li>
-				{/each}
-			</ol>
 			{#if plan.advice?.length}
-				<h3>Advice</h3>
 				<ul>
 					{#each plan.advice as a, i (i)}
 						<li>{a.text}{#each a.cites ?? [] as n (n)}{@const c = cite(plan.citations, n)}{#if c}<button class="mark" onclick={() => (source = c)} aria-label="Source {n}">{n}</button>{/if}{/each}</li>
@@ -278,11 +319,11 @@
 			{/if}
 			{@render chips(plan.citations ?? [])}
 		{:else if plan === null && !planError}
-			<p class="muted">No plan yet. The assistant can suggest a day plan from {child()?.name}'s recent sleep.</p>
+			<p class="muted">No advice yet. The assistant can write a summary and tips for {child()?.name}'s plan, with sources.</p>
 		{/if}
 		{#if planError}<p class="notice">{planError}</p>{/if}
 		<button class="wide" disabled={planBusy || plan === undefined} onclick={makePlan}>
-			<Icon name="sparkle" /> {planBusy ? 'Making the plan… this can take a minute' : plan ? 'Make a new plan' : 'Make a sleep plan'}
+			<Icon name="sparkle" /> {planBusy ? 'Writing the advice… this can take a minute' : plan ? 'Write new advice' : 'Write advice for this plan'}
 		</button>
 		<p class="disclaimer">General information, not medical advice.</p>
 	</section>
@@ -483,9 +524,30 @@
 		background: var(--lavender);
 		color: var(--ink-strong);
 	}
-	.schedule li.feed {
+	.schedule li.feed,
+	.schedule li.night_feed {
 		background: var(--rose);
 		color: var(--ink-strong);
+	}
+	.tag {
+		font-size: 0.75rem;
+		font-weight: 700;
+		padding: 1px 8px;
+		border-radius: 999px;
+		border: 1.5px solid var(--line);
+		white-space: nowrap;
+	}
+	.facts {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 6px 14px;
+		margin: 0 0 12px;
+	}
+	.facts dd {
+		margin: 0;
+	}
+	.notes li {
+		margin-bottom: 6px;
 	}
 	.schedule strong {
 		width: 48px;

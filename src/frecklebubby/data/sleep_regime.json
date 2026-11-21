@@ -1,0 +1,108 @@
+{
+  "about": "Published numbers for the day and night plan (services/regime.py). The child's own logs come first; these numbers fill gaps and give the wide range that is common for the age. Minutes, except counts and shares. Clock times are minutes after midnight. low/high are the limits that the source gives (see range).",
+  "sources": {
+    "sadeh09": {"title": "Sleep and sleep ecology in the first 3 years: a web-based study (Sadeh A, Mindell JA, Luedtke K, Wiegand B. J Sleep Res 2009;18:60-73)", "publisher": "Journal of Sleep Research", "url": "https://doi.org/10.1111/j.1365-2869.2008.00699.x", "year": 2009},
+    "galland12": {"title": "Normal sleep patterns in infants and children: a systematic review of observational studies (Galland BC, et al. Sleep Med Rev 2012;16:213-222)", "publisher": "Sleep Medicine Reviews", "url": "https://doi.org/10.1016/j.smrv.2011.06.001", "year": 2012},
+    "iglowstein03": {"title": "Sleep duration from infancy to adolescence: reference values and generational trends (Iglowstein I, et al. Pediatrics 2003;111:302-307)", "publisher": "Pediatrics", "url": "https://doi.org/10.1542/peds.111.2.302", "year": 2003},
+    "blair12": {"title": "Childhood sleep duration and associated demographic characteristics in an English cohort (Blair PS, et al. Sleep 2012;35:353-360)", "publisher": "Sleep", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3274336/", "year": 2012},
+    "staton20": {"title": "Many naps, one nap, none: a systematic review and meta-analysis of napping patterns in children 0-12 years (Staton S, et al. Sleep Med Rev 2020;50:101247)", "publisher": "Sleep Medicine Reviews", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9704850/", "year": 2020},
+    "brown15": {"title": "Infant sleep and night feeding patterns during later infancy (Brown A, Harries V. Breastfeed Med 2015;10:246-252)", "publisher": "Breastfeeding Medicine", "url": "https://pubmed.ncbi.nlm.nih.gov/25973527/", "year": 2015},
+    "cdc_feeds": {"title": "How Much and How Often to Breastfeed", "publisher": "CDC", "url": "https://www.cdc.gov/infant-toddler-nutrition/breastfeeding/how-much-and-how-often.html", "year": null},
+    "aap_formula": {"title": "Amount and Schedule of Baby Formula Feedings", "publisher": "American Academy of Pediatrics (HealthyChildren.org)", "url": "https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/amount-and-schedule-of-formula-feedings.aspx", "year": null},
+    "wong22": {"title": "Development of the circadian system in early life: maternal and environmental factors (Wong SD, et al. J Physiol Anthropol 2022;41:22)", "publisher": "Journal of Physiological Anthropology", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9109407/", "year": 2022},
+    "stjames15": {"title": "Video evidence that London infants can resettle themselves back to sleep after waking in the night (St James-Roberts I, et al. J Dev Behav Pediatr 2015;36:324-329)", "publisher": "Journal of Developmental & Behavioral Pediatrics", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4459553/", "year": 2015},
+    "pennestri18": {"title": "Uninterrupted infant sleep, development, and maternal mood (Pennestri MH, et al. Pediatrics 2018;142:e20174330)", "publisher": "Pediatrics", "url": "https://pubmed.ncbi.nlm.nih.gov/30420470/", "year": 2018},
+    "mindell16": {"title": "Development of infant and toddler sleep patterns: real-world data from a mobile application (Mindell JA, et al. J Sleep Res 2016;25:508-516)", "publisher": "Journal of Sleep Research", "url": "https://pubmed.ncbi.nlm.nih.gov/27252030/", "year": 2016},
+    "okely17": {"title": "A collaborative approach to adopting/adapting guidelines: the Australian 24-Hour Movement Guidelines for the early years (Okely AD, et al. BMC Public Health 2017;17(Suppl 5):869)", "publisher": "BMC Public Health", "url": "https://doi.org/10.1186/s12889-017-4867-6", "year": 2017},
+    "schoch20": {"title": "Actimetry in infant sleep research: an approach to facilitate comparability (Schoch SF, et al. Sleep 2020;44:zsaa276)", "publisher": "Sleep", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7765288/", "year": 2020},
+    "akacem15": {"title": "The timing of the circadian clock and sleep differ between napping and non-napping toddlers (Akacem LD, et al. PLoS One 2015;10:e0125181)", "publisher": "PLoS One", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4411103/", "year": 2015},
+    "paavonen20": {"title": "Normal sleep development in infants: findings from two large birth cohorts (Paavonen EJ, et al. Sleep Med 2020;69:145-154)", "publisher": "Sleep Medicine", "url": "https://doi.org/10.1016/j.sleep.2020.01.009", "year": 2020},
+    "liu19": {"title": "Time-Series Analysis via Low-Rank Matrix Factorization Applied to Infant-Sleep Data (Liu S, et al. 2019)", "publisher": "arXiv", "url": "https://arxiv.org/abs/1904.04780", "year": 2019}
+  },
+  "bands": [
+    {
+      "key": "0-3", "min_months": 0, "max_months": 3, "label": "birth to 3 months",
+      "total": {"mean": 876, "low": 558, "high": 1200, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_wakes": {"mean": 2.2, "sd": 1.3, "p50": 2, "low": 1, "high": 4, "range": "10th and 90th percentile at 3 months", "cite": "paavonen20"},
+      "longest_night": {"mean": 300, "sd": 108, "cite": "sadeh09"},
+      "notes": [
+        {"text": "A young baby has no fixed day and night rhythm yet. The rhythm starts at about 8 to 9 weeks and gets clearer at about 15 weeks. The times in this plan are a guide, not a target.", "cites": ["wong22"]},
+        {"text": "Newborns feed 8 to 12 times in 24 hours, also at night. In the first weeks, do not let more than about 4 hours pass at night without a feed. Wake the baby if necessary.", "cites": ["cdc_feeds"]},
+        {"text": "At 5 weeks about 1 baby in 10 sleeps 5 hours or more in one stretch. At 3 months it is about 1 in 2.", "cites": ["stjames15"]}
+      ]
+    },
+    {
+      "key": "3-6", "min_months": 3, "max_months": 6, "label": "3 to 6 months",
+      "total": {"mean": 800, "low": 528, "high": 1020, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_wakes": {"mean": 2.5, "sd": 1.8, "p50": 2, "low": 0.5, "high": 4.5, "range": "10th and 90th percentile at 6 months", "cite": "paavonen20"},
+      "longest_night": {"mean": 426, "sd": 144, "cite": "sadeh09"},
+      "notes": [
+        {"text": "The longest sleep at night gets longer in these months: from about 5 hours to about 7 hours on average. The spread between babies is large.", "cites": ["sadeh09"]},
+        {"text": "Night feeds are still common. Many formula-fed babies do not need a feed in the middle of the night from 2 to 4 months, or when they weigh more than 5.4 kg. Breastfed babies usually feed at night for longer.", "cites": ["aap_formula"]}
+      ]
+    },
+    {
+      "key": "6-12", "min_months": 6, "max_months": 12, "label": "6 to 12 months",
+      "total": {"mean": 765, "low": 564, "high": 948, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_wakes": {"mean": 2.4, "sd": 1.8, "p50": 2, "low": 0, "high": 4.5, "range": "10th and 90th percentile at 8 and 12 months", "cite": "paavonen20"},
+      "night_feeds": {"mean": 1.36, "sd": 1.55, "p50": 1, "low": 0, "high": 3, "range": "10th and 90th percentile", "share_any": 0.6, "cite": "brown15"},
+      "longest_night": {"mean": 470, "sd": 162, "cite": "sadeh09"},
+      "notes": [
+        {"text": "Most babies of this age still wake at night: about 8 in 10 wake 1 time or more, and about 6 in 10 still have a milk feed at night. Breastfed and formula-fed babies are the same in this.", "cites": ["brown15"]},
+        {"text": "A baby who does not sleep 6 or 8 hours in one stretch at 6 or 12 months does not develop less well.", "cites": ["pennestri18"]},
+        {"text": "The morning wake time stays almost the same as a baby gets older. An earlier bedtime gives a longer night.", "cites": ["mindell16"]}
+      ]
+    },
+    {
+      "key": "12-24", "min_months": 12, "max_months": 24, "label": "1 to 2 years",
+      "total": {"mean": 756, "low": 600, "high": 912, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_wakes": {"mean": 1.1, "sd": 1.1, "p50": 1, "low": 0, "high": 2.5, "range": "10th and 90th percentile at 18 months", "cite": "paavonen20"},
+      "longest_night": {"mean": 530, "sd": 165, "cite": "sadeh09"},
+      "nap_share": 0.96,
+      "notes": [
+        {"text": "Most children change from 2 naps to 1 nap between about 15 and 24 months. The change is not a clean step: days with 1 nap and days with 2 naps mix for some weeks.", "cites": ["sadeh09", "galland12"]},
+        {"text": "Almost all children of this age still nap: fewer than 3 in 100 stop before 2 years.", "cites": ["staton20"]}
+      ]
+    },
+    {
+      "key": "24-36", "min_months": 24, "max_months": 36, "label": "2 to 3 years",
+      "total": {"mean": 720, "low": 582, "high": 852, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_sleep": {"mean": 678, "sd": 60, "cite": "blair12"},
+      "night_wakes": {"mean": 0.9, "sd": 0.9, "p50": 1, "low": 0, "high": 2, "range": "10th and 90th percentile at 24 months", "cite": "paavonen20"},
+      "longest_night": {"mean": 540, "sd": 144, "cite": "sadeh09"},
+      "naps": 1, "nap_share": 0.87, "nap_minutes": {"mean": 108, "sd": 30, "cite": "iglowstein03"},
+      "bedtime": {"mean": 1190, "sd": 57, "low": 1076, "high": 1304, "range": "2.5th and 97.5th percentile", "cite": "blair12"},
+      "wake": {"mean": 424, "sd": 46, "low": 332, "high": 516, "range": "2.5th and 97.5th percentile", "cite": "blair12"},
+      "notes": [
+        {"text": "Night sleep stays almost the same from 1 to 5 years. The total gets lower because day sleep gets shorter.", "cites": ["iglowstein03"]},
+        {"text": "About 9 in 10 children nap at 2 years, and about 5 in 10 at 3 years. Age is a weak sign of the last nap. Your child's own days decide.", "cites": ["iglowstein03", "staton20"]},
+        {"text": "A nap late in the day can move the time that a child falls asleep at night. In one study, children of about 3 years who napped fell asleep about 1 hour later at night.", "cites": ["akacem15"]}
+      ]
+    },
+    {
+      "key": "36-48", "min_months": 36, "max_months": 48, "label": "3 to 4 years",
+      "total": {"mean": 700, "low": 558, "high": 846, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_sleep": {"mean": 678, "sd": 54, "cite": "blair12"},
+      "naps": 1, "nap_share": 0.5, "nap_minutes": {"mean": 102, "sd": 24, "cite": "iglowstein03"},
+      "bedtime": {"mean": 1186, "sd": 51, "low": 1084, "high": 1288, "range": "2.5th and 97.5th percentile", "cite": "blair12"},
+      "wake": {"mean": 422, "sd": 41, "low": 340, "high": 504, "range": "2.5th and 97.5th percentile", "cite": "blair12"},
+      "notes": [
+        {"text": "About half of the children of this age still nap. Many nap on some days only. Between studies, the share that has stopped at 3 years goes from 5 in 100 to 65 in 100.", "cites": ["staton20", "iglowstein03"]},
+        {"text": "Night sleep stays almost the same from 1 to 5 years. When the nap stops, the night does not get much longer.", "cites": ["iglowstein03"]},
+        {"text": "Regular times help: bedtime and wake time within about 30 minutes each day. The authors of this guideline say that the evidence for the number is weak.", "cites": ["okely17"]}
+      ]
+    },
+    {
+      "key": "48-60", "min_months": 48, "max_months": null, "label": "4 to 5 years",
+      "total": {"mean": 690, "low": 546, "high": 834, "range": "mean and reference range (mean ± 1.96 SD)", "cite": "galland12"},
+      "night_sleep": {"mean": 669, "sd": 45, "cite": "iglowstein03"},
+      "naps": 0, "nap_share": 0.2, "nap_minutes": {"mean": 90, "sd": 24, "cite": "iglowstein03"},
+      "bedtime": {"mean": 1192, "sd": 42, "low": 1108, "high": 1276, "range": "mean ± 2 SD", "cite": "blair12"},
+      "wake": {"mean": 430, "sd": 31, "low": 368, "high": 492, "range": "mean ± 2 SD", "cite": "blair12"},
+      "notes": [
+        {"text": "Most children of this age do not nap: about 8 in 10 have stopped by 4 to 5 years. Some still nap on some days.", "cites": ["staton20"]},
+        {"text": "Regular times help: bedtime and wake time within about 30 minutes each day. The authors of this guideline say that the evidence for the number is weak.", "cites": ["okely17"]}
+      ]
+    }
+  ]
+}

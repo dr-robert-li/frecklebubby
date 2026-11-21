@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.5.3-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.6.0-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -45,6 +45,8 @@ Your data stays on your server.
 - Takes voice commands, so you can log and ask with no hand or one hand free: a talk button, hands free with the
   keyword "Hey Bubby" or "OK Bubby", an optional large hold-to-talk button on the side of the screen, and an option
   to read the answer aloud. Your own server changes the speech into text.
+- Calculates a day and night plan for each child: wake time, naps, bedtime, night feeds and night wakes. It uses
+  your child's own logs of the last 14 days first, and typical values for the age only where logs are missing.
 - Gives development guidance from birth to 5 years: what most children do by each age (CDC), movement, behaviour
   and body changes to expect around now, cited tips on how to help, and a notification at each new age band.
   For a baby born early, give the due date and the app uses the corrected age until 2 years.
@@ -95,12 +97,13 @@ Your data stays on your server.
 </p>
 
 **Hands free and your own layout**<br>
-<sub>Voice command · Voice settings · Change the Home cards</sub>
+<sub>Voice command · Voice settings · Change the Home cards · Day and night plan</sub>
 
 <p>
   <a href="docs/screenshots/voice.png"><img src="docs/screenshots/voice.png" alt="Voice command" title="Voice command" width="23%"></a>
   <a href="docs/screenshots/voice-settings.png"><img src="docs/screenshots/voice-settings.png" alt="Voice settings" title="Voice settings" width="23%"></a>
   <a href="docs/screenshots/home-cards.png"><img src="docs/screenshots/home-cards.png" alt="Change the Home cards" title="Change the Home cards" width="23%"></a>
+  <a href="docs/screenshots/day-night-plan.png"><img src="docs/screenshots/day-night-plan.png" alt="Day and night plan" title="Day and night plan" width="23%"></a>
 </p>
 
 <sub>Select a picture to see it in full size.</sub>
@@ -159,7 +162,7 @@ The long sections are in the `docs/` folder:
 - [Sign-in](docs/sign-in.md): how to set up Clerk sign-in, and how to run an invite-only server for more than one family.
 - [HTTPS and phone install](docs/https.md): how to get an HTTPS address (Tailscale Funnel, Cloudflare Tunnel or a reverse proxy), and how to install the app on a phone.
 - [API and MCP](docs/api-and-mcp.md): how to connect Claude to the MCP server, and how to use the REST API with a token.
-- [AI functions](docs/ai.md): the AI model and the GPU setting, the sleep model, voice commands, the cry helper, and the knowledge library with its licences.
+- [AI functions](docs/ai.md): the AI model and the GPU setting, the day and night plan, the sleep model, voice commands, the cry helper, and the knowledge library with its licences.
 - [Operations](docs/operations.md): how to move your data from Huckleberry, and how to back up and restore the database.
 - [Development](docs/development.md): how to run the app without containers, and how to run the tests.
 

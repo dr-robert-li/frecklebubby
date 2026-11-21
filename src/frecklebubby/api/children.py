@@ -20,6 +20,7 @@ from ..schemas import (
     GrowthOut,
     MilestonesOut,
     Prediction,
+    RegimeOut,
     Status,
     TimerAction,
     TimerBody,
@@ -27,7 +28,7 @@ from ..schemas import (
     TimerResult,
     TimerType,
 )
-from ..services import Ctx, children, entries, export, growth, milestones, reports, sleep, timers
+from ..services import Ctx, children, entries, export, growth, milestones, regime, reports, sleep, timers
 
 router = APIRouter()
 
@@ -164,3 +165,9 @@ def sleep_prediction(
     s: Session = Depends(get_session),
 ):
     return sleep.predict(s, children.get_child(s, ctx, cid), ctx.tz, default=default)
+
+
+@router.get("/children/{cid}/sleep/regime", response_model=RegimeOut,
+            summary="The day and night plan: one typical 24 hours, from the child's last 14 days and the age")
+def sleep_regime(cid: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
+    return regime.regime(s, children.get_child(s, ctx, cid), ctx.tz)

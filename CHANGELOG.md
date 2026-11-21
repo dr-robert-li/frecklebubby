@@ -6,6 +6,21 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-21
+
+### Added
+
+- Day and night plan (**Assistant > Sleep plan**): one typical 24 hours for the child, with the wake time, the naps, bedtime, and the usual night feeds and night wakes. The app calculates it; the AI model does not make the times.
+- The plan uses the child's own logs of the last 14 days first. Each time is the middle value of those days, so one unusual day does not change the plan. From 5 complete days, only the child's own times are used. With fewer days, the plan mixes them with typical times for the age and says so.
+- The page shows the child's own numbers (sleep in 24 hours, sleep at night, longest sleep, wakes and feeds at night) next to the range that is common for the age. The range is information, not a target.
+- Rules that change with the age, in 7 age bands from birth to 5 years, each with its source.
+- Numbers for the age from published studies, with links: Paavonen 2020, Galland 2012, Blair 2012, Iglowstein 2003, Staton 2020, Brown and Harries 2015. The plan now also covers children from 2 to 5 years.
+- API `GET /children/{id}/sleep/regime` and the MCP tool `get_day_and_night_plan`.
+
+### Changed
+
+- "Make a sleep plan" is now "Write advice for this plan". The AI model gets the calculated plan and writes a summary and tips with sources. It cannot change the times.
+
 ## [0.5.3] - 2026-11-21
 
 ### Added

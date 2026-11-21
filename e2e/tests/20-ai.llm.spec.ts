@@ -141,17 +141,18 @@ test('d: the sleep plan for an 8-month-old shows a waiting state, then a cited p
 	await seedSleepWeek(api, family.childId);
 	await page.goto('/assistant');
 	await page.getByRole('tab', { name: 'Sleep plan' }).click();
-	await page.getByRole('button', { name: 'Make a sleep plan' }).click();
-	const waiting = page.getByRole('button', { name: /Making the plan/ });
+	const calc = page.getByRole('region', { name: 'Day and night plan' });
+	await expect(calc.locator('.schedule li.wake')).toContainText('05:40'); // the child's own wake time, with no model
+	expect(await calc.locator('.schedule li.nap').count()).toBeGreaterThanOrEqual(1);
+	await page.getByRole('button', { name: 'Write advice for this plan' }).click();
+	const waiting = page.getByRole('button', { name: /Writing the advice/ });
 	await expect(waiting).toBeDisabled();
 	await page.waitForTimeout(5000);
 	await snap(page, 'd1-plan-waiting');
 	await expect(waiting).toBeHidden({ timeout: 240_000 });
 	const plan = page.getByRole('region', { name: 'Sleep plan' });
-	await expect(plan.getByRole('heading', { name: 'Sleep plan' })).toBeVisible();
-	await expect(plan.locator('.schedule li').first()).toBeVisible();
-	expect(await plan.locator('.schedule li.nap').count()).toBeGreaterThanOrEqual(1);
-	await expect(plan.getByRole('heading', { name: 'Advice' })).toBeVisible();
+	await expect(plan.getByRole('heading', { name: 'Advice from the assistant' })).toBeVisible();
+	await expect(plan.getByRole('listitem').first()).toBeVisible();
 	await expect(plan.locator('.cite').first()).toBeVisible();
 	// every advice mark has a chip
 	const chips = (await plan.locator('.cite').allInnerTexts()).map((t) => Number(/^\[(\d+)\]/.exec(t)![1]));

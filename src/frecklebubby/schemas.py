@@ -642,3 +642,52 @@ class ConfigOut(BaseModel):
     vapid_public_key: str
     version: str
     voice: bool = False  # voice commands are installed on this server
+
+
+class RegimeRow(BaseModel):
+    time: str = Field(description="HH:MM, local time")
+    end: str | None = Field(None, description="End of a nap, HH:MM")
+    kind: Literal["wake", "nap", "bedtime", "night_feed", "night_wake"]
+    label: str
+    part: Literal["day", "night"]
+    basis: Literal["own", "mixed", "age"] = Field(description="own = the child's logs; age = typical for the age; mixed = both")
+    earliest: str | None = Field(None, description="The child's own usual range (8 in 10 days), from")
+    latest: str | None = Field(None, description="The child's own usual range, to")
+    note: str | None = None
+
+
+class RegimeFact(BaseModel):
+    key: str
+    label: str
+    value: str
+    basis: Literal["own", "mixed", "age"]
+    samples: int
+    usual: str | None = Field(None, description="The child's own usual range")
+    common: str | None = Field(None, description="The range that is common for the age. Not a target.")
+    outside: bool = Field(description="The child's own value is outside the common range")
+
+
+class RegimeNote(BaseModel):
+    text: str
+    cites: list[int]
+
+
+class RegimeSource(Citation):
+    n: int
+    kind: Literal["link"] = "link"
+    publisher: str | None = None
+    url: str | None = None
+
+
+class RegimeOut(BaseModel):
+    """The day and night plan: one typical 24 hours, calculated from the child's last 14 days and the age."""
+    age_band: str
+    basis: Literal["own", "mixed", "age"]
+    own_days: int
+    own_nights: int
+    days: int
+    naps: int
+    schedule: list[RegimeRow]
+    facts: list[RegimeFact]
+    notes: list[RegimeNote]
+    sources: list[RegimeSource]

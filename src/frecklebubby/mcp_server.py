@@ -47,6 +47,7 @@ from .schemas import (
     Prediction,
     RashSeverity,
     Reaction,
+    RegimeOut,
     Side,
     SleepCondition,
     SleepLocation,
@@ -62,6 +63,7 @@ from .services import (
     insights,
     milestones,
     plain_errors,
+    regime,
     reports,
     sleep,
     timers,
@@ -627,6 +629,14 @@ def create_mcp(fixed_email: str | None = None, auth: AuthProvider | None = None)
             c = child_of(s, ctx, child)
             rep = reports.daily(s, ctx, c.id, start, end)
             return {**rep, "days": [d.model_dump(mode="json") for d in rep["days"]]}
+
+    @mcp.tool(annotations=READ)
+    def get_day_and_night_plan(child: ChildArg = None) -> dict[str, Any]:
+        """One typical 24 hours for the child: wake, naps, bedtime, and the usual night feeds and night wakes. It is
+        calculated from the child's logs of the last 14 days. With few logs it uses typical values for the age.
+        `facts` compare the child's own values with the range that is common for the age; the range is not a target."""
+        with call() as (s, ctx):
+            return RegimeOut.model_validate(regime.regime(s, child_of(s, ctx, child), ctx.tz)).model_dump(mode="json")
 
     @mcp.tool(annotations=READ)
     def get_sleep_prediction(child: ChildArg = None) -> dict[str, Any] | None:
