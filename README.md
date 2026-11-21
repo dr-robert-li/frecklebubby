@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.7.2-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.8.0-e88fa6)](CHANGELOG.md)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -37,8 +37,10 @@ Your data stays on your server.
 - Tells you when a child has been in a car seat, bouncer, swing, pram, carrier or high chair for a long time: a
   note at 1 hour (children under 5 years) and a break warning at 2 hours (children under 12 months), with sources.
 - Records nappy details: rash, time with the nappy off, poo colour and texture, pee colour, look and smell.
-- Shows the history by day, from the morning to the evening, or as a list. You select the types to show, and
+- Shows the history by day, week or month, or as a list. Week and month show each day as one row of 24 hours,
+  with sleep as bars and feeds and nappies as marks, so you see the pattern. You select the types to show, and
   you can put the list in the order of time or of a logged amount (duration, volume, weight, length, temperature).
+  In the list you can also select days, to see them together with a total.
 - Shows reports: sleep, feeds and nappies per day, and growth on WHO percentile curves. Exports CSV.
 - Sends reminders in the app and as push notifications.
 - Has a REST API and an MCP server, so scripts and AI assistants such as Claude can read and write the data.
@@ -113,10 +115,11 @@ Your data stays on your server.
 </p>
 
 **History and sleep training**<br>
-<sub>History by day · History list, in order of amount · Sleep training</sub>
+<sub>History by week · History by month · History list, in order of amount · Sleep training</sub>
 
 <p>
-  <a href="docs/screenshots/history.png"><img src="docs/screenshots/history.png" alt="History by day" title="History by day" width="23%"></a>
+  <a href="docs/screenshots/history-week.png"><img src="docs/screenshots/history-week.png" alt="History by week" title="History by week" width="23%"></a>
+  <a href="docs/screenshots/history-month.png"><img src="docs/screenshots/history-month.png" alt="History by month" title="History by month" width="23%"></a>
   <a href="docs/screenshots/history-list.png"><img src="docs/screenshots/history-list.png" alt="History list, in order of amount" title="History list, in order of amount" width="23%"></a>
   <a href="docs/screenshots/sleep-training.png"><img src="docs/screenshots/sleep-training.png" alt="Sleep training" title="Sleep training" width="23%"></a>
 </p>

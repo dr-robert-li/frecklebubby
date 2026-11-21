@@ -2,12 +2,18 @@
 	import { api } from '#lib/api.ts';
 	import { child, wording } from '#lib/app.svelte.ts';
 	import EntrySheet from '#lib/EntrySheet.svelte';
-	import { addDays, fmtDayLabel, localDay } from '#lib/format.svelte.ts';
+	import { units } from '#lib/app.svelte.ts';
+	import { addDays, fmtDay, fmtDayLabel, fmtDur, fmtUnit, localDay } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
+	import Pattern from '#lib/Pattern.svelte';
 	import Timeline from '#lib/Timeline.svelte';
 	import { trackers, type Entry } from '#lib/trackers.ts';
 
-	let view = $state<'day' | 'list'>('day');
+	const VIEWS = [['day', 'Day'], ['week', 'Week'], ['month', 'Month'], ['list', 'List']] as const;
+	let view = $state<(typeof VIEWS)[number][0]>('day');
+	// Week and Month: the 7 or 30 days that end on the selected day
+	const span = $derived(view === 'week' ? 7 : view === 'month' ? 30 : 1);
+	const days = $derived(Array.from({ length: span }, (_, i) => addDays(day, i + 1 - span)));
 	let day = $state(localDay());
 	// types: the selected entry types. All are selected at the start.
 	const all = $derived(trackers(wording()));
@@ -17,6 +23,9 @@
 		['time', 'Time'], ['duration', 'Duration'], ['volume', 'Volume'], ['weight', 'Weight'],
 		['height', 'Length or height'], ['head', 'Head'], ['temperature', 'Temperature']
 	];
+	// List: the days with a check mark. With none, the list shows all days.
+	const recent = $derived(Array.from({ length: 30 }, (_, i) => addDays(localDay(), -i)));
+	let picked = $state<string[]>([]);
 	let sort = $state('time');
 	let dir = $state<'desc' | 'asc'>('desc');
 	let entries = $state<Entry[]>([]);
@@ -34,22 +43,37 @@
 		error = '';
 		const q = new URLSearchParams();
 		if (off.length) for (const t of types) q.append('type', t.type);
-		if (view === 'day') {
-			// a day reads from the morning to the evening
-			q.set('from', `${day}T00:00`);
+		if (view !== 'list') {
+			// a day reads from the morning to the evening. Week and Month start one day before, for a sleep that
+			// goes past midnight into the first day.
+			q.set('from', `${addDays(day, span === 1 ? 0 : -span)}T00:00`);
 			q.set('to', `${addDays(day, 1)}T00:00`);
-			q.set('limit', '500');
+			q.set('limit', '1000');
 			q.set('dir', 'asc');
 		} else {
-			q.set('limit', '50');
+			q.set('limit', picked.length ? '1000' : '50');
 			q.set('sort', sort);
 			q.set('dir', dir);
 			if (append) q.set('offset', String(entries.length));
+			if (picked.length) {
+				q.set('from', `${[...picked].sort()[0]}T00:00`);
+				q.set('to', `${addDays([...picked].sort().at(-1)!, 1)}T00:00`);
+			}
 		}
 		try {
-			const page = await api<Entry[]>(`/children/${c.id}/entries?${q}`);
+			let page = await api<Entry[]>(`/children/${c.id}/entries?${q}`);
+			if (view !== 'list' || picked.length) {
+				// a month of a newborn can have more than 1000 entries: read all pages
+				const all = [...page];
+				while (page.length === 1000) {
+					q.set('offset', String(all.length));
+					page = await api<Entry[]>(`/children/${c.id}/entries?${q}`);
+					all.push(...page);
+				}
+				page = view === 'list' ? all.filter((e) => picked.includes(localDay(e.started_at))) : all;
+			}
 			entries = append ? [...entries, ...page] : page;
-			more = view === 'list' && page.length === 50;
+			more = view === 'list' && !picked.length && page.length === 50;
 		} catch (e) {
 			error = (e as Error).message;
 		} finally {
@@ -58,19 +82,17 @@
 	}
 
 	$effect(() => {
-		void [view, day, off, sort, dir, version, child()];
+		void [view, day, off, picked, sort, dir, version, child()];
 		load();
 	});
 
-	// group the list view by local day
-	const groups = $derived.by(() => {
-		const g: [string, Entry[]][] = [];
-		for (const e of entries) {
-			const d = localDay(e.started_at);
-			if (g.at(-1)?.[0] !== d) g.push([d, []]);
-			g.at(-1)![1].push(e);
-		}
-		return g;
+	// the total of the selected days, for the amounts that you can add
+	const total = $derived.by(() => {
+		if (sort === 'volume')
+			return fmtUnit('volume', entries.reduce((s, e) => s + (e.data.amount_ml ?? e.data.total_ml ?? (e.data.left_ml ?? 0) + (e.data.right_ml ?? 0)), 0), units());
+		if (sort === 'duration')
+			return fmtDur(entries.reduce((s, e) => s + (e.ended_at ? (Date.parse(e.ended_at) - Date.parse(e.started_at)) / 1000 : (e.data.left_seconds ?? 0) + (e.data.right_seconds ?? 0)), 0));
+		return '';
 	});
 </script>
 
@@ -78,8 +100,7 @@
 
 <h1>History</h1>
 <div class="seg" role="group" aria-label="View">
-	<button aria-pressed={view === 'day'} onclick={() => (view = 'day')}>Day</button>
-	<button aria-pressed={view === 'list'} onclick={() => (view = 'list')}>List</button>
+	{#each VIEWS as [k, l] (k)}<button aria-pressed={view === k} onclick={() => ((entries = []), (view = k))}>{l}</button>{/each}
 </div>
 
 <details class="filters card">
@@ -97,6 +118,20 @@
 </details>
 
 {#if view === 'list'}
+	<details class="filters card">
+		<summary>Days: {picked.length ? `${picked.length} selected` : 'all'}</summary>
+		<p class="muted small">Select days to show only these days together. With no day selected, the list shows all days.</p>
+		<div class="row">
+			<button class="ghost" disabled={picked.length === recent.length} onclick={() => (picked = [...recent])}>Select all</button>
+			<button class="ghost" disabled={!picked.length} onclick={() => (picked = [])}>Deselect all</button>
+		</div>
+		<div class="types">
+			{#each recent as d (d)}
+				<label class="pick"><input type="checkbox" checked={picked.includes(d)}
+					onchange={() => (picked = picked.includes(d) ? picked.filter((x) => x !== d) : [...picked, d])} /> {d >= addDays(localDay(), -1) ? fmtDayLabel(d) : fmtDay(d, { weekday: 'short', day: 'numeric', month: 'short' })}</label>
+			{/each}
+		</div>
+	</details>
 	<div class="order">
 		<label class="field"><span>Order by</span>
 			<select bind:value={sort}>
@@ -111,14 +146,14 @@
 	{#if sort !== 'time'}<p class="muted small">The list shows only the entries that have this amount.</p>{/if}
 {/if}
 
-{#if view === 'day'}
+{#if view !== 'list'}
 	<div class="spread daynav">
-		<button class="icon" aria-label="Day before" onclick={() => (day = addDays(day, -1))}><Icon name="left" /></button>
-		<label class="daypick"><span class="sr-only">Day</span>
-			<strong>{fmtDayLabel(day)}</strong>
+		<button class="icon" aria-label={span === 1 ? 'Day before' : `${span} days before`} onclick={() => (day = addDays(day, -span))}><Icon name="left" /></button>
+		<label class="daypick"><span class="sr-only">{span === 1 ? 'Day' : 'Last day'}</span>
+			<strong>{span === 1 ? fmtDayLabel(day) : `${fmtDay(days[0], { day: 'numeric', month: 'short' })} to ${fmtDay(day, { day: 'numeric', month: 'short' })}`}</strong>
 			<input type="date" bind:value={day} max={localDay()} aria-label="Choose a day" />
 		</label>
-		<button class="icon" aria-label="Next day" disabled={day >= localDay()} onclick={() => (day = addDays(day, 1))}><Icon name="right" /></button>
+		<button class="icon" aria-label={span === 1 ? 'Next day' : `${span} days after`} disabled={day >= localDay()} onclick={() => (day = addDays(day, span) > localDay() ? localDay() : addDays(day, span))}><Icon name="right" /></button>
 	</div>
 {/if}
 
@@ -127,18 +162,20 @@
 <section class="card">
 	{#if view === 'day'}
 		<Timeline {entries} onpick={(e) => (edit = e)} empty={loading ? 'Loading…' : types.length ? 'Nothing logged on this day.' : 'Select one type or more.'} />
+	{:else if view !== 'list'}
+		{#if !types.length}
+			<p class="empty">Select one type or more.</p>
+		{:else}
+			<Pattern {days} {entries} tall={view === 'week'} onpick={(d) => ((entries = []), (day = d), (view = 'day'))} />
+		{/if}
 	{:else}
 		{#if !types.length}
 			<p class="empty">Select one type or more.</p>
-		{:else if sort !== 'time'}
-			<Timeline {entries} dated onpick={(e) => (edit = e)} empty={loading ? 'Loading…' : 'No entry has this amount.'} />
 		{:else}
-		{#each groups as [d, list] (d)}
-			<h2 class="dayhead">{fmtDayLabel(d)}</h2>
-			<Timeline entries={list} onpick={(e) => (edit = e)} />
-		{:else}
-			<p class="empty">{loading ? 'Loading…' : 'Nothing logged yet.'}</p>
-		{/each}
+			{#if picked.length && entries.length}
+				<p class="muted small sum" role="status">{entries.length} {entries.length === 1 ? 'entry' : 'entries'} on {picked.length} {picked.length === 1 ? 'day' : 'days'}{total ? `. Total: ${total}` : ''}</p>
+			{/if}
+			<Timeline {entries} dated onpick={(e) => (edit = e)} empty={loading ? 'Loading…' : sort === 'time' ? (picked.length ? 'Nothing logged on these days.' : 'Nothing logged yet.') : 'No entry has this amount.'} />
 		{/if}
 		{#if more}<button class="ghost wide" disabled={loading} onclick={() => load(true)}>Show older</button>{/if}
 	{/if}
@@ -158,7 +195,7 @@
 	}
 	.filters summary {
 		font-weight: 700;
-		min-height: 32px;
+		line-height: 36px;
 		cursor: pointer;
 	}
 	.row {
@@ -197,12 +234,7 @@
 		padding: 4px 10px;
 		margin-top: 4px;
 	}
-	.dayhead {
-		font-size: 1rem;
-		margin: 12px 0 4px;
-		color: var(--muted);
-	}
-	.dayhead:first-child {
-		margin-top: 0;
+	.sum {
+		margin: 0 0 6px;
 	}
 </style>

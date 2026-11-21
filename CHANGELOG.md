@@ -6,6 +6,26 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-22
+
+### Added
+
+- History has two new views, Week and Month. The views are now Day, Week, Month and List.
+  - Each day is one row, with the 24 hours from left to right. Sleep is a bar. Each other entry is a mark at its time, in the colour of its type.
+  - Week shows the 7 days to the selected day in tall rows, with one lane for each group (sleep, feeds, nappies, other) and the totals of the day under each row.
+  - Month shows the 30 days to the selected day in thin rows, with the hours of sleep at the end of each row.
+  - The type checkboxes select what the views show. A row opens its day in the Day view. A sleep that goes past midnight shows in the two days.
+  - Each type has its own colour, and a key above the rows shows the colours.
+- History, List view: "Days" is a list of the last 30 days with checkboxes. The list then shows only the selected days together, with the number of entries and, in the order of volume or duration, the total. With no day selected, the list shows all days.
+
+### Changed
+
+- History, List view: the list has no day headings. Each row shows its date.
+
+### Fixed
+
+- History: the text of the "Types" control is now in the middle of its box.
+
 ## [0.7.2] - 2026-11-22
 
 ### Changed

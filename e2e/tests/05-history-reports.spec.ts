@@ -33,6 +33,21 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	expect(times).toEqual([...times].sort());
 	expect(times.length).toBe(5);
 
+	// Week: one row for each of the last 7 days to the selected day, with totals; a row opens its day
+	await page.getByRole('button', { name: 'Week', exact: true }).click();
+	const week = page.getByRole('list', { name: 'Week' });
+	await expect(week.getByRole('listitem')).toHaveCount(7);
+	await expect(week.getByRole('listitem').last()).toContainText('Feeds 5 · Nappies 4');
+	await expect(week.getByRole('listitem').last()).toContainText(/Sleep \d+ h/);
+	await shot(page, '06-history-week');
+	await page.getByRole('button', { name: 'Month', exact: true }).click();
+	const month = page.getByRole('list', { name: 'Month' });
+	await expect(month.getByRole('listitem')).toHaveCount(30);
+	await shot(page, '06-history-month', true);
+	await month.getByRole('listitem').nth(27).getByRole('button').click();
+	await expect(page.getByRole('button', { name: 'Day', exact: true })).toHaveAttribute('aria-pressed', 'true');
+	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Bottle/ })).toHaveCount(5);
+
 	await page.getByRole('button', { name: 'List', exact: true }).click();
 	await page.getByText(/^Types:/).click();
 	await page.getByRole('button', { name: 'Deselect all' }).click();
@@ -53,6 +68,18 @@ test('History and Reports show a week of data, growth percentile and CSV export'
 	await expect(page.getByRole('button', { name: /Edit Nappy/ })).toHaveCount(0);
 	await page.getByRole('button', { name: 'Smallest first' }).click();
 	await expect(first).toContainText('90 ml');
+	// days with a check mark: the list shows only these days together, with their total
+	await page.getByText(/^Days:/).click();
+	await page.getByRole('checkbox', { name: 'Yesterday' }).check();
+	await page.getByRole('checkbox', { name: 'Today' }).check();
+	await expect(page.getByText('Days: 2 selected')).toBeVisible();
+	await expect(page.getByText('6 entries on 2 days. Total: 665 ml')).toBeVisible();
+	await expect(page.getByRole('button', { name: /Edit Bottle/ })).toHaveCount(6);
+	await page.getByText(/^Days:/).click();
+	await shot(page, '06-history-list-days');
+	await page.getByText(/^Days:/).click();
+	await page.getByRole('button', { name: 'Deselect all' }).last().click();
+	await expect(page.getByText('Days: all')).toBeVisible();
 	await page.getByLabel('Order by').selectOption('time');
 	await page.getByRole('button', { name: 'Newest first' }).click();
 	await shot(page, '06-history-list');
