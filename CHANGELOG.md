@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.5] - 2026-11-21
+
+### Fixed
+
+- The "Write new sleep plan" button touched the source chips above it. It now has space above it. The same fault was in **Settings > Children** ("Add a child"), and it is fixed there too. A test now checks the space above the wide buttons on the main pages.
+
 ## [0.6.4] - 2026-11-21
 
 ### Fixed

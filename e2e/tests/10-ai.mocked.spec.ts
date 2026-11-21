@@ -75,6 +75,9 @@ test('the parent asks the assistant and opens a source', async ({ page, family }
 	await page.getByRole('button', { name: 'Write a sleep plan' }).click();
 	await expect(page.getByText('Three naps and bedtime at 18:45.')).toBeVisible();
 	await expect(page.getByText('Keep the room dark for naps.')).toBeVisible();
+	// The button does not touch the source chips above it.
+	const space = await page.getByRole('button', { name: 'Write new sleep plan' }).evaluate((b) => b.getBoundingClientRect().top - b.previousElementSibling!.getBoundingClientRect().bottom);
+	expect(space).toBeGreaterThanOrEqual(8);
 	await shot(page, '11-sleep-plan');
 
 	// milestones are real (the endpoint exists)

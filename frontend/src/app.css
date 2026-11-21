@@ -224,6 +224,11 @@ button.icon {
 button.wide {
 	width: 100%;
 }
+/* A wide button directly after a block with no space under it (source chips, a field, a list of values) keeps a gap.
+   No specificity: a rule that sets its own space (for example .stack) wins. */
+:where(.chips, dl, ul, ol, fieldset, label, div, input, select) + :where(button.wide) {
+	margin-top: 12px;
+}
 
 label.field {
 	display: block;
