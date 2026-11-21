@@ -30,6 +30,8 @@ test('b: the talk button in the Assistant puts the command in the chat', async (
 	await expect(card(page)).toContainText('Recording');
 	await page.waitForTimeout(9000); // one full turn of the WAV
 	await page.getByRole('button', { name: 'Stop recording and send' }).click();
+	await expect(card(page).getByRole('progressbar')).toBeVisible(); // the speech is received and the app works on it
+	await expect(card(page)).toContainText(/Changing speech to words|Working/);
 	const turn = page.locator('.msgs li.assistant').last();
 	await expect(turn.getByRole('group', { name: 'Logged' }).getByText(/Nappy – wee/).first()).toBeVisible({ timeout: 120_000 });
 	await expect(page.locator('.msgs li.user').last()).toContainText(/wet nappy/i);

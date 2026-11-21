@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-    image: frecklebubby:0.5.2
+    image: frecklebubby:0.5.3
     restart: unless-stopped
     ports:
       - "${FRECKLEBUBBY_PORT:-8000}:8000"

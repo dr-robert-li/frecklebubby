@@ -8,7 +8,7 @@
 	import { canVoice, pttStart, pttStop, setHandsFree, voice } from './voice.svelte';
 
 	const status = $derived(
-		voice.recording ? 'Recording… ' : voice.busy ? 'Working…' : voice.armed ? 'Yes? Say it now.' : voice.handsFree ? 'Hands free is on. Say "Hey Bubby" and then your words.' : voice.turn ? 'Done' : ''
+		voice.recording ? 'Recording… ' : voice.hearing ? (voice.handsFree && !voice.armed ? 'I heard a sound. Checking for "Hey Bubby"…' : 'I heard you. Changing speech to words…') : voice.busy ? 'Working…' : voice.armed ? 'Yes? Say it now.' : voice.handsFree ? 'Hands free is on. Say "Hey Bubby" and then your words.' : voice.turn ? 'Done' : ''
 	);
 	const paras = (m: Msg) => m.content.replace(/\[\d+\]/g, '').split(/\n\n+/).filter(Boolean);
 
@@ -40,6 +40,8 @@
 					<button class="icon" aria-label="Close" onclick={() => ((voice.turn = null), (voice.error = ''), (voice.heard = ''))}><Icon name="close" size={20} /></button>
 				{/if}
 			</div>
+			{#if voice.hearing || voice.busy}<div class="bar" role="progressbar" aria-label="Working"></div>{/if}
+			{#if voice.busy && !voice.hearing && !voice.turn && voice.heard}<p class="muted small said">You said: {voice.heard}</p>{/if}
 			{#if voice.error}<p class="error" role="alert">{voice.error}</p>{/if}
 			{#if voice.turn}
 				{@const m = voice.turn}
@@ -97,6 +99,31 @@
 		font-weight: 700;
 		color: var(--ink-strong);
 		flex: 1;
+	}
+	.bar {
+		height: 4px;
+		margin-top: 8px;
+		border-radius: 2px;
+		background: linear-gradient(90deg, transparent, var(--accent), transparent) 0 0 / 50% 100% no-repeat;
+		animation: slide 1.1s linear infinite;
+	}
+	@keyframes slide {
+		from {
+			background-position: -100% 0;
+		}
+		to {
+			background-position: 200% 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bar {
+			animation: none;
+			background: var(--accent);
+			opacity: 0.5;
+		}
+	}
+	.said {
+		margin: 6px 0 0;
 	}
 	.turn p {
 		margin: 6px 0;

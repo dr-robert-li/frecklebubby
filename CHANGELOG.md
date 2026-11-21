@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-11-21
+
+### Added
+
+- Voice commands show progress. After you speak, the voice card shows a moving bar and a line of text while the server changes the speech into words, and while the assistant works. Your words show as soon as the server has them.
+
 ## [0.5.2] - 2026-11-21
 
 ### Fixed

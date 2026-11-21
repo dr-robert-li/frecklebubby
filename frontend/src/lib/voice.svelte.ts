@@ -22,6 +22,7 @@ export const voice = $state({
 	handsFree: false,
 	armed: false, // the keyword came alone: the next phrase is the command
 	busy: false, // a command runs
+	hearing: false, // a phrase is with the server: speech to words
 	error: '',
 	heard: '', // the words of the last command
 	turn: null as Msg | null, // the answer to the last command, when no page shows it
@@ -172,12 +173,15 @@ async function onPhrase(parts: Float32Array[], rate: number) {
 	if (!voice.handsFree) return;
 	const armed = voice.armed;
 	let r;
+	voice.hearing = true;
 	try {
 		r = await toText(parts, rate, !armed);
 	} catch (e) {
 		// Too many requests or no network: say it once, then listen again.
 		voice.error = e instanceof ApiError ? e.message : '';
 		return;
+	} finally {
+		voice.hearing = false;
 	}
 	if (armed) {
 		disarm();
@@ -274,8 +278,9 @@ export async function pttStop() {
 	close();
 	if (!long) return;
 	voice.busy = true;
+	voice.hearing = true;
 	try {
-		const r = await toText(parts, rate, false);
+		const r = await toText(parts, rate, false).finally(() => (voice.hearing = false));
 		if (r.text) await run(r.text, false);
 		else voice.error = 'I did not hear words. Try again.';
 	} catch (e) {
