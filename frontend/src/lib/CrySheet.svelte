@@ -240,7 +240,7 @@
 				</ul>
 			</section>
 
-			<section class="save">
+			<section class="save stack">
 				<label class="field"><span>Crying for about</span>
 					<select bind:value={crying}>
 						<option value="0">It just started</option>

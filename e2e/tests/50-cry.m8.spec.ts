@@ -37,6 +37,11 @@ test('no microphone: the logs rank what to check, then the parent saves the cryi
 	await s.getByLabel('What helped (optional)').fill('feed');
 	await expect(s.getByRole('button', { name: 'Done' })).toHaveCount(0); // one button saves, a small one cancels
 	await expect(s.getByRole('button', { name: 'Cancel' })).toBeVisible();
+	const above = (await s.getByLabel('What helped (optional)').boundingBox())!;
+	const row = (await s.getByRole('button', { name: 'Save to timeline' }).boundingBox())!;
+	expect(row.y - (above.y + above.height)).toBeGreaterThanOrEqual(12); // space above the buttons
+	await s.getByRole('button', { name: 'Save to timeline' }).scrollIntoViewIfNeeded();
+	await shotM8(page, '04b-save-row');
 	await s.getByRole('button', { name: 'Save to timeline' }).click();
 	await expect(s).toBeHidden();
 	const item = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ });

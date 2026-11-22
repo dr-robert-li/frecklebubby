@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.8] - 2026-11-22
+
+### Fixed
+
+- The cry helper has space between the last field and the buttons to save and to cancel.
+
 ## [0.8.7] - 2026-11-22
 
 ### Changed
