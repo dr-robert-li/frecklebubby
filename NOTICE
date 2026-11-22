@@ -1,0 +1,43 @@
+Frecklebubby
+Copyright (C) 2026 Robert Li
+https://github.com/dr-robert-li/frecklebubby
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version. See the file LICENSE.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Additional terms under section 7(b) of the GNU Affero General Public License, version 3
+----------------------------------------------------------------------------------------
+
+1. The user interface of this program shows the author attribution "Frecklebubby by Robert Li" with a link to
+   https://github.com/dr-robert-li/frecklebubby (on the Settings screen). You must keep this attribution, with the
+   link, in the Appropriate Legal Notices that the user interface shows. This applies to this program and to each
+   work that is based on it.
+2. A changed version can add its own name. Then it must show "Based on Frecklebubby by Robert Li" with the same
+   link, in a place that each user can see.
+3. You must keep this NOTICE file in each copy of the source code and of the built program.
+
+
+The name
+--------
+
+This licence gives no right to the name "Frecklebubby" or to the logo as the name or logo of your own product
+(section 7(e)). You can use the name to say what your work is based on, as the terms above require. A changed
+version that you give to other people must have a different name.
+
+
+Earlier versions
+----------------
+
+Versions 0.8.9 and earlier were released under the MIT licence. Those versions keep that licence.
+
+
+Other material
+--------------
+
+Data in src/frecklebubby/data/ and in training/ keeps its own licence. See the NOTICE files in those folders and
+docs/ai.md. Some of it is for non-commercial use only.

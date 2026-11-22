@@ -29,6 +29,7 @@ FROM docker.io/library/python:3.14-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --uid 1000 app && mkdir /data && chown app:app /data
 COPY --from=build /app/.venv /app/.venv
+COPY LICENSE NOTICE /app/
 ENV PATH=/app/.venv/bin:$PATH DATA_DIR=/data HOST=0.0.0.0 PORT=8000 PYTHONUNBUFFERED=1
 USER app
 WORKDIR /data

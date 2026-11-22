@@ -33,6 +33,8 @@
 	{/each}
 </nav>
 <p class="muted small center">Signed in as {app.me?.user.email} · Frecklebubby {app.config?.version}</p>
+<!-- The licence requires this attribution and the link to the source code: see the file NOTICE. -->
+<p class="muted small center">Frecklebubby by Robert Li · free software, AGPL-3.0 · <a href="https://github.com/dr-robert-li/frecklebubby" target="_blank" rel="noopener">Source code</a></p>
 {#if app.config?.auth_mode === 'clerk'}<button class="ghost wide" onclick={signOut}>Sign out</button>{/if}
 
 <style>

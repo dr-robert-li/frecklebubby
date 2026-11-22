@@ -1,7 +1,8 @@
 {
   "name": "frecklebubby-frontend",
   "private": true,
-  "version": "0.8.9",
+  "license": "AGPL-3.0-or-later",
+  "version": "0.8.10",
   "type": "module",
   "scripts": {
     "dev": "vite dev",

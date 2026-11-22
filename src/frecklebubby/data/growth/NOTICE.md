@@ -1,6 +1,6 @@
 # WHO Child Growth Standards: LMS tables
 
-This folder is NOT covered by the MIT licence of the Frecklebubby code. The data belongs to the World Health Organization (WHO) and is used under WHO's own terms (below).
+This folder is NOT covered by the licence of the Frecklebubby code. The data belongs to the World Health Organization (WHO) and is used under WHO's own terms (below).
 
 Retrieved: 2026-11-20
 

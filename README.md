@@ -10,8 +10,8 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.8.9-e88fa6)](CHANGELOG.md)
-[![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.8.10-e88fa6)](CHANGELOG.md)
+[![Licence: AGPL-3.0](https://img.shields.io/badge/licence-AGPL--3.0-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
 [Website](https://frecklebubby.app) · [Quick start](#quick-start) · [Connect Claude](docs/api-and-mcp.md#connect-claude-mcp) · [Screenshots](#what-it-does) · [Changelog](CHANGELOG.md)
@@ -67,7 +67,7 @@ Your data stays on your server.
   For a baby born early, give the due date and the app uses the corrected age until 2 years.
 - Makes a support report: the last 7 days by area, compared with cited references, with suggestions on where you
   can support your child.
-- Copies your data out of the Huckleberry app, once or as often as you like.
+- Imports your data from another baby tracker app, once or as often as you like (see [Operations](docs/operations.md)).
 
 <div align="center">
 
@@ -192,7 +192,7 @@ The long sections are in the `docs/` folder:
 - [HTTPS and phone install](docs/https.md): how to get an HTTPS address (Tailscale Funnel, Cloudflare Tunnel or a reverse proxy), and how to install the app on a phone.
 - [API and MCP](docs/api-and-mcp.md): how to connect Claude to the MCP server, and how to use the REST API with a token.
 - [AI functions](docs/ai.md): the AI model and the GPU setting, the day and night plan, sleep training, the sleep model, voice commands, the cry helper, and the knowledge library with its licences.
-- [Operations](docs/operations.md): how to move your data from Huckleberry, and how to back up and restore the database.
+- [Operations](docs/operations.md): how to import your data from another app, and how to back up and restore the database.
 - [Development](docs/development.md): how to run the app without containers, and how to run the tests.
 
 ## Troubleshooting
@@ -206,14 +206,20 @@ The long sections are in the `docs/` folder:
 | "Turn on notifications" fails, or there is no push | Push needs HTTPS. On iPhone, add the app to the Home Screen first. Check that the browser allows notifications |
 | The assistant answers stop part-way through a proxy | Turn off response buffering in the proxy for `/api/` |
 | A sleep plan takes long | Normal on a CPU: about 1 minute or more |
-| Import says "Huckleberry sign-in failed" | Check the email and password in the Huckleberry app |
 | Import says it is not available on this server | The `import` extra is not installed. The container has it. Without containers: `uv sync --extra import` |
 
 ## Licence
 
-MIT for the code. See [LICENSE](LICENSE). Data in `src/frecklebubby/data/` keeps its own licence (see
+The code has the GNU Affero General Public License, version 3 or later. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+- You can use, change and share the code. A changed version must have the same licence, and you must publish its
+  source code. This also applies when you only run it as a server for other people.
+- You must keep the attribution "Frecklebubby by Robert Li" with the link to this repository in the app. A changed
+  version shows "Based on Frecklebubby by Robert Li". The exact terms are in [NOTICE](NOTICE).
+- A changed version that you give to other people must have a different name.
+- Versions 0.8.9 and earlier have the MIT licence.
+
+Data in `src/frecklebubby/data/` keeps its own licence (see
 [Knowledge library and licences](docs/ai.md#knowledge-library-and-licences)). The sleep norms file, the sleep data in
 `training/sleep/data/` and the cry models are for non-commercial use, with attribution (see [Sleep model](docs/ai.md#sleep-model)
 and [Cry helper](docs/ai.md#cry-helper)).
-
-This project is not affiliated with Huckleberry Labs Inc.

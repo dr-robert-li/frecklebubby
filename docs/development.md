@@ -52,3 +52,13 @@ size of the phone screen in the tests (1082 x 2202).
 
 What the tests do not prove yet: a carer invite and a refused email with a real Clerk account, push notifications on a real phone (headless Chromium has no push service), and import from a real Huckleberry
 account.
+
+## Contributions
+
+The code has the licence AGPL-3.0-or-later (see `LICENSE` and `NOTICE`). When you open a pull request, you agree to
+these 2 points:
+
+- Your contribution has the same licence.
+- You give Robert Li the right to also use and license your contribution under other terms.
+
+The second point lets the owner change the licence later and keep private extensions.

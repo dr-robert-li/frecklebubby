@@ -6,6 +6,18 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.10] - 2026-11-22
+
+### Changed
+
+- The licence of the code is now AGPL-3.0-or-later. It was MIT. Versions 0.8.9 and earlier keep the MIT licence.
+- A changed version must keep the same licence and publish its source code, also when it only runs as a server.
+- The new file `NOTICE` has the attribution terms: the app must show "Frecklebubby by Robert Li" with a link to the
+  source code. A changed version shows "Based on Frecklebubby by Robert Li" and must have a different name.
+- The Settings screen shows the attribution, the licence and a link to the source code.
+- The container image has the files `LICENSE` and `NOTICE` in `/app`.
+- `docs/development.md` has the terms for contributions.
+
 ## [0.8.9] - 2026-11-22
 
 ### Changed

@@ -2,7 +2,7 @@
 name = "crykit"
 version = "0.1.0"
 description = "Training kit for the Frecklebubby cry detector and cry-reason model"
-license = { text = "MIT" }
+license = { text = "AGPL-3.0-or-later" }
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "numpy>=2.1",
