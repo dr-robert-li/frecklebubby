@@ -73,7 +73,8 @@ How the two parts connect (decided, not built):
 - The licence of the app (AGPL-3.0) helps here. The owner has the copyright and can run a closed plug-in.
   Another person who hosts a changed app for other people must publish the changes.
 
-To build (in the closed repository, except where this text says other):
+The plug-in (done in the closed repository, except where this text says other; on the server of the owner since
+0.9.0):
 
 - Keep the clip only when the parent saves the crying entry. The server holds the recording for some minutes
   after the analysis and deletes it when the parent does not save.
@@ -91,8 +92,15 @@ To build (in the closed repository, except where this text says other):
 - Tell the owner of each family clearly, with the message at sign-in and in Settings, that recordings are kept
   and how to turn this off. The privacy text of the open source app stays true (audio is not stored); the plug-in changes
   the text on the server of the owner.
-- In this repository (done, not released): the extension point, the lower limit of 10 seconds, and a test that
+- In this repository (released in 0.9.0): the extension point, the lower limit of 10 seconds, and a test that
   the app with no plug-in keeps no audio. See `src/frecklebubby/plugins.py`.
+
+To build (in the closed repository): the training and publishing pipeline.
+
+- Read the export of the plug-in in the training kit. Map the reasons of the parent to the classes of the model.
+- Train with each child as one group. Give more weight to a label that the parent changed from the default.
+- Publish the gated dataset. At each update, remove the clips that were deleted on the server.
+- Look at the free text "what helped" before it is published, because it can contain a name.
 
 Decided on the message and the dataset:
 

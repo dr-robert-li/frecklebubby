@@ -6,6 +6,8 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-23
+
 ### Added
 
 - A general extension point for plug-ins (`src/frecklebubby/plugins.py`, see [Development](docs/development.md#plug-ins)).

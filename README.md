@@ -10,7 +10,7 @@ Log the day, see the patterns, and ask an assistant that shows its sources.
 Your data stays on your server.
 
 [![CI](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-robert-li/frecklebubby/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.8.10-e88fa6)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.9.0-e88fa6)](CHANGELOG.md)
 [![Licence: AGPL-3.0](https://img.shields.io/badge/licence-AGPL--3.0-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
@@ -25,6 +25,9 @@ Your data stays on your server.
 > closed alpha. Only invited people can sign in. There is no public sign-up. You can join the waitlist at
 > [frecklebubby.app](https://frecklebubby.app). The software can change between
 > versions. You can host your own server with the [quick start](#quick-start).
+>
+> The hosted server keeps the cry recordings of saved crying entries, to train a better cry helper. A family can turn
+> this off (see the [privacy policy](https://frecklebubby.app/privacy.html#cry)). The open source app keeps no audio.
 
 ## What it does
 

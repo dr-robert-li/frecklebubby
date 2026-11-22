@@ -32,6 +32,7 @@
 <tr><td>The family: its name, its members and their roles, invitations by email</td><td>You</td><td>To share the logs between carers</td></tr>
 <tr><td>Each child: name, date of birth, sex, and the logs (sleep, feeds, nappies, growth, temperature, medicine, crying, notes, milestones and other entries)</td><td>You and the other carers</td><td>This is the function of the app</td></tr>
 <tr><td>Sleep plans, reminders, notifications and reports that the app makes from the logs</td><td>The app</td><td>To show them to you</td></tr>
+<tr><td>Cry recordings (10 seconds at most) of saved crying entries, with labels</td><td>You, with the cry helper</td><td>To train a better cry helper (see section 3a). You can turn this off.</td></tr>
 <tr><td>Your messages to the assistant and its answers</td><td>You</td><td>To show the conversation and to give answers in context</td></tr>
 <tr><td>Files that you add to the knowledge library</td><td>You</td><td>So that the assistant can use them as sources</td></tr>
 <tr><td>The address that your browser gives for push notifications</td><td>Your browser, when you turn notifications on</td><td>To send reminders to your device</td></tr>
@@ -43,18 +44,30 @@
 <h2>3. Data we do not keep</h2>
 <ul>
 <li><strong>Voice commands.</strong> The recording goes to our server, which changes it into text. The recording is then discarded.</li>
-<li><strong>Cry recordings.</strong> The recording goes to our server, which analyses it. The recording is then discarded. The result is kept only if you save the entry.</li>
 <li><strong>Passwords.</strong> We never get the password of your sign-in account. If you import data from another app, its password is used only during the import and is not stored.</li>
 <li><strong>Advertising and analytics data.</strong> We use no advertising, no analytics service and no tracking cookies.</li>
 </ul>
 <p>If one of these points changes, we will change this policy and tell each family owner before the change.</p>
+
+<h2 id="cry">3a. Cry recordings</h2>
+<p>The cry helper records up to 10 seconds of sound and sends it to our server, which analyses it.</p>
+<ul>
+<li><strong>If you do not save a crying entry</strong>, the recording is discarded. It is never written to a disk.</li>
+<li><strong>If you save the crying entry from the cry helper</strong>, we keep the recording with these labels: the reason that you selected, what helped, the guess of the app, the age of your child in days, and the time since the last feed and the last sleep. The labels have no name and no date of birth.</li>
+</ul>
+<p><strong>Purpose:</strong> to train a better sound model for the cry helper.</p>
+<p><strong>Who can get it:</strong> the operator. The recordings and labels are also added to a restricted public dataset. It is open only to researchers, who must ask for permission, and the operator gives or refuses it.</p>
+<p><strong>For how long:</strong> until you delete the crying entry, the child or the family. Then the recording is deleted from our server, and from the dataset at its next update.</p>
+<p><strong>How to turn it off:</strong> the family owner clears the checkbox in <strong>Settings &gt; Options of this server</strong>. It is on by default. After that, no new recording is kept. The recordings from before stay, until you delete their entries.</p>
+<p>The voice of a child and "what helped" can identify a person. Do not save the entry if other people speak in the recording and you do not want that kept.</p>
+<p>The family owner gets a message about this one time in the app.</p>
 
 <h2>4. Sign-in, and data from Google</h2>
 <p>Sign-in is done by Clerk (Clerk, Inc., United States). You can sign in with Google, with GitHub, or with an email address and a password. Clerk keeps your sign-in account and sets the cookies that are necessary to keep you signed in.</p>
 <p>When you sign in with Google, Clerk gets your name, your email address and your profile picture from Google. Our server gets only your name and your email address. We use this data only to sign you in and to connect you to your family. We do not sell it, we do not use it for advertising, and we give it to no other party than the ones in section 6. We do not get access to your Gmail, your contacts, your calendar or your files.</p>
 
 <h2>5. The assistant and the AI models</h2>
-<p>The language model, the speech model and the cry sound model all run on our own server. Your logs, your questions and your recordings are not sent to an AI company.</p>
+<p>The language model, the speech model and the cry sound model all run on our own server. Your logs, your questions and your recordings are not sent to an AI company. Section 3a tells you what we do with cry recordings.</p>
 <p>There is one exception, and you control it. If you connect an external AI agent (for example Claude) to your account, that agent can read and change the logs of your family. The company of that agent then gets the data that the agent reads. You can remove the connection at any time.</p>
 
 <h2>6. Who can get the data</h2>
@@ -65,6 +78,7 @@
 <tr><td>Cloudflare</td><td>Carries the traffic between your device and our server, and stops attacks</td><td>Your IP address; the traffic goes through its network</td></tr>
 <tr><td>The push service of your browser (Google, Apple or Mozilla)</td><td>Delivers notifications</td><td>The notification, which is encrypted</td></tr>
 <tr><td>Google Forms</td><td>The waitlist form</td><td>Your answers on the form</td></tr>
+<tr><td>Researchers with permission, through a dataset host (Hugging Face)</td><td>Research on infant cry sounds</td><td>Cry recordings and their labels (see section 3a)</td></tr>
 <tr><td>GitHub</td><td>Hosts the website frecklebubby.app</td><td>Your IP address, in its server logs</td></tr>
 </table>
 <p>Some of these parties are outside Australia, for example in the United States.</p>
