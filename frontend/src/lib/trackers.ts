@@ -147,6 +147,7 @@ export function trackers(wording: Wording): Tracker[] {
 		] },
 		{ type: 'note', label: 'Note', color: '--cloud', fields: [] },
 		{ type: 'cry', label: 'Crying', color: '--coral', end: 'optional', fields: [
+			{ key: 'reason', label: 'Reason', kind: 'one', options: Object.keys(NEEDS).map((k) => [k, needLabel(k, wording)]) },
 			{ key: 'soothed_by', label: 'What helped', kind: 'text' }
 		] }
 	];
@@ -226,7 +227,9 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 		case 'cry':
 			// The first of likely_needs is the top reason that the cry helper showed (logs and sound together).
 			// The sound guess alone can be a different reason, so it shows only as the second item.
-			parts.push(dur, d.likely_needs?.[0] && `Most likely: ${needLabel(d.likely_needs[0], wording).toLowerCase()}`,
+			// `reason` is the choice of the parent in the cry helper or in the edit form.
+			parts.push(dur, d.reason ? `Reason: ${needLabel(d.reason, wording).toLowerCase()}`
+				: d.likely_needs?.[0] && `Most likely: ${needLabel(d.likely_needs[0], wording).toLowerCase()}`,
 				d.soothed_by && `Helped: ${d.soothed_by}`,
 				d.sound_reason && `Sound alone: ${soundLabel(d.sound_reason).toLowerCase()} (experimental)`);
 			break;
@@ -242,13 +245,13 @@ export const SOUND_LABELS: Record<string, string> = {
 };
 export const soundLabel = (v: string) => SOUND_LABELS[v] ?? v;
 
+const NEEDS: Record<string, string> = {
+	hunger: 'Hungry', tired: 'Tired', nappy: 'Nappy', wind: 'Wind',
+	unwell: 'May be unwell', allergic: 'Allergic reaction', too_hot_or_cold: 'Too hot or too cold',
+	cuddle: 'Wants comfort', evening_crying: 'Evening crying', colic: 'Colic pattern'
+};
 export function needLabel(need: string, wording: Wording): string {
-	const labels: Record<string, string> = {
-		hunger: 'Hungry', tired: 'Tired', nappy: wording === 'diaper' ? 'Diaper' : 'Nappy', wind: 'Wind',
-		unwell: 'May be unwell', allergic: 'Allergic reaction', too_hot_or_cold: 'Too hot or too cold',
-		cuddle: 'Wants comfort', evening_crying: 'Evening crying', colic: 'Colic pattern'
-	};
-	return labels[need] ?? need;
+	return need === 'nappy' && wording === 'diaper' ? 'Diaper' : (NEEDS[need] ?? need);
 }
 
 export const deviceLabel = (v: string) => label(DEVICES, v);

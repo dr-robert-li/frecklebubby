@@ -31,6 +31,9 @@
 	let listened = $state(false);
 	let crying = $state('0');
 	let helped = $state('');
+	// the reason to save: the first of the list, until the parent selects another one
+	let picked = $state<string | null>(null);
+	const reason = $derived(picked ?? result?.combined[0]?.need ?? '');
 	let saving = $state(false);
 	let stopRec: (() => void) | null = null;
 	const name = child()?.name ?? 'your baby';
@@ -125,6 +128,7 @@
 		saving = true;
 		const top = listened && r.sound.is_cry ? r.sound.reasons[0] : null;
 		const data: Record<string, any> = { likely_needs: r.combined.slice(0, 3).map((c) => c.need) };
+		if (reason) data.reason = reason;
 		if (top) Object.assign(data, { sound_reason: top.label, sound_confidence: top.probability });
 		if (helped.trim()) data.soothed_by = helped.trim();
 		const now = Date.now();
@@ -243,6 +247,13 @@
 						{#each [5, 10, 15, 20, 30, 45, 60] as m (m)}<option value={String(m)}>{m} minutes</option>{/each}
 					</select>
 				</label>
+				{#if r.combined.length}
+					<label class="field"><span>Reason</span>
+						<select value={reason} onchange={(e) => (picked = e.currentTarget.value)}>
+							{#each r.combined as c, i (c.need)}<option value={c.need}>{needLabel(c.need, wording())}{i === 0 ? ' (most likely)' : ''}</option>{/each}
+						</select>
+					</label>
+				{/if}
 				<label class="field"><span>What helped (optional)</span>
 					<input bind:value={helped} maxlength="200" placeholder="For example: feed, rocking" />
 				</label>

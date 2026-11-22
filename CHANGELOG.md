@@ -6,6 +6,13 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-11-22
+
+### Added
+
+- Cry helper: before you save, you can select the reason from the reasons that the helper gave. The first reason is selected at the start. The timeline shows it as "Reason: tired".
+- You can also set or change the reason later, when you edit a crying entry.
+
 ## [0.8.4] - 2026-11-22
 
 ### Fixed

@@ -149,6 +149,8 @@ class CryData(_Data):
     sound_confidence: float | None = Field(None, ge=0, le=1)
     likely_needs: list[Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)]] | None = (
         Field(None, max_length=12))
+    # the reason that the parent selected: one of the needs of the cry helper (the first of likely_needs by default)
+    reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)] | None = None
     soothed_by: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)] | None = None
 
 

@@ -232,7 +232,9 @@ The **Crying?** tile on the Home screen answers "what do I check first?".
   library. This part needs no model and no microphone.
 - **Listen**: records up to 60 seconds and adds a guess from the sound. The audio is analysed on your server and is
   not stored.
-- You can save the crying time and what helped to the timeline. Reports show crying per day.
+- You can save the crying time, the reason and what helped to the timeline. The first reason of the list is
+  selected, and you can select another one from the list. You can change it later in the entry. Reports show
+  crying per day.
 
 **The sound guess is experimental. It is a guess, not a diagnosis.** There are two models:
 
