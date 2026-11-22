@@ -1,0 +1,23 @@
+/* The privacy policy and the terms of service. Same colours and font as index.html. */
+@font-face { font-family: Nunito; font-weight: 400; font-display: swap; src: url(fonts/nunito-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: Nunito; font-weight: 700; font-display: swap; src: url(fonts/nunito-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: Nunito; font-weight: 800; font-display: swap; src: url(fonts/nunito-latin-800-normal.woff2) format('woff2'); }
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f4ecdd; color: #4a4458; font: 17px/1.6 Nunito, ui-rounded, system-ui, sans-serif; }
+main, header, footer { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+header { padding-top: 18px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; color: #2f2a3b; text-decoration: none; }
+.brand img { width: 40px; height: 40px; }
+h1, h2 { color: #2f2a3b; font-weight: 800; line-height: 1.2; }
+h1 { font-size: 2rem; margin: 28px 0 4px; }
+h2 { font-size: 1.25rem; margin: 34px 0 8px; }
+p, ul { margin: 0 0 12px; }
+ul { padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: #6d55c4; }
+a:focus-visible { outline: 3px solid #6d55c4; outline-offset: 3px; border-radius: 6px; }
+.date { color: #6a6479; font-size: 0.95rem; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 12px; font-size: 0.95rem; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border: 1px solid #e3d9c6; background: #fffbf3; }
+footer { padding: 28px 20px 40px; color: #6a6479; font-size: 0.92rem; }
