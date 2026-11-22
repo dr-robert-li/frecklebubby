@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-    image: frecklebubby:0.8.8
+    image: frecklebubby:0.8.9
     restart: unless-stopped
     ports:
       - "${FRECKLEBUBBY_PORT:-8000}:8000"
@@ -26,6 +26,7 @@ services:
       LIMIT_AI: ${LIMIT_AI:-30/300}
       LIMIT_UPLOADS: ${LIMIT_UPLOADS:-20/3600}
       LIMIT_BAD_TOKEN: ${LIMIT_BAD_TOKEN:-20/600}
+      LLM_PARALLEL: ${LLM_PARALLEL:-4}
       LLM_QUEUE_MAX: ${LLM_QUEUE_MAX:-8}
       LLM_QUEUE_WAIT: ${LLM_QUEUE_WAIT:-60}
       VOICE: ${VOICE:-true}
@@ -62,8 +63,11 @@ services:
       - "0"
       - --chat-template-kwargs
       - '{"enable_thinking":false}'
+      # 4 requests at a time, 8192 tokens each: the context is shared by the slots. Keep LLM_PARALLEL at or below -np.
       - -c
-      - "8192"
+      - "32768"
+      - -np
+      - "4"
       - --host
       - 0.0.0.0
       - --port

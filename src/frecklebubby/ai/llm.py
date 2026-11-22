@@ -44,12 +44,16 @@ class Busy(LlmError):
 
 
 class Queue:
-    """One model request at a time for the whole server; the others wait in order of arrival."""
+    """LLM_PARALLEL model requests at a time for the whole server; the others wait in order of arrival."""
 
     # shortcut: in memory, one process; move to a shared store if the app ever runs more than one process
     def __init__(self):
-        self.busy = False
+        self.active = 0
         self.waiting: deque[asyncio.Future] = deque()
+
+    @property
+    def busy(self) -> bool:
+        return self.active >= get_settings().llm_parallel
 
     def check(self) -> None:
         """Busy (429) when a new request would have to wait and the wait list is full."""
@@ -77,7 +81,7 @@ class Queue:
             except TimeoutError as err:
                 raise Busy() from err
         else:
-            self.busy = True
+            self.active += 1
         try:
             yield
         finally:
@@ -88,8 +92,8 @@ class Queue:
             turn = self.waiting.popleft()
             if not turn.done():
                 turn.set_result(None)
-                return
-        self.busy = False
+                return  # the slot goes to the next in the line: the count stays
+        self.active -= 1
 
 
 QUEUE = Queue()

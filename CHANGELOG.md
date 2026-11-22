@@ -6,6 +6,18 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.9] - 2026-11-22
+
+### Changed
+
+- The assistant can answer 4 people at the same time with the bundled model server. Before, one request ran and the others waited. The new setting `LLM_PARALLEL` sets how many requests run at one time (4 in `compose.yaml`, 1 with no compose file). More requests wait in order, as before (`LLM_QUEUE_MAX`, `LLM_QUEUE_WAIT`).
+- Voice commands: the speech model reads 4 recordings at the same time. Before, it read one at a time, so some people in hands-free mode could make the others wait.
+- The bundled model server has 4 slots with 8192 tokens each (`-c 32768 -np 4`). Before, the 4 slots shared 8192 tokens.
+
+### Fixed
+
+- `compose.gpu.yaml` uses a fixed build of the model server (`server-cuda13-b11515`). The tag `server-cuda` moved to a newer build, which gave poor answers with the bundled model.
+
 ## [0.8.8] - 2026-11-22
 
 ### Fixed

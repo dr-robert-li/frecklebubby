@@ -246,3 +246,23 @@ async def test_wrong_session_token_per_address(env, clerk, pushes, clock):  # no
         assert (await me(_token(key))).status_code == 429  # this address is stopped for a time
         clock[0] += 601
         assert (await me(_token(key))).status_code == 200
+
+
+async def test_queue_parallel(env):
+    limits(env, llm_parallel=2, llm_queue_max=1)
+    q = llm.QUEUE
+    order, gate = [], asyncio.Event()
+
+    async def user(n):
+        async with q.slot():
+            order.append(n)
+            await gate.wait()
+
+    tasks = [asyncio.create_task(user(n)) for n in range(3)]
+    await asyncio.sleep(0.01)
+    assert order == [0, 1] and q.busy and len(q.waiting) == 1  # two run, the third waits
+    with pytest.raises(llm.Busy):
+        q.check()
+    gate.set()
+    await asyncio.gather(*tasks)
+    assert order == [0, 1, 2] and q.active == 0 and not q.busy

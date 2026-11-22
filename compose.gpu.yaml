@@ -4,7 +4,9 @@
 
 services:
   llama:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    # A fixed build. The build of server-cuda from November 2026 gave poor answers with the bundled model on this
+    # GPU. Test the answers of the assistant before you change the build.
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda13-b11515
     deploy:
       resources:
         reservations:

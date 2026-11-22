@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     limit_uploads: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "20/3600"
     limit_voice: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "300/300"
     limit_bad_token: Annotated[str, Field(pattern=r"^\d+/\d+$")] = "20/600"
+    # Model requests that run at one time. Not more than the slots of the model server (the bundled one has 4).
+    llm_parallel: Annotated[int, Field(ge=1)] = 1
     # Model requests that can wait for the model at one time; one more gets "The assistant is busy" (429).
     llm_queue_max: int = 8
     # Seconds a request with no stream (plain words, model test) can wait for the model; then "busy" (429).

@@ -15,7 +15,8 @@ from . import Invalid, ServiceError
 RATE = 16000  # the page sends WAV: one channel, 16 bit, 16 kHz
 MAX_SECONDS = 30
 MAX_BYTES = 44 + RATE * 2 * MAX_SECONDS + 4096
-MAX_WAITING = 4  # recordings that can wait for the speech model; one more gets "busy"
+WORKERS = 4  # recordings that the speech model reads at the same time
+MAX_WAITING = WORKERS + 4  # recordings that run or wait; one more gets "busy"
 # The keyword: "Hey Bubby" or "OK Bubby" at the start. Whisper writes the name in more than one way.
 # Not "baby" and not "buddy": parents say "hey baby" and "hey buddy" to the child.
 WAKE = re.compile(r"^\W*(?:hey|hi|ok|okay|o\.k\.)\W+(?:bubby|bubbie|bubbi|buby|bubby's|bobby|bubbly|bubba|bubbe)\b\W*", re.I)
@@ -23,7 +24,8 @@ PROMPT = "Hey Bubby, OK Bubby."  # helps Whisper to write the keyword the same w
 
 log = logging.getLogger(__name__)
 _model = None
-_lock = threading.Lock()
+_lock = threading.Lock()  # for the load of the model
+_slots = threading.BoundedSemaphore(WORKERS)
 _waiting = 0
 TRANSCRIBER = None  # tests put a function (samples) -> text here
 
@@ -83,7 +85,8 @@ def _load():
         st = get_settings()
         root = st.data_dir / "models" / "whisper"
         root.mkdir(parents=True, exist_ok=True)
-        _model = WhisperModel(st.whisper_model, device="cpu", compute_type="int8", download_root=str(root))
+        _model = WhisperModel(st.whisper_model, device="cpu", compute_type="int8", num_workers=WORKERS,
+                              download_root=str(root))
     return _model
 
 
@@ -98,14 +101,16 @@ def warm() -> None:
 
 
 def _whisper(audio) -> str:
-    segments, _ = _load().transcribe(audio, language=get_settings().whisper_language or None, beam_size=1,
+    with _lock:
+        model = _load()
+    segments, _ = model.transcribe(audio, language=get_settings().whisper_language or None, beam_size=1,
                                     initial_prompt=PROMPT, condition_on_previous_text=False,
                                     no_speech_threshold=0.6)
     return " ".join(x.text.strip() for x in segments if x.no_speech_prob < 0.6).strip()
 
 
 def transcribe(data: bytes) -> str:
-    """The words in the recording ("" for silence or noise). One recording at a time; a few can wait."""
+    """The words in the recording ("" for silence or noise). WORKERS recordings at a time; a few can wait."""
     global _waiting
     if not available():
         raise NotInstalled()
@@ -116,7 +121,7 @@ def transcribe(data: bytes) -> str:
         raise Busy()
     _waiting += 1
     try:
-        with _lock:
+        with _slots:
             text = (TRANSCRIBER or _whisper)(audio)
     except ServiceError:
         raise

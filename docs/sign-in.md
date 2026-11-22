@@ -54,5 +54,5 @@ Put your email in `OPERATOR_EMAILS` (comma list). Then the server is invite only
 - `ALLOWED_EMAILS` stays optional: with `OPERATOR_EMAILS` set, it is a fixed list of more emails that can sign in.
 
 Protection for a public server: requests to the AI model, uploads and wrong tokens have rate limits, and the model
-takes one request at a time (the others wait in order). The settings are in `.env.example`. Behind a Cloudflare
+takes `LLM_PARALLEL` requests at a time (4 with the bundled model server; the others wait in order). The settings are in `.env.example`. Behind a Cloudflare
 Tunnel set `BEHIND_CLOUDFLARE=true`.
