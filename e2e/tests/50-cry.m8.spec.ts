@@ -35,6 +35,8 @@ test('no microphone: the logs rank what to check, then the parent saves the cryi
 	await s.getByLabel('Crying for about').selectOption('15');
 	await expect(s.getByLabel('Reason')).toHaveValue('hunger'); // the first reason is the default
 	await s.getByLabel('What helped (optional)').fill('feed');
+	await expect(s.getByRole('button', { name: 'Done' })).toHaveCount(0); // one button saves, a small one cancels
+	await expect(s.getByRole('button', { name: 'Cancel' })).toBeVisible();
 	await s.getByRole('button', { name: 'Save to timeline' }).click();
 	await expect(s).toBeHidden();
 	const item = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ });

@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.7] - 2026-11-22
+
+### Changed
+
+- The cry helper has one button to save ("Save to timeline") and a small round button to cancel. The "Done" button, which closed the sheet and did not save, is removed.
+
 ## [0.8.6] - 2026-11-22
 
 ### Changed

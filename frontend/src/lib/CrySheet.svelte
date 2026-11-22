@@ -260,7 +260,7 @@
 				{#if error}<p class="error" role="alert">{error}</p>{/if}
 				<div class="row">
 					<button class="go" disabled={saving} onclick={save}><Icon name="check" /> Save to timeline</button>
-					<button onclick={onclose}>Done</button>
+					<button class="icon" aria-label="Cancel" onclick={onclose}><Icon name="close" /></button>
 				</div>
 			</section>
 			<p class="disclaimer">General information, not medical advice.</p>
@@ -411,8 +411,11 @@
 		display: flex;
 		gap: 10px;
 	}
-	.save .row button {
+	.save .row .go {
 		flex: 1;
+	}
+	.save .row .icon {
+		border-radius: 50%;
 	}
 	.go {
 		background: var(--coral);
