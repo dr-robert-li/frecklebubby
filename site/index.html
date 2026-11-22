@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Frecklebubby: a baby tracker that shows its sources</title>
+<title>Frecklebubby: a baby tracker app you can own</title>
 <meta name="description" content="Frecklebubby is a baby tracker. Log the day, see the patterns, and ask an assistant that shows its sources. It is in a closed alpha, invite only.">
 <meta property="og:title" content="Frecklebubby">
 <meta property="og:description" content="A baby tracker. Log the day, see the patterns, and ask an assistant that shows its sources. Closed alpha, invite only.">
@@ -21,14 +21,6 @@
 	--lavender: #b9a8e8; --mint: #bde8d3; --peach: #ffd3bf; --sky: #bfe0f6; --butter: #ffefb0; --coral: #ffc6c2;
 	--accent: #6d55c4; --on-accent: #ffffff; --shadow: 0 10px 40px rgba(74, 68, 88, 0.16);
 	color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-	:root {
-		--cream: #16141e; --surface: #211e2c; --ink: #e6e0f0; --ink-strong: #f4f0fb; --muted: #aba4bc; --line: #322d42;
-		--lavender: #4f4478; --mint: #284f41; --peach: #5c3c30; --sky: #27445a; --butter: #4f4524; --coral: #5e3433;
-		--accent: #c5b6ff; --on-accent: #1d1830; --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-		color-scheme: dark;
-	}
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--cream); color: var(--ink); font: 18px/1.55 Nunito, ui-rounded, system-ui, sans-serif; }
@@ -58,7 +50,6 @@ header nav a { font-weight: 700; }
 
 /* The pictures come from the test run, which has a sign-in strip at the top: the crop removes it. */
 .phone { display: block; box-sizing: content-box; width: min(284px, 74vw); height: auto; aspect-ratio: 1082 / 2096; object-fit: cover; object-position: bottom; margin: 0 auto; border-radius: 34px; border: 8px solid var(--ink-strong); background: var(--surface); box-shadow: var(--shadow); }
-@media (prefers-color-scheme: dark) { .phone { border-color: #3b3550; } }
 
 .feature { padding: 44px 0; }
 .feature .wrap { display: grid; gap: 28px; align-items: center; }
@@ -71,7 +62,6 @@ header nav a { font-weight: 700; }
 
 .notice { padding: 56px 0; }
 .notice .box { background: var(--butter); color: var(--ink-strong); border-radius: 28px; padding: 32px 26px; }
-@media (prefers-color-scheme: dark) { .notice .box { color: var(--ink-strong); } }
 .notice ul { margin: 16px 0 24px; padding-left: 22px; }
 .notice li { margin-bottom: 8px; }
 .notice .btn { background: var(--ink-strong); color: var(--cream); }
@@ -100,7 +90,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 		<div class="wrap">
 			<div>
 				<span class="alpha">Closed alpha · invite only</span>
-				<h1>A baby tracker that shows its sources.</h1>
+				<h1>A baby tracker app you can own</h1>
 				<p class="lead">Log the day, see the patterns, and ask an assistant that tells you where each answer comes from.</p>
 				<div class="cta">
 					<a class="btn" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
@@ -146,7 +136,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 		<div class="wrap">
 			<div class="text">
 				<span class="num" aria-hidden="true">3</span>
-				<h2>A day and night plan from your child's own logs</h2>
+				<h2>Personalize your child's sleep plan</h2>
 				<p>The plan starts from the last 14 days of your child, not from a fixed table. When the logs are outside a recommended range, the plan moves toward the range in small steps and tells you what it changed.</p>
 			</div>
 			<div class="shot"><img class="phone" loading="lazy" src="day-night-plan.png" alt="The day and night plan: a timeline of sleep blocks and feeds." width="1082" height="2202"></div>
@@ -169,7 +159,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 		<div class="wrap">
 			<div class="text">
 				<span class="num" aria-hidden="true">5</span>
-				<h2>Voice commands, with no hand free</h2>
+				<h2>Voice commands, with hands free AI voice control</h2>
 				<p>Say "Hey Bubby, she had a wet nappy", and the app logs it. Use the talk button, or hands free with the keyword. The app can read the answer aloud.</p>
 			</div>
 			<div class="shot"><img class="phone" loading="lazy" src="voice.png" alt="A voice command that the app heard and logged." width="1082" height="2202"></div>
