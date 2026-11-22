@@ -65,7 +65,7 @@ is not in this repository. The code is in `src/frecklebubby/plugins.py`.
 - **A message**: `reg.notice(key, title, text)` shows a message one time to the family owner. Carers do not get it.
 - **Routes**: `reg.router(router)` adds a FastAPI router below `/api/v1`.
 - **Events**: `reg.on(event, function)`. The events are `cry_analyzed` (with the recording as samples, mono at
-  16 kHz, 10 seconds at most), `entry_saved`, `entry_deleted` and `family_deleted`. A deleted child or family
+  16 kHz, 10 seconds at most), `entry_saved`, `entry_deleted`, `child_deleted` and `family_deleted`. A deleted child or family
   deletes its entries with no event for each entry.
 
 The app itself has no plug-in and keeps no audio. `tests/test_plugins.py` proves this.

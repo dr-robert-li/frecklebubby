@@ -15,6 +15,7 @@ Events:
     entry_saved     an entry was made or changed (entry=).
     entry_deleted   one entry was deleted (entry=). A deleted child or family deletes its entries with no event
                     for each entry.
+    child_deleted   a child was deleted with all its entries (child_id=, family_id=).
     family_deleted  a family was deleted with all its data (family_id=).
 
 A setting is a checkbox for the family. The app shows it in Settings and keeps the value; read it with enabled().

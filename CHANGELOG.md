@@ -11,7 +11,7 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 - A general extension point for plug-ins (`src/frecklebubby/plugins.py`, see [Development](docs/development.md#plug-ins)).
   A plug-in is an extra Python package on the server. It can add a checkbox to Settings, show a message one time to
   the family owner, add API routes, and get events (a cry recording was analysed, an entry was saved or deleted, a
-  family was deleted). With no plug-in, the app shows and keeps nothing more.
+  child or a family was deleted). With no plug-in, the app shows and keeps nothing more.
 
 ### Changed
 

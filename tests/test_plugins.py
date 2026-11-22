@@ -16,7 +16,7 @@ from .test_cry import fake_model, post_audio, wav_bytes  # noqa: F401  (fake_mod
 def reg(monkeypatch):
     """An empty registry for one test: what a test adds does not stay."""
     r = plugins.Registry(loaded=True)
-    for mod in ("frecklebubby.plugins", "frecklebubby.services.cry", "frecklebubby.services.entries",
+    for mod in ("frecklebubby.plugins", "frecklebubby.services.cry", "frecklebubby.services.entries", "frecklebubby.services.children",
                 "frecklebubby.services.families"):
         monkeypatch.setattr(f"{mod}.registry", r)
     return r
@@ -57,6 +57,10 @@ async def test_plugin_gets_the_recording_and_the_entry(client, fake_model, reg):
     eid = r.json()["id"]
     assert (await client.delete(f"/api/v1/entries/{eid}", headers=h)).status_code in (200, 204)
     assert got[1:] == [("saved", "cry"), ("deleted", eid)]
+    reg.on("child_deleted", lambda **kw: got.append(("child", kw["child_id"])))
+    r = await client.request("DELETE", f"/api/v1/children/{cid}/permanent", headers=h, json={"confirm": "Ada"})
+    assert r.status_code in (200, 204), r.text
+    assert got[-1] == ("child", cid)
 
 
 async def test_setting_and_notice(client, reg):

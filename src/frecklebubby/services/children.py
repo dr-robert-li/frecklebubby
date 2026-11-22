@@ -6,6 +6,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from ..models import Child, ImportJob
+from ..plugins import registry
 from ..schemas import ChildIn, ChildPatch
 from . import Conflict, Ctx, Invalid, NotFound, hm
 
@@ -82,6 +83,7 @@ def delete_child(s: Session, ctx: Ctx, child_id: int, confirm: str) -> None:
         raise Conflict("An import is running. Wait until it is done, then try again.")
     s.execute(delete(Child).where(Child.id == child.id))
     s.commit()
+    registry.emit("child_deleted", child_id=child_id, family_id=ctx.fam.id)
 
 
 def resolve_child(s: Session, ctx: Ctx, ref: str | int | None) -> Child:
