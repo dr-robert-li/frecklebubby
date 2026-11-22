@@ -53,7 +53,7 @@ Decided:
 - **A recording is 10 seconds at most.** The app already records 10 seconds. The server accepts up to 60
   seconds through the API today; this limit goes down to 10 seconds.
 - **The new clips go on top of the existing dataset.** They do not replace it.
-- **The model stays open weight.** It can be published on Hugging Face.
+- **The model can be published** on Hugging Face. Its licence is decided later (see the open decisions).
 - **The dataset has restricted access.** It can be stored on Hugging Face as a gated dataset: a person requests
   access, and the owner gives or refuses permission.
 
@@ -86,13 +86,13 @@ To build (in the closed repository, except where this text says other):
 - An export for the owner: a zip file with the clips and one table of labels, in the format that
   `training/cry` reads. In training, each child is one group, so that a child is not in the training data and
   the test data at the same time.
-- Tell each family clearly, at the first use of Listen and in Settings, that recordings are kept and how to
-  turn this off. The privacy text of the open source app stays true (audio is not stored); the plug-in changes
+- Tell the owner of each family clearly, with the message at sign-in and in Settings, that recordings are kept
+  and how to turn this off. The privacy text of the open source app stays true (audio is not stored); the plug-in changes
   the text on the server of the owner.
 - In this repository: the extension point, the lower limit of 10 seconds, and a test that the app with no
   plug-in keeps no audio.
 
-Decided on the message, the dataset and the licence:
+Decided on the message and the dataset:
 
 - **A message at the first sign-in.** The first user of a family (the owner) gets a message one time, at the
   first sign-in. When the plug-in is connected after the family exists, the message shows one time at the next
@@ -103,13 +103,12 @@ Decided on the message, the dataset and the licence:
 - **The published dataset contains only the new clips.** The other datasets (ICSD, DeepInfant) are named as
   sources. Access is by permission only: a person requests access, and the owner gives or refuses it. The
   dataset is not open.
-- **The licence of the model.** A model that is trained with the existing data (ICSD is CC BY-NC-SA 4.0) is open
-  weight for non-commercial use. When a model is trained only with the clips from the families, it has no such
-  limit, and it is published as open source with a permissive licence.
+- **A family that opts out later.** The clips that are kept before the opt out stay. No new clip is kept after
+  the opt out.
+- **The message goes to the owner only.** A carer who joins later does not get the message, also not at the
+  first use of Listen. The disclosure stays on the Settings page.
 
 Open decisions:
 
-- **The clips of a family that opts out later.** Recommendation: delete the kept clips of that family, and
-  leave them out of the next version of the dataset.
-- **Carers who join later.** Recommendation: the message goes to the owner only. Each carer sees the
-  disclosure in Settings and at the first use of Listen.
+- **The licence of the model.** To be decided later. A fact for that decision: ICSD is CC BY-NC-SA 4.0, so a
+  model that is trained with it is limited to non-commercial use.
