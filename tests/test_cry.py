@@ -248,9 +248,11 @@ async def test_upload_limits(client, fake_model, data, ctype, detail):
 
 async def test_length_limits(client, fake_model):
     h, cid = await make_family(client)
-    assert "longer than 60" in (await post_audio(client, cid, h, wav_bytes(62, 8000))).json()["detail"]
+    assert "longer than 10" in (await post_audio(client, cid, h, wav_bytes(13, 8000))).json()["detail"]
     assert "too short" in (await post_audio(client, cid, h, wav_bytes(0.5))).json()["detail"]
-    assert (await post_audio(client, cid, h, wav_bytes(60, 8000))).status_code == 200
+    # a browser recording can be a little longer than 10 seconds: it is accepted and cut to 10 seconds
+    assert (await post_audio(client, cid, h, wav_bytes(11, 8000))).status_code == 200
+    assert fake_model == [160000]
 
 
 async def test_ffmpeg_missing_gives_501(client, fake_model, monkeypatch):

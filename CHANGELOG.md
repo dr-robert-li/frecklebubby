@@ -6,6 +6,18 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- A general extension point for plug-ins (`src/frecklebubby/plugins.py`, see [Development](docs/development.md#plug-ins)).
+  A plug-in is an extra Python package on the server. It can add a checkbox to Settings, show a message one time to
+  the family owner, add API routes, and get events (a cry recording was analysed, an entry was saved or deleted, a
+  family was deleted). With no plug-in, the app shows and keeps nothing more.
+
+### Changed
+
+- A recording for the cry helper is 10 seconds at most. It was 60 seconds. The app already records 10 seconds. A
+  recording that is a little longer is cut to 10 seconds.
+
 ## [0.8.10] - 2026-11-22
 
 ### Changed
