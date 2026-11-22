@@ -92,11 +92,23 @@ To build (in the closed repository, except where this text says other):
 - In this repository: the extension point, the lower limit of 10 seconds, and a test that the app with no
   plug-in keeps no audio.
 
+Decided on the agreement, the dataset and the licence:
+
+- **An agreement at the first sign-in.** The first user of a family (the owner) gets a page with the agreement
+  at the first sign-in and must select a button to continue. The page shows only when the plug-in is connected,
+  so an open source server with no plug-in never shows it. The agreement covers the storage of the clips and
+  their upload to the gated dataset on Hugging Face. A family that exists before the plug-in is connected gets
+  the page at the next sign-in of its owner.
+- **The published dataset contains only the new clips.** The other datasets (ICSD, DeepInfant) are named as
+  sources. Access is by permission only: a person requests access, and the owner gives or refuses it. The
+  dataset is not open.
+- **The licence of the model.** A model that is trained with the existing data (ICSD is CC BY-NC-SA 4.0) is open
+  weight for non-commercial use. When a model is trained only with the clips from the families, it has no such
+  limit, and it is published as open source with a permissive licence.
+
 Open decisions:
 
-- **Upload to Hugging Face.** To keep a recording on the family's own server is one thing. To send it to
-  Hugging Face is to give it to a third party. Recommendation: a second, separate agreement of each family
-  before its clips are uploaded.
-- **What the published dataset contains.** The existing data has its own licences (ICSD is CC BY-NC-SA 4.0).
-  Recommendation: publish only the new clips, and name the other datasets as sources.
-- **Licence of the model.** A model trained with the existing data stays for non-commercial use.
+- **A parent who does not agree.** Recommendation: the parent can refuse on the agreement page and use the app
+  as before. Then the setting is off and no clip is kept.
+- **Carers who join later.** Recommendation: the agreement of the owner covers the family. Each carer sees the
+  disclosure in Settings and at the first use of Listen.
