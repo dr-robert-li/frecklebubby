@@ -28,6 +28,6 @@ jobs:
           cp -r site _site
           cp frontend/static/icon.svg frontend/static/icon-512.png _site/
           for f in home plain-words history-week day-night-plan assistant voice; do cp docs/screenshots/$f.png _site/; done
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
