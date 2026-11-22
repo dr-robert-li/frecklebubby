@@ -20,6 +20,11 @@ Your data stays on your server.
 
 ---
 
+> [!NOTE]
+> **Closed alpha, invite only.** The hosted server at [my.frecklebubby.app](https://my.frecklebubby.app) is in a
+> closed alpha. Only invited people can sign in. There is no public sign-up. The software can change between
+> versions. You can host your own server with the [quick start](#quick-start).
+
 ## What it does
 
 - Tracks sleep, breastfeeding, bottles, solids, nappies, potty, pumping, growth, temperature, medicine, activities
