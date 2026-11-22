@@ -43,6 +43,8 @@ Decided:
 - **The recording and training pipeline is in a closed repository.** Only the server of the owner
   (my.frecklebubby.app) uses it. The reason: another person who hosts the app must not get a ready tool to
   collect recordings, because that person can treat the data with less care.
+- **The value is in the dataset and the trained model, not in the recorder.** A closed repository does not stop
+  another person who writes a recorder. This is accepted.
 - **The model can be open.** The trained model can be published and included in the open source app. Only the
   recordings and the pipeline stay closed.
 - **One setting for the parent, only when the pipeline is connected.** A checkbox in Settings. It is on by
@@ -55,7 +57,7 @@ Decided:
 - **The dataset has restricted access.** It can be stored on Hugging Face as a gated dataset: a person requests
   access, and the owner gives or refuses permission.
 
-How the two parts connect (recommendation, not built):
+How the two parts connect (decided, not built):
 
 - This repository gets one small, general extension point: the app loads extra Python packages that are installed
   with it (a plug-in), and a plug-in can add a setting and get the recording when a crying entry is saved. The
