@@ -230,7 +230,7 @@ The **Crying?** tile on the Home screen answers "what do I check first?".
 - **Just tell me what to check**: uses only the logs (last feed, last sleep, last nappy, age). It ranks the likely
   needs, gives things to try and says when to get medical help. Each fact has a source from the built-in NHS and CDC
   library. This part needs no model and no microphone.
-- **Listen**: records up to 60 seconds and adds a guess from the sound. The audio is analysed on your server and is
+- **Listen**: records 10 seconds and adds a guess from the sound. The audio is analysed on your server and is
   not stored.
 - You can save the crying time, the reason and what helped to the timeline. The first reason of the list is
   selected, and you can select another one from the list. You can change it later in the entry. Reports show

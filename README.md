@@ -129,6 +129,10 @@ Your data stays on your server.
 
 </div>
 
+## Roadmap
+
+Planned work is in [ROADMAP.md](ROADMAP.md).
+
 ## Not medical advice
 
 Frecklebubby gives general information only. It is not a medical device. If you are worried about your child, speak
