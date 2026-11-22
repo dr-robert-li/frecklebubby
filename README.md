@@ -14,7 +14,7 @@ Your data stays on your server.
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-7fb8a4)](LICENSE)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-6c9bd2)](pyproject.toml)
 
-[Quick start](#quick-start) · [Connect Claude](docs/api-and-mcp.md#connect-claude-mcp) · [Screenshots](#what-it-does) · [Changelog](CHANGELOG.md)
+[Website](https://frecklebubby.app) · [Quick start](#quick-start) · [Connect Claude](docs/api-and-mcp.md#connect-claude-mcp) · [Screenshots](#what-it-does) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -22,7 +22,8 @@ Your data stays on your server.
 
 > [!NOTE]
 > **Closed alpha, invite only.** The hosted server at [my.frecklebubby.app](https://my.frecklebubby.app) is in a
-> closed alpha. Only invited people can sign in. There is no public sign-up. The software can change between
+> closed alpha. Only invited people can sign in. There is no public sign-up. You can join the waitlist at
+> [frecklebubby.app](https://frecklebubby.app). The software can change between
 > versions. You can host your own server with the [quick start](#quick-start).
 
 ## What it does
