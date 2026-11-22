@@ -1,7 +1,14 @@
 # Roadmap
 
-This file lists the work that is planned and not started. The order is the planned order.
+This file lists the work that is planned, and the state of work that is in progress. The order is the planned order.
 Released work is in [CHANGELOG.md](CHANGELOG.md).
+
+State on 23 November 2026:
+
+| Item | State |
+|---|---|
+| 1. Localisation, first language: Simplified Chinese | Not started. Two decisions are open. |
+| 2. Cry recordings as a labelled dataset | The app part is released (0.9.0). The plug-in runs on the server of the owner. The training pipeline is not started. |
 
 ## 1. Localisation, first language: Simplified Chinese
 
@@ -36,89 +43,62 @@ Open decisions:
 Keep the recordings of the cry helper, with their labels, so that they can be added to the existing training
 data (ICSD and DeepInfant) and the sound models can be trained again.
 
-Decided:
+### Done
 
-- **The open source app does not keep or send recordings.** All data stays on the server, as today. The code
-  that keeps the clips, and the training pipeline, are not in this repository.
-- **The recording and training pipeline is in a closed repository.** Only the server of the owner
-  (my.frecklebubby.app) uses it. The reason: another person who hosts the app must not get a ready tool to
-  collect recordings, because that person can treat the data with less care.
+- **In this repository (released in 0.9.0):** a general extension point for plug-ins (`src/frecklebubby/plugins.py`,
+  see [Development](docs/development.md#plug-ins)), the limit of 10 seconds for a recording, and a test that the app
+  with no plug-in keeps no audio.
+- **In the closed repository:** the plug-in. It runs on the server of the owner (my.frecklebubby.app) since
+  23 November 2026, in a private image: the open image of the release, plus the plug-in. It was tested there with a
+  real recording: the message, the save, the label and the delete.
+
+What the plug-in does:
+
+- It holds a recording in memory for 10 minutes after the analysis. It writes the clip to the disk only when the
+  parent saves the crying entry from the cry helper. A crying entry that is typed in gets no clip.
+- It stores one lossless file for each entry, with the label: the reason that the parent selected (as it is), if
+  the parent changed the default reason, what helped, the guesses of the helper and of the sound model, the seconds
+  of crying that the detector found, the age in days, and the time since the last feed and the last sleep. The label
+  has no name and no date of birth.
+- It keeps a clip also when the detector finds no crying, because the detector can miss a real cry.
+- It deletes the clip when its entry, its child or its family is deleted.
+- The owner of each family gets a message one time. A checkbox in **Settings > Options of this server** is on by
+  default. After an opt out, no new clip is kept, and the clips from before stay. A carer gets no message.
+- The operator can export all clips and one table of labels as a zip file.
+- The [privacy policy](https://frecklebubby.app/privacy.html#cry) of the hosted server tells the parent what is
+  kept, for what purpose, who can get it, for how long and how to turn it off.
+
+### To build (in the closed repository): the training and publishing pipeline
+
+It runs by hand on the machine of the owner, not as a service. It needs real clips first.
+
+- Read the export of the plug-in in the training kit (`training/cry`). Map the reasons of the parent to the classes
+  of the model: the helper has 10 reasons, the model has 6 classes, and "wind" can be burping or belly pain.
+- Train with each child as one group, so that a child is not in the training data and the test data at the same
+  time. Give more weight to a label that the parent changed from the default: a model must not learn its own guesses.
+- Use the seconds of crying in the label to filter the clips where the detector found no crying.
+- Ignore the time since the last feed or sleep when it is not plausible. A family can log feeds and sleep in a
+  different app.
+- Look at the free text "what helped" before it is published, because it can contain a name.
+- Publish the dataset with restricted access (a gated dataset on Hugging Face): a person requests access, and the
+  owner gives or refuses permission. It contains only the new clips. The other datasets are named as sources.
+- At each update of the dataset, remove the clips that were deleted on the server.
+- The trained model can be published and included in the open source app.
+
+### Decided
+
+- **The open source app does not keep or send recordings.** The code that keeps the clips, and the training
+  pipeline, are in a closed repository. Only the server of the owner uses it. The reason: another person who hosts
+  the app must not get a ready tool to collect recordings, because that person can treat the data with less care.
 - **The value is in the dataset and the trained model, not in the recorder.** A closed repository does not stop
   another person who writes a recorder. This is accepted.
-- **The model can be open.** The trained model can be published and included in the open source app. Only the
-  recordings and the pipeline stay closed.
-- **One setting for the parent, only when the pipeline is connected.** A checkbox in Settings. It is on by
-  default, and a parent can turn it off (opt out). The same page tells the parent what is kept, for what purpose,
-  for how long, who can get access, and how to delete it. With no pipeline, the checkbox does not show.
-- **A recording is 10 seconds at most.** The app already records 10 seconds. The server accepts up to 60
-  seconds through the API today; this limit goes down to 10 seconds.
-- **The new clips go on top of the existing dataset.** They do not replace it.
-- **The model can be published** on Hugging Face. Its licence is decided later (see the open decisions).
-- **The dataset has restricted access.** It can be stored on Hugging Face as a gated dataset: a person requests
-  access, and the owner gives or refuses permission.
-
-How the two parts connect (decided, not built):
-
-- This repository gets one small, general extension point: the app loads extra Python packages that are installed
-  with it (a plug-in), and a plug-in can add a setting and get the recording when a crying entry is saved. The
-  extension point has no code for recordings, storage or upload.
-- The closed repository has two parts. Part 1 is a plug-in: it keeps the clips and the labels on the same server,
-  adds the checkbox and the disclosure text, and makes the export. Part 2 is the training and publishing pipeline:
-  it runs by hand on the machine of the owner, not as a service.
-- The server of the owner runs a private image: the open image of the release, plus the plug-in. Not a second
-  network service: then a recording does not go across a network before the export, and there is no second
-  sign-in to protect.
-- The README tells the reader that the hosted server keeps cry recordings (with opt out) and that the open
-  source app does not.
-- The licence of the app (AGPL-3.0) helps here. The owner has the copyright and can run a closed plug-in.
+- **The licence of the app (AGPL-3.0) helps here.** The owner has the copyright and can run a closed plug-in.
   Another person who hosts a changed app for other people must publish the changes.
+- **The new clips go on top of the existing dataset.** They do not replace it.
+- **A plug-in in the same image, not a second network service.** Then a recording does not go across a network
+  before the export, and there is no second sign-in to protect.
 
-The plug-in (done in the closed repository, except where this text says other; on the server of the owner since
-0.9.0):
+### Open decisions
 
-- Keep the clip only when the parent saves the crying entry. The server holds the recording for some minutes
-  after the analysis and deletes it when the parent does not save.
-- Store one lossless file for each entry in the data folder, with the label: the reason that the parent
-  selected, what helped, the guess of the sound model, the age in days, and the time since the last feed and
-  the last sleep.
-- Store the reason of the parent as it is. Map it to the classes of the model at training time: the helper has
-  10 reasons, the model has 6 classes, and "wind" can be burping or belly pain.
-- Record if the parent changed the default reason. The default is the first guess of the helper, and a model
-  must not learn its own guesses.
-- Delete the clip when its entry is deleted, and all clips when the family is deleted.
-- An export for the owner: a zip file with the clips and one table of labels, in the format that
-  `training/cry` reads. In training, each child is one group, so that a child is not in the training data and
-  the test data at the same time.
-- Tell the owner of each family clearly, with the message at sign-in and in Settings, that recordings are kept
-  and how to turn this off. The privacy text of the open source app stays true (audio is not stored); the plug-in changes
-  the text on the server of the owner.
-- In this repository (released in 0.9.0): the extension point, the lower limit of 10 seconds, and a test that
-  the app with no plug-in keeps no audio. See `src/frecklebubby/plugins.py`.
-
-To build (in the closed repository): the training and publishing pipeline.
-
-- Read the export of the plug-in in the training kit. Map the reasons of the parent to the classes of the model.
-- Train with each child as one group. Give more weight to a label that the parent changed from the default.
-- Publish the gated dataset. At each update, remove the clips that were deleted on the server.
-- Look at the free text "what helped" before it is published, because it can contain a name.
-
-Decided on the message and the dataset:
-
-- **A message at the first sign-in.** The first user of a family (the owner) gets a message one time, at the
-  first sign-in. When the plug-in is connected after the family exists, the message shows one time at the next
-  sign-in. The message shows only when the plug-in is connected, so an open source server with no plug-in never
-  shows it. It is a message only: it tells the parent that the clips are kept and uploaded to the gated dataset
-  on Hugging Face, and where to turn this off. It has no button to refuse.
-- **On by default, opt out in Settings.** To opt out, the parent goes to Settings and clears the checkbox.
-- **The published dataset contains only the new clips.** The other datasets (ICSD, DeepInfant) are named as
-  sources. Access is by permission only: a person requests access, and the owner gives or refuses it. The
-  dataset is not open.
-- **A family that opts out later.** The clips that are kept before the opt out stay. No new clip is kept after
-  the opt out.
-- **The message goes to the owner only.** A carer who joins later does not get the message, also not at the
-  first use of Listen. The disclosure stays on the Settings page.
-
-Open decisions:
-
-- **The licence of the model.** To be decided later. A fact for that decision: ICSD is CC BY-NC-SA 4.0, so a
-  model that is trained with it is limited to non-commercial use.
+- **The licence of the model.** A fact for that decision: ICSD is CC BY-NC-SA 4.0, so a model that is trained with
+  it is limited to non-commercial use.
