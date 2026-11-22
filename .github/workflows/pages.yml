@@ -1,0 +1,33 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: [site/**, docs/screenshots/**, frontend/static/icon*, .github/workflows/pages.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      # The landing page is site/. The pictures are the ones of the docs, so there is one copy in the repository.
+      - run: |
+          cp -r site _site
+          cp frontend/static/icon.svg frontend/static/icon-512.png _site/
+          for f in home plain-words history-week day-night-plan assistant voice; do cp docs/screenshots/$f.png _site/; done
+      - uses: actions/upload-pages-artifact@v3
+      - id: deploy
+        uses: actions/deploy-pages@v4
