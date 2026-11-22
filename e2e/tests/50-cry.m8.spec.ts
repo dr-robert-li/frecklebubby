@@ -68,7 +68,8 @@ test('listen: a real cry clip goes through the experimental sound model', async 
 	await shotM8(page, '08-listen-sound-block');
 	await s.getByLabel('Reason').selectOption('tired'); // the parent selects another reason from the list
 	await s.getByRole('button', { name: 'Save to timeline' }).click();
-	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ })).toContainText(/Reason: tired · Sound alone: .+ \(experimental\)/);
+	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ })).toContainText('Reason: tired');
+	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ })).not.toContainText('experimental'); // the guess from the sound alone is not in the timeline
 	await shotM8(page, '09-listen-saved', true);
 	void family;
 });

@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.6] - 2026-11-22
+
+### Changed
+
+- The timeline line of a crying entry no longer shows the guess from the sound alone ("Sound alone: hungry (experimental)"). It shows the reason and what helped. The guess stays saved in the entry, and the cry helper still shows it.
+
 ## [0.8.5] - 2026-11-22
 
 ### Added

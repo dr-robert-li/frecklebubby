@@ -226,12 +226,11 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 			break;
 		case 'cry':
 			// The first of likely_needs is the top reason that the cry helper showed (logs and sound together).
-			// The sound guess alone can be a different reason, so it shows only as the second item.
+			// The guess from the sound alone can be a different reason. It is saved in the entry and not shown here.
 			// `reason` is the choice of the parent in the cry helper or in the edit form.
 			parts.push(dur, d.reason ? `Reason: ${needLabel(d.reason, wording).toLowerCase()}`
 				: d.likely_needs?.[0] && `Most likely: ${needLabel(d.likely_needs[0], wording).toLowerCase()}`,
-				d.soothed_by && `Helped: ${d.soothed_by}`,
-				d.sound_reason && `Sound alone: ${soundLabel(d.sound_reason).toLowerCase()} (experimental)`);
+				d.soothed_by && `Helped: ${d.soothed_by}`);
 			break;
 	}
 	if (e.type === 'note' || (e.notes && !parts.some(Boolean))) parts.push(e.notes ?? '');
