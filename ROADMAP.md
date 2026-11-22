@@ -70,6 +70,8 @@ How the two parts connect (decided, not built):
   sign-in to protect.
 - The README tells the reader that the hosted server keeps cry recordings (with opt out) and that the open
   source app does not.
+- The licence of the app (AGPL-3.0) helps here. The owner has the copyright and can run a closed plug-in.
+  Another person who hosts a changed app for other people must publish the changes.
 
 To build (in the closed repository, except where this text says other):
 
@@ -89,8 +91,8 @@ To build (in the closed repository, except where this text says other):
 - Tell the owner of each family clearly, with the message at sign-in and in Settings, that recordings are kept
   and how to turn this off. The privacy text of the open source app stays true (audio is not stored); the plug-in changes
   the text on the server of the owner.
-- In this repository: the extension point, the lower limit of 10 seconds, and a test that the app with no
-  plug-in keeps no audio.
+- In this repository (done, not released): the extension point, the lower limit of 10 seconds, and a test that
+  the app with no plug-in keeps no audio. See `src/frecklebubby/plugins.py`.
 
 Decided on the message and the dataset:
 

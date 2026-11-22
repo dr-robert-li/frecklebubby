@@ -72,6 +72,7 @@ async def test_family_isolation(client):
 
 # Routes with no id: they act on the caller's own user or family, so there is no id of another family to give.
 OWN = {
+    ("GET", "/plugins"),
     ("GET", "/health"), ("GET", "/config"), ("GET", "/me"), ("DELETE", "/me"), ("POST", "/families"),
     ("GET", "/family"), ("PATCH", "/family"), ("DELETE", "/family"), ("GET", "/family/settings"),
     ("PATCH", "/family/settings"), ("GET", "/family/members"), ("GET", "/family/invites"),
@@ -101,6 +102,7 @@ BODIES = {
     ("POST", "/children/{cid}/assistant/messages/{mid}/proposals"): {"proposals": []},
     ("POST", "/children/{cid}/assistant/chat"): {"message": "how many wet nappies is normal"},
     ("POST", "/operator/invites"): {"email": "x@example.com"},
+    ("PUT", "/plugins/settings/{key}"): {"value": True},
 }
 FILES = {("POST", "/children/{cid}/cry/analyze"): {"audio": ("a.webm", b"x", "audio/webm")}}
 
@@ -129,7 +131,8 @@ async def test_every_route_keeps_families_apart(app, client):
         s.commit()
         ids = {"cid": bcid, "eid": entry["id"], "rid": reminder["id"], "nid": note.id, "token_id": token["id"],
                "invite_id": invite["id"], "user_id": (await client.get(f"{API}/me", headers=b)).json()["user"]["id"],
-               "mid": msg.id, "source_id": upload["id"], "job_id": job.id, "type": "sleep", "action": "complete"}
+               "mid": msg.id, "source_id": upload["id"], "job_id": job.id, "type": "sleep", "action": "complete",
+               "key": "none"}  # key: a plug-in setting; these routes act only on the caller's own family
 
     missing, leaks = [], []
     for method, path in sorted(api_routes(app)):

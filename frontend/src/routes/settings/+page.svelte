@@ -17,7 +17,13 @@
 		['appearance', 'Appearance', 'Night theme, clock', 'sun'],
 		['delete', 'Delete data', 'The family or your account', 'trash']
 	];
-	const shown = $derived(app.me?.operator ? [['access', 'Server access', 'Invites and families', 'link'], ...items] : items);
+	const shown = $derived([
+		...(app.me?.operator ? [['access', 'Server access', 'Invites and families', 'link']] : []),
+		...items.slice(0, -1),
+		// only on a server with a plug-in that adds options
+		...(app.config?.plugins ? [['plugins', 'Options of this server', 'What this server keeps and shares', 'note']] : []),
+		...items.slice(-1)
+	]);
 </script>
 
 <svelte:head><title>Settings · Frecklebubby</title></svelte:head>

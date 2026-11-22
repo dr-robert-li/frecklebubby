@@ -3,8 +3,10 @@
 from importlib.metadata import version
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from .. import plugins
 from ..auth import get_ctx
 from ..config import get_settings
 from ..db import get_session
@@ -39,7 +41,8 @@ def health() -> dict:
 def config():
     st = get_settings()
     return {"auth_mode": st.auth_mode, "invite_only": bool(st.operators), "clerk_publishable_key": st.clerk_publishable_key,
-            "vapid_public_key": vapid_public_key(), "version": version("frecklebubby"), "voice": voice.available()}
+            "vapid_public_key": vapid_public_key(), "version": version("frecklebubby"), "voice": voice.available(),
+            "plugins": plugins.registry.active}
 
 
 @router.get("/me", response_model=MeOut)
@@ -130,3 +133,25 @@ def create_token(body: TokenIn, ctx: Ctx = Depends(get_ctx), s: Session = Depend
 @router.delete("/tokens/{token_id}", status_code=204)
 def delete_token(token_id: int, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)):
     tokens.delete_token(s, ctx, token_id)
+
+
+# --- plug-ins (see plugins.py). With no plug-in, the lists are empty. ---------------------------------
+
+
+class PluginValue(BaseModel):
+    value: bool
+
+
+@router.get("/plugins", summary="Settings and notices that the plug-ins of this server add")
+def plugin_state(ctx: Ctx = Depends(get_ctx)) -> dict:
+    return plugins.state(ctx)
+
+
+@router.put("/plugins/settings/{key}", summary="Change a plug-in setting (family owner)")
+def plugin_setting(key: str, body: PluginValue, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)) -> dict:
+    return plugins.set_value(s, ctx, key, body.value)
+
+
+@router.post("/plugins/notices/{key}/seen", summary="The family owner saw this notice")
+def plugin_notice_seen(key: str, ctx: Ctx = Depends(get_ctx), s: Session = Depends(get_session)) -> dict:
+    return plugins.mark_seen(s, ctx, key)

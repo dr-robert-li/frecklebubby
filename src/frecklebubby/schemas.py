@@ -644,6 +644,7 @@ class ConfigOut(BaseModel):
     vapid_public_key: str
     version: str
     voice: bool = False  # voice commands are installed on this server
+    plugins: bool = False  # a plug-in of this server adds settings or notices
 
 
 class RegimeRow(BaseModel):

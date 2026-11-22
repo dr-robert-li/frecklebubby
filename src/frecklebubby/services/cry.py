@@ -25,6 +25,7 @@ from sqlalchemy.orm import Session
 from ..config import get_settings
 from ..db import utcnow
 from ..models import Child, Entry, Timer
+from ..plugins import registry
 from . import Ctx, Invalid, ServiceError
 from .children import get_child
 from .families import wording
@@ -35,7 +36,8 @@ from .sleep import predict
 log = logging.getLogger(__name__)
 
 MAX_BYTES = 10 * 1024 * 1024
-MAX_SECONDS = 60.0
+MAX_SECONDS = 10.0  # the app records 10 seconds
+SLACK_SECONDS = 2.0  # the timer of a browser is not exact: a recording can be a little longer, and it is cut
 MIN_SECONDS = 1.0
 AUDIO_TYPES = {"audio/webm", "video/webm", "audio/ogg", "audio/mp4", "video/mp4", "audio/x-m4a", "audio/m4a",
                "audio/aac", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/wave"}
@@ -327,7 +329,7 @@ def decode(data: bytes):
         try:
             r = subprocess.run(
                 [ffmpeg, "-nostdin", "-hide_banner", "-loglevel", "error", "-protocol_whitelist", "file",
-                 "-i", str(src), "-t", str(MAX_SECONDS + 1), "-vn", "-sn", "-dn", "-ac", "1", "-ar", "16000",
+                 "-i", str(src), "-t", str(MAX_SECONDS + SLACK_SECONDS + 1), "-vn", "-sn", "-dn", "-ac", "1", "-ar", "16000",
                  "-f", "f32le", "pipe:1"],
                 capture_output=True, timeout=FFMPEG_TIMEOUT, check=False)
         except subprocess.TimeoutExpired as err:
@@ -336,11 +338,11 @@ def decode(data: bytes):
         raise Invalid("audio: the server could not read this recording.")
     wav = np.frombuffer(r.stdout, dtype=np.float32)
     seconds = len(wav) / 16000
-    if seconds > MAX_SECONDS + 0.5:
-        raise Invalid("audio: the recording is longer than 60 seconds.")
+    if seconds > MAX_SECONDS + SLACK_SECONDS:
+        raise Invalid("audio: the recording is longer than 10 seconds.")
     if seconds < MIN_SECONDS:
         raise Invalid("audio: the recording is too short (1 second or more).")
-    return wav
+    return wav[: int(MAX_SECONDS * 16000)]
 
 
 def _smooth(on, size: int):
@@ -445,8 +447,14 @@ def analyze(s: Session, ctx: Ctx, child_id: int, data: bytes, content_type: str,
     child = get_child(s, ctx, child_id)
     check_upload(data, content_type)
     models = load_models()
-    sound = infer(models, decode(data)) if models else None
-    return _help(s, ctx, child, now or utcnow(), sound, models["card"] if models else None)
+    sound = None
+    if models:
+        wav = decode(data)
+        sound = infer(models, wav)
+    out = _help(s, ctx, child, now or utcnow(), sound, models["card"] if models else None)
+    if models:  # the app keeps no audio; a plug-in of the server can (see plugins.py)
+        registry.emit("cry_analyzed", family_id=ctx.fam.id, child_id=child.id, user_id=ctx.user.id, samples=wav, result=out)
+    return out
 
 
 def context_lines(s: Session, ctx: Ctx, child: Child, now: datetime) -> str:

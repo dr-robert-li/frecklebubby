@@ -16,6 +16,7 @@ from ..models import (
     ServerInvite,
     User,
 )
+from ..plugins import registry
 from ..schemas import FamilyIn, FamilyPatch, LlmOut, SettingsOut, SettingsPatch, Units
 from . import Conflict, Ctx, Invalid, NotFound, zone
 from .access import is_operator, use_invite
@@ -191,6 +192,7 @@ def _purge_family(s: Session, family_id: int) -> None:
     # M17: the server invite of each member goes too; to use the server again, a member needs a new invite.
     s.execute(delete(ServerInvite).where(ServerInvite.email.in_(select(User.email).where(User.id.in_(members)))))
     s.execute(delete(Family).where(Family.id == family_id))
+    registry.emit("family_deleted", family_id=family_id)
 
 
 def delete_family(s: Session, ctx: Ctx, confirm: str) -> None:

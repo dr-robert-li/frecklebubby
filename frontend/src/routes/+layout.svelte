@@ -7,7 +7,7 @@
 	import { dev } from '$app/env';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { ApiError, devUser, initAuth, mountSignIn, setDevUser, signOut } from '#lib/api.ts';
+	import { api, ApiError, devUser, initAuth, mountSignIn, setDevUser, signOut } from '#lib/api.ts';
 	import { app, child, loadMe, refresh, selectChild } from '#lib/app.svelte.ts';
 	import { ageText, prefs } from '#lib/format.svelte.ts';
 	import Icon from '#lib/Icon.svelte';
@@ -23,6 +23,8 @@
 	let devEdit = $state(false);
 	let devEmail = $state(devUser());
 	let dark = $state(false);
+	// messages of a plug-in of this server, for the family owner: each shows one time
+	let notices = $state<{ key: string; title: string; text: string }[]>([]);
 
 	const tabs = [
 		['/', 'Home', 'home'],
@@ -53,6 +55,8 @@
 			if (!app.me!.family || !app.me!.children.length) goto('/onboarding');
 			else if (onboarding) goto('/');
 			refresh();
+			if (config.plugins && app.me!.role === 'owner')
+				api<{ notices: typeof notices }>('/plugins').then((r) => (notices = r.notices), () => {});
 		} catch (e) {
 			error = (e as Error).message;
 			phase = e instanceof ApiError && e.status === 403 ? 'refused' : 'error';
@@ -79,6 +83,12 @@
 	$effect(() => {
 		if (phase === 'signin' && signInNode) mountSignIn(signInNode);
 	});
+
+	function seen() {
+		const [n, ...rest] = notices;
+		notices = rest;
+		api(`/plugins/notices/${n.key}/seen`, { method: 'POST' }).catch(() => {});
+	}
 
 	function changeDevUser(e: SubmitEvent) {
 		e.preventDefault();
@@ -149,6 +159,13 @@
 
 	{#if !onboarding && app.me?.family}<VoiceCard />{/if}
 
+	{#if notices.length && !onboarding}
+		<Sheet title={notices[0].title} onclose={seen}>
+			<p class="notice-text">{notices[0].text}</p>
+			<button class="wide" onclick={seen}>OK</button>
+		</Sheet>
+	{/if}
+
 	{#if !onboarding}
 		<nav aria-label="Main">
 			{#each tabs as [href, label, icon] (href)}
@@ -179,6 +196,10 @@
 </div>
 
 <style>
+	.notice-text {
+		white-space: pre-line;
+		margin: 0 0 16px;
+	}
 	main {
 		max-width: 520px;
 		margin: 0 auto;

@@ -19,6 +19,7 @@ export type Config = {
 	vapid_public_key: string;
 	version: string;
 	voice?: boolean;
+	plugins?: boolean;
 };
 
 export class ApiError extends Error {

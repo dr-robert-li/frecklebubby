@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from ..db import utcnow
 from ..models import Child, Entry
+from ..plugins import registry
 from ..schemas import DATA_MODELS, END_OPTIONAL, END_REQUIRED, EntryIn, EntryPatch, EntryType
 from . import Ctx, Invalid, NotFound, plain_errors, to_utc
 from .children import get_child
@@ -50,6 +51,7 @@ def create_entry(s: Session, ctx: Ctx, child_id: int, body: EntryIn, external_id
                   notes=body.notes or None, source=ctx.source, created_by=ctx.user.id, external_id=external_id)
     s.add(entry)
     s.commit()
+    registry.emit("entry_saved", entry=entry)
     return entry
 
 
@@ -118,12 +120,15 @@ def update_entry(s: Session, ctx: Ctx, entry_id: int, body: EntryPatch) -> Entry
     data = validate(entry.type, started, ended, body.data if body.data is not None else entry.data, notes)
     entry.started_at, entry.ended_at, entry.data, entry.notes = started, ended, data, notes or None
     s.commit()
+    registry.emit("entry_saved", entry=entry)
     return entry
 
 
 def delete_entry(s: Session, ctx: Ctx, entry_id: int) -> None:
-    s.delete(get_entry(s, ctx, entry_id))
+    entry = get_entry(s, ctx, entry_id)
+    s.delete(entry)
     s.commit()
+    registry.emit("entry_deleted", entry=entry)
 
 
 def last_entries(s: Session, child_id: int) -> dict[str, Entry]:

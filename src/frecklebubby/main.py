@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastmcp.server.auth.providers.clerk import ClerkProvider
 from starlette.routing import Route
 
+from . import plugins
 from .api import ai, children, core, cry, importer, notify, operator
 from .config import get_settings
 from .db import SessionLocal, init_db, utcnow
@@ -68,6 +69,7 @@ def create_app(scheduler: bool = True) -> FastAPI:
     if settings.auth_mode == "dev":
         log.warning("AUTH_MODE=dev: anyone who can reach this server can sign in as any user. Use only for development.")
     init_db(settings.data_dir)
+    plugins.load()
     vapid()  # make the VAPID keys on first start
 
     auth = None
@@ -108,6 +110,8 @@ def create_app(scheduler: bool = True) -> FastAPI:
     app.include_router(importer.router, prefix=API)
     app.include_router(cry.router, prefix=API)
     app.include_router(operator.router, prefix=API)
+    for extra in plugins.registry.routers:
+        app.include_router(extra, prefix=API)
     # Later milestones add their routers here, one line each, for example:
     # app.include_router(nl.router, prefix=API)
 
