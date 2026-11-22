@@ -24,7 +24,7 @@ jobs:
       - run: |
           cp -r site _site
           cp frontend/static/icon.svg frontend/static/icon-512.png _site/
-          for f in home plain-words history-week day-night-plan assistant voice; do cp docs/screenshots/$f.png _site/; done
+          for f in home day-night-plan cry-helper voice insights history-week; do cp docs/screenshots/$f.png _site/; done
       - uses: actions/upload-pages-artifact@v5
 
   # A separate job: in one job, the deploy step sometimes did not find the artifact that was uploaded a moment before.

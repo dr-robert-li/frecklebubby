@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Frecklebubby: a baby tracker app you can own</title>
-<meta name="description" content="A baby tracker app you can own. A sleep plan from your child's own logs, logging by voice, and answers that show their medical sources. Closed alpha: join the waitlist.">
+<meta name="description" content="A baby tracker app you can own. It learns the rhythm of your child: a personal sleep plan, help when your baby cries, hands free voice control and advice when you need it. Closed alpha: join the waitlist.">
 <meta property="og:title" content="Frecklebubby">
-<meta property="og:description" content="A baby tracker app you can own. A sleep plan from your child's own logs, logging by voice, and answers that show their sources. Join the waitlist.">
+<meta property="og:description" content="A baby tracker app you can own. It learns the rhythm of your child: a personal sleep plan, help when your baby cries, hands free voice control and advice when you need it. Closed alpha: join the waitlist.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://frecklebubby.app/">
 <meta property="og:image" content="https://frecklebubby.app/icon-512.png">
@@ -60,7 +60,7 @@ header .btn { min-height: 42px; padding: 0 20px; font-size: 0.95rem; display: no
 .feature .wrap { display: grid; gap: 28px; align-items: center; }
 .feature .text { max-width: 30em; }
 .feature .tag { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-strong); background: var(--tint); margin-bottom: 14px; }
-.feature h2 + p { margin-top: 12px; }
+.feature h2 + p, .feature p + p { margin-top: 12px; }
 .feature ul { margin: 14px 0 0; padding-left: 22px; }
 .feature li { margin-bottom: 6px; }
 .band { background: var(--surface); }
@@ -107,7 +107,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 			<div>
 				<span class="alpha">Closed alpha · invite only</span>
 				<h1>A baby tracker app you can own</h1>
-				<p class="lead">A sleep plan made from your child's own logs. Logging by voice when your hands are full. Answers that show their medical sources.</p>
+				<p class="lead">A new baby brings a hundred questions each day. Frecklebubby learns the rhythm of your child and helps you with the next step: the next nap, the reason for a cry, the moment to call a doctor.</p>
 				<div class="cta">
 					<a class="btn big" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
 					<a class="alt" href="https://github.com/dr-robert-li/frecklebubby">or host it yourself</a>
@@ -128,7 +128,8 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 			<div class="text">
 				<span class="tag">Sleep</span>
 				<h2>Personalize your child's sleep plan</h2>
-				<p>The plan starts from the last 14 days of your child, not from a fixed table. When the logs are outside a recommended range, the plan moves toward the range in small steps and tells you what it changed.</p>
+				<p>No two babies sleep the same. So why follow a chart that was made for all of them?</p>
+				<p>Frecklebubby learns the rhythm of your child from the last 14 days. It shows you the naps and the bedtime of today. Then it moves them gently toward the healthy range, one small step at a time. It always tells you what it changed.</p>
 			</div>
 			<div class="shot"><img class="phone" loading="lazy" src="day-night-plan.png" alt="The day and night plan: a timeline of sleep blocks and feeds." width="1082" height="2202"></div>
 		</div>
@@ -137,53 +138,50 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 	<section class="feature flip" style="--tint: var(--coral)">
 		<div class="wrap">
 			<div class="text">
-				<span class="tag">Voice</span>
-				<h2>Voice commands, with hands free AI voice control</h2>
-				<p>Your hands are full. Say "Hey Bubby, she had a wet nappy", and the app logs it. The app can read the answer aloud.</p>
+				<span class="tag">Crying</span>
+				<h2>When your baby cries, know what to check first</h2>
+				<p>It is 3 am. Your baby cries, and you do not know why. You are not alone, and you do not have to guess.</p>
+				<p>Tap one button. Frecklebubby looks at the last feed, the last sleep and the last nappy, and puts the most likely reason first. You get things to try, and you learn when it is time to call a doctor. It can also listen to the cry for 10 seconds and add its own guess.</p>
+				<p class="small">The guess from the sound is experimental. It is a guess, not a diagnosis.</p>
 			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="voice.png" alt="A voice command that the app heard and logged." width="1082" height="2202"></div>
-		</div>
-	</section>
-
-	<section class="feature band" style="--tint: var(--peach)">
-		<div class="wrap">
-			<div class="text">
-				<span class="tag">Answers</span>
-				<h2>An assistant that shows its sources</h2>
-				<p>Ask a question at 3 am. The answer has citations to medical sources such as the NHS, the CDC and the WHO. You can open each source.</p>
-				<p class="small">General information, not medical advice.</p>
-			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="assistant.png" alt="An answer of the assistant with numbered sources." width="1082" height="2202"></div>
-		</div>
-	</section>
-
-	<section class="feature flip" style="--tint: var(--lavender)">
-		<div class="wrap">
-			<div class="text">
-				<span class="tag">Patterns</span>
-				<h2>See the patterns</h2>
-				<p>The week and the month show each day as one row of 24 hours. Sleep is a bar. Feeds and nappies are marks.</p>
-				<ul>
-					<li>Reports with the average and the common range.</li>
-					<li>Growth on WHO percentile curves.</li>
-				</ul>
-			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="history-week.png" alt="The week in History: one row for each day, with sleep as bars and feeds and nappies as marks." width="1082" height="2202"></div>
+			<div class="shot"><img class="phone" loading="lazy" src="cry-helper.png" alt="The cry helper: a list of the likely reasons for crying, with hungry first, each with a source." width="1082" height="2202"></div>
 		</div>
 	</section>
 
 	<section class="feature band" style="--tint: var(--mint)">
 		<div class="wrap">
 			<div class="text">
-				<span class="tag">Logging</span>
-				<h2>Log the day in one tap</h2>
-				<p>Sleep, feeds, nappies, growth, medicine, activities and more. Timers keep running when you close the app.</p>
-				<ul>
-					<li>Or write plain words: "120 ml formula 20 minutes ago".</li>
-					<li>More than one child, and more than one carer.</li>
-				</ul>
+				<span class="tag">Voice</span>
+				<h2>Voice commands, with hands free AI voice control</h2>
+				<p>Your arms are full of baby. Your phone is across the room.</p>
+				<p>Say "Hey Bubby, she had a wet nappy", and it is logged. Ask a question aloud, and hear the answer. You never have to put your baby down to keep the record.</p>
 			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="plain-words.png" alt="A log entry made from plain words on the Home screen." width="1082" height="2202"></div>
+			<div class="shot"><img class="phone" loading="lazy" src="voice.png" alt="A voice command that the app heard and logged." width="1082" height="2202"></div>
+		</div>
+	</section>
+
+	<section class="feature flip" style="--tint: var(--peach)">
+		<div class="wrap">
+			<div class="text">
+				<span class="tag">Insights</span>
+				<h2>The right advice, at the moment you need it</h2>
+				<p>New parents do not know what they do not know. Frecklebubby watches the logs, so you do not have to.</p>
+				<p>Is a temperature too high for a baby this young? It tells you to get medical help now. Too little sleep this week? It shows you the range that is recommended for the age of your child. Each insight shows its source, such as the NHS, so you can read it yourself.</p>
+				<p class="small">General information, not medical advice.</p>
+			</div>
+			<div class="shot"><img class="phone" loading="lazy" src="insights.png" alt="Insights: an urgent warning about a high temperature in a young baby, with sources, and a note about total sleep." width="1082" height="2202"></div>
+		</div>
+	</section>
+
+	<section class="feature band" style="--tint: var(--lavender)">
+		<div class="wrap">
+			<div class="text">
+				<span class="tag">Patterns</span>
+				<h2>See the patterns</h2>
+				<p>The days blur together. Frecklebubby does not forget.</p>
+				<p>One look shows you the full week: each sleep, each feed, each nappy. You see the rhythm of your baby appear. And when the nurse asks "How is the sleep?", you have the answer, with reports and WHO growth curves ready for each appointment.</p>
+			</div>
+			<div class="shot"><img class="phone" loading="lazy" src="history-week.png" alt="The week in History: one row for each day, with sleep as bars and feeds and nappies as marks." width="1082" height="2202"></div>
 		</div>
 	</section>
 
