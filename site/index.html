@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Frecklebubby: a baby tracker app you can own</title>
-<meta name="description" content="Frecklebubby is a baby tracker. Log the day, see the patterns, and ask an assistant that shows its sources. It is in a closed alpha, invite only.">
+<meta name="description" content="A baby tracker app you can own. A sleep plan from your child's own logs, logging by voice, and answers that show their medical sources. Closed alpha: join the waitlist.">
 <meta property="og:title" content="Frecklebubby">
-<meta property="og:description" content="A baby tracker. Log the day, see the patterns, and ask an assistant that shows its sources. Closed alpha, invite only.">
+<meta property="og:description" content="A baby tracker app you can own. A sleep plan from your child's own logs, logging by voice, and answers that show their sources. Join the waitlist.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://frecklebubby.app/">
 <meta property="og:image" content="https://frecklebubby.app/icon-512.png">
@@ -32,11 +32,11 @@ h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); }
 h2 { font-size: clamp(1.5rem, 4vw, 2.1rem); }
 p { margin: 0; }
 
-header { padding: 22px 0; }
+header { padding: 14px 0; background: var(--cream); }
 header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; color: var(--ink-strong); text-decoration: none; }
 .brand img { width: 40px; height: 40px; }
-header nav a { font-weight: 700; }
+header .btn { min-height: 42px; padding: 0 20px; font-size: 0.95rem; display: none; }
 
 .alpha { display: inline-block; background: var(--butter); color: var(--ink-strong); font-weight: 700; font-size: 0.9rem; padding: 6px 14px; border-radius: 999px; }
 .hero { padding: 28px 0 56px; }
@@ -45,7 +45,12 @@ header nav a { font-weight: 700; }
 .hero h1 { margin-top: 16px; }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border-radius: 999px; font-weight: 800; text-decoration: none; background: var(--accent); color: var(--on-accent); }
-.btn.ghost { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+.btn { transition: transform 0.12s, box-shadow 0.12s; box-shadow: 0 6px 18px rgba(109, 85, 196, 0.32); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(109, 85, 196, 0.4); }
+.btn.big { min-height: 58px; padding: 0 34px; font-size: 1.1rem; }
+.cta .alt { font-weight: 700; }
+.trust { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 0; padding: 0; font-size: 0.88rem; font-weight: 700; color: var(--ink-strong); }
+.trust li { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
 .small { font-size: 0.92rem; color: var(--muted); margin-top: 14px; }
 
 /* The pictures come from the test run, which has a sign-in strip at the top: the crop removes it. */
@@ -54,17 +59,24 @@ header nav a { font-weight: 700; }
 .feature { padding: 44px 0; }
 .feature .wrap { display: grid; gap: 28px; align-items: center; }
 .feature .text { max-width: 30em; }
-.feature .num { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; color: var(--ink-strong); background: var(--tint); margin-bottom: 14px; }
+.feature .tag { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-strong); background: var(--tint); margin-bottom: 14px; }
 .feature h2 + p { margin-top: 12px; }
 .feature ul { margin: 14px 0 0; padding-left: 22px; }
 .feature li { margin-bottom: 6px; }
 .band { background: var(--surface); }
 
-.notice { padding: 56px 0; }
-.notice .box { background: var(--butter); color: var(--ink-strong); border-radius: 28px; padding: 32px 26px; }
-.notice ul { margin: 16px 0 24px; padding-left: 22px; }
-.notice li { margin-bottom: 8px; }
-.notice .btn { background: var(--ink-strong); color: var(--cream); }
+.join { padding: 64px 0; background: var(--ink-strong); color: var(--cream); text-align: center; }
+.join h2 { color: #fff; }
+.join ol { list-style: none; counter-reset: s; display: grid; gap: 14px; margin: 30px auto; padding: 0; max-width: 820px; text-align: left; }
+.join li { counter-increment: s; background: rgba(255, 255, 255, 0.07); border-radius: 18px; padding: 16px 18px; }
+.join li::before { content: counter(s); display: block; font-weight: 800; color: var(--butter); }
+.join .btn { background: var(--butter); color: var(--ink-strong); box-shadow: none; }
+.join .small { color: #c9c2d8; max-width: 44em; margin-left: auto; margin-right: auto; }
+
+/* Small screens: the button stays at the bottom of the screen. */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--line); font-weight: 700; font-size: 0.9rem; color: var(--ink-strong); }
+.bar .btn { min-height: 44px; padding: 0 20px; box-shadow: none; }
+body { padding-bottom: 72px; }
 
 footer { padding: 30px 0 50px; font-size: 0.92rem; color: var(--muted); }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: space-between; }
@@ -73,7 +85,11 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 	.hero .wrap, .feature .wrap { grid-template-columns: 1fr 1fr; gap: 56px; }
 	.feature.flip .shot { order: -1; }
 	.feature { padding: 64px 0; }
-	.notice .box { padding: 44px 48px; }
+	.join ol { grid-template-columns: repeat(3, 1fr); }
+	header { position: sticky; top: 0; z-index: 5; }
+	header .btn { display: inline-flex; }
+	.bar { display: none; }
+	body { padding-bottom: 0; }
 }
 </style>
 </head>
@@ -81,7 +97,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 <header>
 	<div class="wrap">
 		<a class="brand" href="/"><img src="icon.svg" alt="" width="40" height="40">Frecklebubby</a>
-		<nav><a href="https://my.frecklebubby.app">Sign in</a></nav>
+		<a class="btn" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
 	</div>
 </header>
 
@@ -91,36 +107,60 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 			<div>
 				<span class="alpha">Closed alpha · invite only</span>
 				<h1>A baby tracker app you can own</h1>
-				<p class="lead">Log the day, see the patterns, and ask an assistant that tells you where each answer comes from.</p>
+				<p class="lead">A sleep plan made from your child's own logs. Logging by voice when your hands are full. Answers that show their medical sources.</p>
 				<div class="cta">
-					<a class="btn" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
-					<a class="btn ghost" href="https://github.com/dr-robert-li/frecklebubby">See the code</a>
+					<a class="btn big" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
+					<a class="alt" href="https://github.com/dr-robert-li/frecklebubby">or host it yourself</a>
 				</div>
-				<p class="small">Frecklebubby is open source. You can also host it on your own server.</p>
+				<p class="small">4 short questions. We send your invitation by email.</p>
+				<ul class="trust" aria-label="Facts">
+					<li>Open source, MIT licence</li>
+					<li>Sources: NHS, CDC, WHO</li>
+					<li>Runs on your own server</li>
+				</ul>
 			</div>
 			<img class="phone" src="home.png" alt="The Home screen: cards for sleep, feeds and nappies, with the totals of today." width="1082" height="2202">
 		</div>
 	</section>
 
-	<section class="feature band" style="--tint: var(--mint)">
+	<section class="feature band" style="--tint: var(--sky)">
 		<div class="wrap">
 			<div class="text">
-				<span class="num" aria-hidden="true">1</span>
-				<h2>Log the day in one tap</h2>
-				<p>Sleep, feeds, nappies, growth, medicine, activities and more. Timers keep running when you close the app.</p>
-				<ul>
-					<li>Or write plain words: "120 ml formula 20 minutes ago".</li>
-					<li>More than one child, and more than one carer.</li>
-				</ul>
+				<span class="tag">Sleep</span>
+				<h2>Personalize your child's sleep plan</h2>
+				<p>The plan starts from the last 14 days of your child, not from a fixed table. When the logs are outside a recommended range, the plan moves toward the range in small steps and tells you what it changed.</p>
 			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="plain-words.png" alt="A log entry made from plain words on the Home screen." width="1082" height="2202"></div>
+			<div class="shot"><img class="phone" loading="lazy" src="day-night-plan.png" alt="The day and night plan: a timeline of sleep blocks and feeds." width="1082" height="2202"></div>
+		</div>
+	</section>
+
+	<section class="feature flip" style="--tint: var(--coral)">
+		<div class="wrap">
+			<div class="text">
+				<span class="tag">Voice</span>
+				<h2>Voice commands, with hands free AI voice control</h2>
+				<p>Your hands are full. Say "Hey Bubby, she had a wet nappy", and the app logs it. The app can read the answer aloud.</p>
+			</div>
+			<div class="shot"><img class="phone" loading="lazy" src="voice.png" alt="A voice command that the app heard and logged." width="1082" height="2202"></div>
+		</div>
+	</section>
+
+	<section class="feature band" style="--tint: var(--peach)">
+		<div class="wrap">
+			<div class="text">
+				<span class="tag">Answers</span>
+				<h2>An assistant that shows its sources</h2>
+				<p>Ask a question at 3 am. The answer has citations to medical sources such as the NHS, the CDC and the WHO. You can open each source.</p>
+				<p class="small">General information, not medical advice.</p>
+			</div>
+			<div class="shot"><img class="phone" loading="lazy" src="assistant.png" alt="An answer of the assistant with numbered sources." width="1082" height="2202"></div>
 		</div>
 	</section>
 
 	<section class="feature flip" style="--tint: var(--lavender)">
 		<div class="wrap">
 			<div class="text">
-				<span class="num" aria-hidden="true">2</span>
+				<span class="tag">Patterns</span>
 				<h2>See the patterns</h2>
 				<p>The week and the month show each day as one row of 24 hours. Sleep is a bar. Feeds and nappies are marks.</p>
 				<ul>
@@ -132,52 +172,31 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 		</div>
 	</section>
 
-	<section class="feature band" style="--tint: var(--sky)">
+	<section class="feature band" style="--tint: var(--mint)">
 		<div class="wrap">
 			<div class="text">
-				<span class="num" aria-hidden="true">3</span>
-				<h2>Personalize your child's sleep plan</h2>
-				<p>The plan starts from the last 14 days of your child, not from a fixed table. When the logs are outside a recommended range, the plan moves toward the range in small steps and tells you what it changed.</p>
-			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="day-night-plan.png" alt="The day and night plan: a timeline of sleep blocks and feeds." width="1082" height="2202"></div>
-		</div>
-	</section>
-
-	<section class="feature flip" style="--tint: var(--peach)">
-		<div class="wrap">
-			<div class="text">
-				<span class="num" aria-hidden="true">4</span>
-				<h2>An assistant that shows its sources</h2>
-				<p>Ask a question, and the answer has citations to medical sources such as the NHS, the CDC and the WHO. You can open each source.</p>
-				<p class="small">General information, not medical advice.</p>
-			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="assistant.png" alt="An answer of the assistant with numbered sources." width="1082" height="2202"></div>
-		</div>
-	</section>
-
-	<section class="feature band" style="--tint: var(--coral)">
-		<div class="wrap">
-			<div class="text">
-				<span class="num" aria-hidden="true">5</span>
-				<h2>Voice commands, with hands free AI voice control</h2>
-				<p>Say "Hey Bubby, she had a wet nappy", and the app logs it. Use the talk button, or hands free with the keyword. The app can read the answer aloud.</p>
-			</div>
-			<div class="shot"><img class="phone" loading="lazy" src="voice.png" alt="A voice command that the app heard and logged." width="1082" height="2202"></div>
-		</div>
-	</section>
-
-	<section class="notice" id="alpha">
-		<div class="wrap">
-			<div class="box">
-				<h2>Frecklebubby is in a closed alpha</h2>
+				<span class="tag">Logging</span>
+				<h2>Log the day in one tap</h2>
+				<p>Sleep, feeds, nappies, growth, medicine, activities and more. Timers keep running when you close the app.</p>
 				<ul>
-					<li>Only invited people can sign in. There is no public sign-up.</li>
-					<li>The app can change between versions, and it can have faults.</li>
-					<li>The app gives general information. It is not medical advice, and it does not replace your doctor or nurse.</li>
+					<li>Or write plain words: "120 ml formula 20 minutes ago".</li>
+					<li>More than one child, and more than one carer.</li>
 				</ul>
-				<a class="btn" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
-				<p class="small" style="color: inherit">The button opens a Google form.</p>
 			</div>
+			<div class="shot"><img class="phone" loading="lazy" src="plain-words.png" alt="A log entry made from plain words on the Home screen." width="1082" height="2202"></div>
+		</div>
+	</section>
+
+	<section class="join" id="alpha">
+		<div class="wrap">
+			<h2>Get an invitation to the closed alpha</h2>
+			<ol>
+				<li>Fill in the form. It has 4 short questions.</li>
+				<li>We send you an invitation by email when a place is free.</li>
+				<li>Sign in and log the first day.</li>
+			</ol>
+			<a class="btn big" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a>
+			<p class="small">Frecklebubby is in a closed alpha. Only invited people can sign in, and there is no public sign-up. The app can change between versions, and it can have faults. It gives general information. It is not medical advice, and it does not replace your doctor or nurse.</p>
 		</div>
 	</section>
 </main>
@@ -188,5 +207,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: s
 		<span><a href="https://github.com/dr-robert-li/frecklebubby">GitHub</a> · <a href="https://my.frecklebubby.app">Sign in (invited people)</a></span>
 	</div>
 </footer>
+
+<div class="bar"><span>Closed alpha · invite only</span><a class="btn" href="https://forms.gle/AGmzr34T2xLomGsP6" target="_blank" rel="noopener">Join the waitlist</a></div>
 </body>
 </html>
