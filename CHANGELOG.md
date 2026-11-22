@@ -6,6 +6,12 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-11-22
+
+### Fixed
+
+- Cry helper: the timeline showed only the guess from the sound ("Sound guess: Hungry"), which can be a different reason from the first reason in the helper. The timeline now shows the first reason ("Most likely: tired"). The guess from the sound alone shows after it, with the word "experimental". Saved entries were correct and show the new text with no change to the data.
+
 ## [0.8.3] - 2026-11-22
 
 ### Changed

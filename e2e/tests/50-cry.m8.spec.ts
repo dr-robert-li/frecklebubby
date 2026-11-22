@@ -38,6 +38,7 @@ test('no microphone: the logs rank what to check, then the parent saves the cryi
 	await expect(s).toBeHidden();
 	const item = page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ });
 	await expect(item).toContainText('Helped: feed');
+	await expect(item).toContainText('Most likely: hungry'); // the first reason of the list in the sheet
 	await expect(item).toContainText('15 min');
 	await shotM8(page, '05-timeline', true);
 
@@ -65,7 +66,7 @@ test('listen: a real cry clip goes through the experimental sound model', async 
 	await sound.scrollIntoViewIfNeeded();
 	await shotM8(page, '08-listen-sound-block');
 	await s.getByRole('button', { name: 'Save to timeline' }).click();
-	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ })).toContainText('(experimental)');
+	await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('button', { name: /Edit Crying/ })).toContainText(/Most likely: .+ · Sound alone: .+ \(experimental\)/);
 	await shotM8(page, '09-listen-saved', true);
 	void family;
 });

@@ -224,8 +224,11 @@ export function entryDetail(e: Entry, u: Units, wording: Wording): string {
 			parts.push(d.title);
 			break;
 		case 'cry':
-			parts.push(dur, d.soothed_by && `Helped: ${d.soothed_by}`,
-				d.sound_reason && `Sound guess: ${soundLabel(d.sound_reason)} (experimental)`);
+			// The first of likely_needs is the top reason that the cry helper showed (logs and sound together).
+			// The sound guess alone can be a different reason, so it shows only as the second item.
+			parts.push(dur, d.likely_needs?.[0] && `Most likely: ${needLabel(d.likely_needs[0], wording).toLowerCase()}`,
+				d.soothed_by && `Helped: ${d.soothed_by}`,
+				d.sound_reason && `Sound alone: ${soundLabel(d.sound_reason).toLowerCase()} (experimental)`);
 			break;
 	}
 	if (e.type === 'note' || (e.notes && !parts.some(Boolean))) parts.push(e.notes ?? '');
