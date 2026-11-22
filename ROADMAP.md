@@ -92,13 +92,14 @@ To build (in the closed repository, except where this text says other):
 - In this repository: the extension point, the lower limit of 10 seconds, and a test that the app with no
   plug-in keeps no audio.
 
-Decided on the agreement, the dataset and the licence:
+Decided on the message, the dataset and the licence:
 
-- **An agreement at the first sign-in.** The first user of a family (the owner) gets a page with the agreement
-  at the first sign-in and must select a button to continue. The page shows only when the plug-in is connected,
-  so an open source server with no plug-in never shows it. The agreement covers the storage of the clips and
-  their upload to the gated dataset on Hugging Face. A family that exists before the plug-in is connected gets
-  the page at the next sign-in of its owner.
+- **A message at the first sign-in.** The first user of a family (the owner) gets a message one time, at the
+  first sign-in. When the plug-in is connected after the family exists, the message shows one time at the next
+  sign-in. The message shows only when the plug-in is connected, so an open source server with no plug-in never
+  shows it. It is a message only: it tells the parent that the clips are kept and uploaded to the gated dataset
+  on Hugging Face, and where to turn this off. It has no button to refuse.
+- **On by default, opt out in Settings.** To opt out, the parent goes to Settings and clears the checkbox.
 - **The published dataset contains only the new clips.** The other datasets (ICSD, DeepInfant) are named as
   sources. Access is by permission only: a person requests access, and the owner gives or refuses it. The
   dataset is not open.
@@ -108,7 +109,7 @@ Decided on the agreement, the dataset and the licence:
 
 Open decisions:
 
-- **A parent who does not agree.** Recommendation: the parent can refuse on the agreement page and use the app
-  as before. Then the setting is off and no clip is kept.
-- **Carers who join later.** Recommendation: the agreement of the owner covers the family. Each carer sees the
+- **The clips of a family that opts out later.** Recommendation: delete the kept clips of that family, and
+  leave them out of the next version of the dataset.
+- **Carers who join later.** Recommendation: the message goes to the owner only. Each carer sees the
   disclosure in Settings and at the first use of Listen.
