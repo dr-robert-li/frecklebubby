@@ -9,6 +9,7 @@ State on 23 November 2026:
 |---|---|
 | 1. Localisation, first language: Simplified Chinese | Not started. Two decisions are open. |
 | 2. Cry recordings as a labelled dataset | The app part is released (0.9.0). The plug-in runs on the server of the owner. The training pipeline is not started. |
+| 3. Tablet Mode: a wide layout for large screens | Not started. Three decisions are open. |
 
 ## 1. Localisation, first language: Simplified Chinese
 
@@ -102,3 +103,53 @@ It runs by hand on the machine of the owner, not as a service. It needs real cli
 
 - **The licence of the model.** A fact for that decision: ICSD is CC BY-NC-SA 4.0, so a model that is trained with
   it is limited to non-commercial use.
+
+## 3. Tablet Mode: a wide layout for large screens
+
+The app is one column of 520 px on all screens today. On a tablet in landscape, a laptop or a desktop computer,
+most of the screen is empty. Tablet Mode uses that room to show more information at one time.
+
+Decided:
+
+- **Two uses, in two steps.** Step 1 is the wide layout for normal use: the same tasks as on the phone, with more
+  in view. Step 2 is a dashboard view for a tablet that stands in the nursery or the kitchen and is always on.
+- **Automatic by the width of the window, with a setting to turn it off.** A window that is wide enough gets the
+  wide layout. A phone, and a tablet in portrait, keep the layout of today. A person can force the phone layout in
+  **Settings > Appearance**.
+- **The bottom bar stays.** The navigation is the same in each mode, so that the app is familiar. There is no side
+  bar.
+- **The Home screen shows panels next to the tiles and the timers.** The panels are:
+  - the timeline of today,
+  - the day and night plan,
+  - the insights and the week pattern,
+  - the assistant.
+- **The user selects the panels.** Each panel can be shown or hidden.
+- **Each other screen gets a wide layout too:** History, Reports, the assistant, Notifications and Settings. For
+  example, History shows the week and the selected day side by side.
+
+To do, step 1 (the wide layout):
+
+- Find the width at which the wide layout starts. Test on an iPad in landscape and in portrait, on a small laptop
+  and with a split window.
+- Home: the tiles and the timers stay in one column of the present width, and the panels fill the other room.
+  The panels are the components that the app has today, used again.
+- The setting for the panels, and the setting that forces the phone layout.
+- A wide layout for each other screen. Charts and tables get the full width.
+- Touch targets, keyboard use and screen reader order stay correct in the wide layout.
+- Playwright tests at a tablet size and at a desktop size, and new screenshots for the docs and the landing page.
+
+To do, step 2 (the dashboard view):
+
+- A view with large text that a person can read from a distance: the timers that run, the time since the last
+  feed, nappy and sleep, and the next sleep of the plan.
+- The screen stays on (the Screen Wake Lock function of the browser), and the data updates with no touch.
+- A dark variant for the night, so that the screen does not light the room.
+
+Open decisions:
+
+- **Where the panel selection is kept.** For each device (recommended: a phone and a tablet of the same person
+  need different values) or for each user.
+- **The sign-in of a shared tablet.** A dashboard on a wall is signed in as one carer. Decide if the dashboard view
+  can log entries, or only shows data. Each entry has the name of the person who made it.
+- **The assistant panel on Home.** Decide if it is the full chat or only a field for a question, with the answer
+  on the assistant screen.
