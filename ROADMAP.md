@@ -9,7 +9,7 @@ State on 23 November 2026:
 |---|---|
 | 1. Localisation, first language: Simplified Chinese | Not started. Two decisions are open. |
 | 2. Cry recordings as a labelled dataset | The app part is released (0.9.0). The plug-in runs on the server of the owner. The training pipeline is not started. |
-| 3. Tablet Mode: a wide layout for large screens | Not started. Three decisions are open. |
+| 3. Tablet Mode: a wide layout for large screens | Not started. One decision is open. |
 
 ## 1. Localisation, first language: Simplified Chinese
 
@@ -124,6 +124,10 @@ Decided:
   - the insights and the week pattern,
   - the assistant.
 - **The user selects the panels.** Each panel can be shown or hidden.
+- **The panel selection is kept for each device.** A phone and a tablet of the same person can have different
+  values.
+- **The dashboard view only shows data.** It cannot log entries. A tablet on a wall is signed in as one carer, and
+  a person logs entries on their own device, with their own name.
 - **Each other screen gets a wide layout too:** History, Reports, the assistant, Notifications and Settings. For
   example, History shows the week and the selected day side by side.
 
@@ -147,9 +151,5 @@ To do, step 2 (the dashboard view):
 
 Open decisions:
 
-- **Where the panel selection is kept.** For each device (recommended: a phone and a tablet of the same person
-  need different values) or for each user.
-- **The sign-in of a shared tablet.** A dashboard on a wall is signed in as one carer. Decide if the dashboard view
-  can log entries, or only shows data. Each entry has the name of the person who made it.
 - **The assistant panel on Home.** Decide if it is the full chat or only a field for a question, with the answer
   on the assistant screen.
