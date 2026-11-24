@@ -9,7 +9,7 @@ State on 23 November 2026:
 |---|---|
 | 1. Localisation, first language: Simplified Chinese | Not started. Two decisions are open. |
 | 2. Cry recordings as a labelled dataset | The app part is released (0.9.0). The plug-in runs on the server of the owner. The training pipeline is not started. |
-| 3. Tablet Mode: a wide layout for large screens | Not started. One decision is open. |
+| 3. Tablet Mode: a wide layout for large screens | Not started. All decisions are made. |
 
 ## 1. Localisation, first language: Simplified Chinese
 
@@ -126,6 +126,8 @@ Decided:
 - **The user selects the panels.** Each panel can be shown or hidden.
 - **The panel selection is kept for each device.** A phone and a tablet of the same person can have different
   values.
+- **The assistant panel on Home is the full chat.** A wide screen has the room. A person who does not want it
+  can hide the panel.
 - **The dashboard view only shows data.** It cannot log entries. A tablet on a wall is signed in as one carer, and
   a person logs entries on their own device, with their own name.
 - **Each other screen gets a wide layout too:** History, Reports, the assistant, Notifications and Settings. For
@@ -148,8 +150,3 @@ To do, step 2 (the dashboard view):
   feed, nappy and sleep, and the next sleep of the plan.
 - The screen stays on (the Screen Wake Lock function of the browser), and the data updates with no touch.
 - A dark variant for the night, so that the screen does not light the room.
-
-Open decisions:
-
-- **The assistant panel on Home.** Decide if it is the full chat or only a field for a question, with the answer
-  on the assistant screen.
